@@ -1,0 +1,441 @@
+---
+title: "embryo_non_intestine_scRNAseq"
+author: "Jessica Hill"
+date: "2/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Install packages
+```{r}
+#install.packages('Seurat')
+#packageVersion('Seurat')
+#remotes::install_github('satijalab/seurat-wrappers')
+
+#reticulate::py_install(packages = 'umap-learn', envname = 'r-reticulate')
+#BiocManager::install("limma")
+#install.packages("hdf5r")
+#BiocManager::install("biomaRt")
+#install.packages("clustree")
+```
+
+
+
+# Load packages
+```{r echo=FALSE}
+library(biomaRt)
+library(Seurat)
+library(tidyverse)
+library(patchwork)
+library(limma)
+library(clustree)
+#library(usethis) 
+#usethis::edit_r_environ()
+```
+
+
+
+```{r}
+emb_non_int.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
+```
+
+
+
+Get filternames from https://parasite.wormbase.org/biomart/martview
+```{r}
+mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+genes.df <- getBM(mart = mart, 
+      filters = c("species_id_1010", "wbps_gene_id"),
+      value = list("caelegprjna13758", rownames(emb_non_int.data)),
+      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
+      )
+
+mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id'] # only 12
+genes.df$chromosome_name = NULL # deletes column in the df, frees up a little memory 
+
+c(nrow(genes.df), nrow(emb_non_int.data))
+
+
+# there are genes missing
+nrow(emb_non_int.data)-nrow(genes.df)
+```
+
+
+
+There are `r nrow(emb_non_int.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
+
+
+
+```{r}
+emb_non_int.data.filt <- emb_non_int.data[rownames(emb_non_int.data) %in% genes.df$wbps_gene_id,]
+
+# The two datastructures do not have the same order of WBGeneIDs
+identical(rownames(emb_non_int.data.filt), genes.df$wbps_gene_id)
+
+# Use match to make sure they are in the same order
+identical(rownames(emb_non_int.data.filt),
+          genes.df[match(rownames(emb_non_int.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+)
+
+# now replace the WBGeneIDs with gene names
+rownames(emb_non_int.data.filt) <- genes.df[
+  match(rownames(emb_non_int.data.filt),
+        genes.df$wbps_gene_id)
+  ,]$external_gene_id
+
+# are there NAs?
+sum(!is.na(rownames(emb_non_int.data.filt)))
+head(emb_non_int.data.filt)
+```
+
+
+
+```{r}
+emb_non_int <- CreateSeuratObject(counts = emb_non_int.data.filt, project = "emb_non_int_pool", min.cells = 3, min.features = 200)
+emb_non_int
+```
+
+
+
+```{r}
+length(unique(genes.df$wbps_gene_id))
+length(unique(rownames(emb_non_int)))
+#rownames(emb_non_int)[!(rownames(emb_non_int) %in% genes.df$wbps_gene_id)]
+emb_non_int
+```
+
+
+
+# Quality control metrics
+
+show QC metrics for the first 5 cells 
+```{r}
+head(emb_non_int@meta.data, 5)
+```
+
+
+
+Mitochondrial genome percentage 
+```{r}
+mitoIndices = which(rownames(emb_non_int) %in% mitoList)
+emb_non_int[["percent.mt"]] <- PercentageFeatureSet(emb_non_int, features = mitoIndices)
+```
+
+
+
+- `nFeature_RNA` is the number of genes detected in each cell. 
+- `nCount_RNA` is the total number of molecules detected within a cell (AKA total UMIs per cell)
+- Low `nFeature_RNA` indicates that the cell may be dead or dying or an empty droplet
+- High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
+
+
+
+Visualize QC metrics as a violin plot
+```{r}
+VlnPlot(emb_non_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+```
+
+
+
+FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
+```{r}
+plot1 <- FeatureScatter(emb_non_int, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb_non_int, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 + plot2
+```
+
+
+
+# Filter based on features
+
+cells being filtered due to mito percent: 
+```{r}
+sum(emb_non_int$percent.mt > 50)/ length(emb_non_int$percent.mt)
+
+emb_non_int <- subset(emb_non_int, subset = nFeature_RNA > 200 & nFeature_RNA < 6000 & nCount_RNA < 50000 & percent.mt < 50)
+```
+
+
+
+# Visualize after filtering
+```{r}
+VlnPlot(emb_non_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+FeatureScatter(emb_non_int, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+```
+
+
+
+# Normalize the data
+
+Normalize the count data present in the assay. 
+
+LogNormalize: Feature counts for each cell are divided by the total counts for that cell and multiplied by the scale.factor. This is then natural-log transformed using log1p.
+
+Scale.factor: Sets the scale factor for cell-level normalization
+
+```{r}
+emb_non_int <- NormalizeData(emb_non_int, normalization.method = "LogNormalize", scale.factor = 10000)
+```
+
+
+
+# Feature selection
+
+Identify highly variable features to focus on in downstream analysis
+```{r}
+emb_non_int <- FindVariableFeatures(emb_non_int, selection.method = "vst", nfeatures = 2000)
+
+# Identify the 10 most highly variable genes
+top10 <- head(VariableFeatures(emb_non_int), 10)
+
+# plot variable features with and without labels
+plot1 <- VariableFeaturePlot(emb_non_int)
+LabelPoints(plot = plot1, points = top10, repel = TRUE)
+```
+
+
+
+# Normalization
+
+Scale the data so that each gene has a mean expression of 0 and variance of 1 across all cells
+```{r}
+all.genes <- rownames(emb_non_int)
+emb_non_int <- ScaleData(emb_non_int, features = all.genes)
+```
+
+
+
+# Linear dimensionality reduction 
+
+PCA linear dimensionality reduction
+```{r}
+emb_non_int <- RunPCA(emb_non_int, features = VariableFeatures(object = emb_non_int))
+```
+
+Examine and visualize PCA results a few different ways
+```{r}
+print(emb_non_int[["pca"]], dims = 1:5, nfeatures = 5)
+```
+
+```{r}
+VizDimLoadings(emb_non_int, dims = 1:2, reduction = "pca")
+```
+
+```{r}
+DimPlot(emb_non_int, reduction = "pca")
+```
+
+```{r}
+DimHeatmap(emb_non_int, dims = 1, cells = 500, balanced = TRUE)
+```
+
+```{r}
+DimHeatmap(emb_non_int, dims = 1:6, cells = 500, balanced = TRUE)
+```
+
+
+
+# Determine dataset dimensionality
+
+How many components should we include? 
+Use resampling test
+```{r}
+emb_non_int <- JackStraw(emb_non_int, num.replicate = 100)
+emb_non_int <- ScoreJackStraw(emb_non_int, dims = 1:20)
+```
+
+The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
+
+```{r}
+JackStrawPlot(emb_non_int, dims = 1:20)
+```
+
+
+
+An alternative, more approximate technique is the elbow plot, which ranges principle components based on the percentage of variance explained by each PC.
+
+```{r}
+ElbowPlot(emb_non_int)
+```
+
+The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
+
+
+
+# Cell clustering
+
+Choose the number of PCs to use for clustering 
+```{r}
+emb_non_int <- FindNeighbors(emb_non_int, dims = 1:15)
+view(emb_non_int)
+
+## Find clusters using Clustree
+# generate a vector of different resolutions to see which one performs best 
+emb_non_int_clust <- FindClusters(
+  object = emb_non_int,
+  reduction.type = "pca",
+  resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+  dims.use = 1:15,
+  save.SNN = TRUE
+)
+
+## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
+clustree(emb_non_int_clust, prefix = "RNA_snn_res.")
+
+view(emb_non_int_clust)
+
+
+## Find clusters using original Surat package methods
+# choose the appropriate resolution for the given dimensions using the Clustree data
+emb_non_int <- FindClusters(emb_non_int, resolution = 0.8)
+view(emb_non_int)
+
+## Look at cluster IDs of the first 5 cells
+head(Idents(emb_non_int), 5)
+```
+
+
+
+# Non-linear dimensional reduction (UMAP/tSNE)
+
+```{r}
+emb_non_int <- RunUMAP(emb_non_int, dims = 1:15)
+```
+
+```{r}
+# Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
+DimPlot(emb_non_int, reduction = "umap", label = "TRUE", label.box = TRUE)
+```
+
+
+
+# Find differentially expressed features (aka marker genes)
+
+Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
+```{r}
+emb_non_int.markers <- FindAllMarkers(emb_non_int, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+
+emb_non_int.markers %>% 
+  group_by(cluster) %>%
+  slice_max(n = 2, order_by = avg_log2FC)
+
+write.csv(emb_non_int.markers,"/Users/jessicahill/Desktop/Work/embryo_intestine_scRNAseq/emb_non_int_markers.csv", row.names = TRUE)
+```
+
+Find all markers for cluster 2
+```{r}
+#emb_non_int2.markers <- FindMarkers(emb_non_int, ident.1 = 2, min.pct = 0.25)
+#head(emb_non_int2.markers, n = 5)
+```
+
+Find all markers distinguishing cluster 5 from clusters 0 and 3
+```{r}
+#emb_non_int5.markers <- FindMarkers(emb_non_int, ident.1 = 5, ident.2 = c(0, 3), min.pct = 0.25)
+#head(emb_non_int5.markers, n = 5)
+```
+
+Differential expression with ROC test
+```{r}
+#emb_non_int0.markers <- FindMarkers(emb_non_int, ident.1 = 0, logfc.threshold = 0.25, test.use = "roc", only.pos = TRUE)
+#head(emb_non_int0.markers)
+```
+
+
+
+# Perform gene ontology
+
+```{r}
+library(reticulate)
+#use_condaenv("kw_fig5", required = TRUE)
+#py_install("tissue_enrichment_analysis", pip = T)
+tea <- import("tissue_enrichment_analysis")
+tissue_df <- tea$fetch_dictionary("tissue")
+phenotype_df <- tea$fetch_dictionary("phenotype")
+go_df <- tea$fetch_dictionary("go")
+```
+
+```{r}
+emb_non_int.markers <- emb_non_int.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
+emb_non_int.markers <- emb_non_int.markers %>% rename(WBGeneID = wbps_gene_id)
+```
+
+```{r}
+clusters <- unique(emb_non_int.markers$cluster)
+my_tea_analysis <- function(input_df, tea_dict){
+  tea_df <- data.frame()
+  for (i in clusters){
+  tea_set <- tea$enrichment_analysis(
+    (input_df %>% 
+       filter(cluster == i))$WBGeneID, 
+    tissue_df = tea_dict 
+    # %>% 
+    #   filter(wbid %in% (input_df %>% 
+    #                       filter(cluster %in% clusters))$WBGeneID)
+  )
+  if(nrow(tea_set) == 0){
+    next
+  } else {
+  tea_df <- bind_rows(tea_df, data.frame(tea_set, cluster = i))
+  }
+}
+tea_df
+}
+
+reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
+    new_x <- paste(x, within, sep = sep)
+    stats::reorder(new_x, by, FUN = fun)
+}
+scale_x_reordered <- function(..., sep = "___") {
+    reg <- paste0(sep, ".+$")
+    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
+}
+my_ontology_plot <- function(input_df, xlabel){
+  input_df %>%
+  filter(Q.value < 0.001,  Observed > 50) %>% 
+  ggplot(aes(x = reorder_within(Term, -log10(Q.value), cluster), y = -log10(Q.value))) +
+  geom_point(aes(size = Observed)) +
+  coord_flip() +
+  scale_x_reordered() +
+  facet_grid(cluster~., scales = "free_y") +
+  theme_bw() +
+  xlab(xlabel) +
+  guides(size = guide_legend(title = "# genes")) +
+  scale_size_continuous(breaks = c(20,100,200))
+}
+```
+
+
+```{r fig.height=15, fig.width=5}
+my_ontology_plot(my_tea_analysis(emb_non_int.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), tissue_df), "Tissue Ontology")
+
+#my_ontology_plot(my_tea_analysis(emb_non_int.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.25), tissue_df), "Tissue Ontology")
+```
+
+
+
+#Pull out cluster specific targets 
+
+```{r fig.height=4, fig.width=7}
+emb_non_int.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
+
+DoHeatmap(emb_non_int, features = top10clecs$gene,raster=F)
+```
+
+
+
+# Find markers in each cluster
+```{r}
+emb_non_int.markers %>% 
+  group_by(cluster) %>%
+  filter(grepl("clec*",gene), p_val_adj < .01) %>%
+  slice_max(n = 10, order_by = avg_log2FC)
+
+write.csv(emb_non_int.markers,"/Users/jessicahill/Desktop/Work/embryo_intestine_scRNAseq/emb_non_int_marker_clecs.csv", row.names = TRUE)
+```
+
