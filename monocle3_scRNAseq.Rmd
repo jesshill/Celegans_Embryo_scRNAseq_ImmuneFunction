@@ -1,0 +1,168 @@
+---
+title: "monocle3_scRNAseq"
+author: "Jessica Hill"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Calculating Trajectories with Monocle 3 and Seurat 
+## Compiled: July 23, 2020
+### http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/monocle3.html 
+
+---
+
+## This vingette demonstrates how to run trajectory inference and pseudotime calculations with Monocle 3 on Seurat objects.
+
+The single-cell transcriptional landscape of mammalian organogenesis
+Junyue Cao, Malte Spielmann, Xiaojie Qiu, Xingfan Huang, Daniel M. Ibrahim, Andrew J. Hill, Fan Zhang, Stefan Mundlos, Lena Christiansen, Frank J. Steemers, Cole Trapnell & Jay Shendure
+
+
+## other useful websites: 
+
+https://broadinstitute.github.io/2019_scWorkshop/feature-selection-and-cluster-analysis.html#seurat-tutorial
+
+https://cole-trapnell-lab.github.io/monocle3/docs/trajectories/#order-cells
+
+
+
+## Prerequisites to install:
+# R v4.1.3
+# Seurat v4.1.0 
+# BiocManager v3.14 
+# SeuratWrappers
+# SeuratData
+# Monocle 3 v2.22.0 
+
+
+## Install Packages (don't install from source code, use binaries)
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install(version = "3.14")
+
+BiocManager::install(c('BiocGenerics', 'DelayedArray', 'DelayedMatrixStats',
+                       'limma', 'S4Vectors', 'SingleCellExperiment',
+                       'SummarizedExperiment', 'batchelor', 'Matrix.utils'))
+
+install.packages("devtools")
+
+install.packages("Seurat")
+
+install.packages("R.utils")
+remotes::install_github('satijalab/seurat-wrappers')
+devtools::install_github('satijalab/seurat-data', force = TRUE)
+
+devtools::install_github('cole-trapnell-lab/leidenbase')
+devtools::install_github('cole-trapnell-lab/monocle3')
+
+
+## Packages to load
+library(monocle3)
+library(Seurat)
+library(SeuratData)
+library(SeuratWrappers)
+library(ggplot2)
+library(patchwork)
+library(magrittr)
+
+
+# load in example data HCA Bone Marrow 40k
+InstallData("hcabm40k")
+data("hcabm40k")
+
+
+## STEP 1 ##
+
+# Splits object based on a single attribute into a list of subsetted objects, one for each level of the attribute.
+hcabm40k <- SplitObject(hcabm40k, split.by = "orig.ident")
+
+# log normalize data then identify variable features 
+for (i in seq_along(hcabm40k)) {
+  hcabm40k[[i]] <- NormalizeData(hcabm40k[[i]]) %>% FindVariableFeatures()
+}
+
+# choose the features to use when integrating multiple datasets. 
+features <- SelectIntegrationFeatures(hcabm40k)
+
+# scale and centers features in the dataset. Run PCA dimensionality reduction. 
+for (i in seq_along(along.with = hcabm40k)) {
+  hcabm40k[[i]] <- ScaleData(hcabm40k[[i]], features = features) %>% RunPCA(features = features)
+}
+
+
+## STEP 2 ##
+
+# find a set of anchors between a list of Seurat objects. 
+anchors <- FindIntegrationAnchors(hcabm40k, reference = c(1, 2), reduction = "rpca", dims = 1:30)
+
+# Perform dataset integration using a pre-computed AnchorSet.
+integrated <- IntegrateData(anchors, dims = 1:30)
+
+
+## STEP 3 ##
+integrated <- ScaleData(integrated)
+integrated <- RunPCA(integrated)
+integrated <- RunUMAP(integrated, dims = 1:30, reduction.name = "UMAP") #why do before clustering?
+integrated <- FindNeighbors(integrated, dims = 1:30)
+integrated <- FindClusters(integrated)
+#integrated <- RunUMAP(integrated, dims = 1:30, reduction.name = "UMAP") #doesnt seem to matter if before or after
+DimPlot(integrated, group.by = c("orig.ident", "ident"))
+
+
+## STEP 4 ##
+
+# convert objects to Monocle3 cell_data_set objects 
+cds <- as.cell_data_set(integrated) # throws a warning and requires you to run the subsequent command
+
+# Take cell_data_set and cluster cells (unsupervised clustering) using Louvain/Leiden community detection. Returns a cell_data_set with internally stored cluster assignments.
+cds <- cluster_cells(cds)
+
+# plot cells along with their trajectories 
+p1 <- plot_cells(cds, show_trajectory_graph = FALSE)
+p2 <- plot_cells(cds, color_cells_by = "partition", show_trajectory_graph = FALSE)
+wrap_plots(p1, p2)
+
+
+## STEP 5 ##
+
+# Conversion to Seurat objects  
+#integrated.sub <- subset(as.Seurat(cds), monocle3_partitions == 1) # throws an error, see solve: check your cds object, the default assay for as.Seurat is "RNA". In your first line you can use as.Seurat(cds, assay = NULL). Using NULL will convert all assays present in cds. Should fix the problem.
+integrated.sub <- subset(as.Seurat(cds, assay = NULL), monocle3_partitions == 1)
+
+# Convert objects to Monocle3 cell_data_set objects
+cds <- as.cell_data_set(integrated.sub)
+
+# Learn principal graph from the reduced dimension space using reversed graph embedding 
+cds <- learn_graph(cds)
+
+plot_cells(cds, label_groups_by_cluster = FALSE, label_leaves = FALSE, label_branch_points = FALSE)
+
+
+## STEP 6 ## 
+
+# Retrieve data 
+max.avp <- which.max(unlist(FetchData(integrated.sub, "AVP")))
+max.avp <- colnames(integrated.sub)[max.avp]
+
+# Order cells according to pseudotime. 
+# Assigns cells a pseudotime value based on their projection on the principal graph learned in the learn_graph function and the position of chosen root states.
+cds <- order_cells(cds, root_cells = max.avp)
+
+# Plot cells along with their trajectories 
+plot_cells(cds, color_cells_by = "pseudotime", label_cell_groups = FALSE, label_leaves = FALSE, 
+           label_branch_points = FALSE)
+
+
+## STEP 7 ##
+
+# set the assay back as 'integrated' 
+
+# ...
+integrated.sub <- as.Seurat(cds, assay = "integrated")
+
+
+FeaturePlot(integrated.sub, "monocle3_pseudotime")
+
