@@ -1,7 +1,10 @@
 # C. elegans mixed stage embryo scRNAseq 
+
 ### Exploring immune function and metabolism
 
-Contributers: 
+---
+
+#### Contributers: 
 - Jessica Hill
 - Robert Williams
 - David King
