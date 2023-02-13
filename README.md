@@ -1,4 +1,5 @@
-# C. elegans mixed stage embryo scRNAseq (exploring immune function)
+# C. elegans mixed stage embryo scRNAseq 
+### Exploring immune function and metabolism
 
 Contributers: 
 - Jessica Hill
