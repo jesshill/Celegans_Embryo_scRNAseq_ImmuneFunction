@@ -542,7 +542,8 @@ DoHeatmap(emb_int_specific_recluster, features = top10clecs$gene,raster=F)
 # plot genes of interest
 
 ```{r}
-FeaturePlot(emb_int_specificClusters, features =top1clecs$gene,raster=F)
+FeaturePlot(emb_int_specific_recluster, features =top10clecs$gene,raster=F)
+
 VlnPlot(emb_int_specificClusters, features = c("clec-167","clec-266","clec-40","clec-47"))
 FeaturePlot(emb_int_specificClusters, features = c("clec-41", "clec-67"))
 
