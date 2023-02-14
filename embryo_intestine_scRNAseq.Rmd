@@ -392,7 +392,7 @@ emb_int_marker_clecs <- emb_int.markers %>%
   filter(grepl("clec*",gene), p_val_adj < .01) %>%
   slice_max(n = 10, order_by = avg_log2FC)
 
-write.csv(emb_int.markers,"./Output/emb_int_marker_clecs.csv", row.names = TRUE)
+write.csv(emb_int_marker_clecs,"./Output/emb_int_marker_clecs.csv", row.names = TRUE)
 ```
 
 
