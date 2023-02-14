@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+---
+
 # Install packages
 ```{r}
 #install.packages('Seurat')
@@ -31,6 +33,9 @@ library(patchwork)
 library(limma)
 library(clustree)
 ```
+
+---
+# Get started!
 
 ```{r}
 emb_int.data <- Read10X_h5("./10x_cloud_analysis/GFPsort_pooled_count/raw_feature_bc_matrix.h5")
@@ -87,7 +92,6 @@ emb_int
 length(unique(genes.df$wbps_gene_id))
 length(unique(rownames(emb_int)))
 rownames(emb_int)[!(rownames(emb_int) %in% genes.df$wbps_gene_id)]
-emb_int
 ```
 
 # Quality control metrics
@@ -395,6 +399,7 @@ emb_int_marker_clecs <- emb_int.markers %>%
 write.csv(emb_int_marker_clecs,"./Output/emb_int_marker_clecs.csv", row.names = TRUE)
 ```
 
+--- 
 
 # Pull out cluster specific SPPs 
 ```{r fig.height=4, fig.width=7}
@@ -410,9 +415,7 @@ emb_int.markers %>% group_by(cluster) %>% filter(grepl("^irg",gene), p_val_adj <
 DoHeatmap(emb_int, features = top10irgs$gene,raster=F)
 ```
 
-
-
------------------------------------------------------------------
+---
 
 # Remove contamination clusters (based on tissue ontology)
 intestinal clusters = 0, 1, 2, 3, 4, 5, 7
