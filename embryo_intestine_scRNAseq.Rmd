@@ -5,12 +5,9 @@ date: "9/22/2021"
 output: html_document
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-
 
 # Install packages
 ```{r}
@@ -25,8 +22,6 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("clustree")
 ```
 
-
-
 # Load packages
 ```{r echo=FALSE}
 library(biomaRt)
@@ -37,13 +32,9 @@ library(limma)
 library(clustree)
 ```
 
-
-
 ```{r}
 emb_int.data <- Read10X_h5("./10x_cloud_analysis/GFPsort_pooled_count/raw_feature_bc_matrix.h5")
 ```
-
-
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
 ```{r}
@@ -55,7 +46,7 @@ genes.df <- getBM(mart = mart,
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
       )
 
-mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id'] # only 12
+mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes.df$chromosome_name = NULL # deletes column in the df, frees up a little memory 
 
 c(nrow(genes.df), nrow(emb_int.data))
