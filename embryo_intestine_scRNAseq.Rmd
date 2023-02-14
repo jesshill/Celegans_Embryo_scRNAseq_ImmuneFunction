@@ -279,30 +279,24 @@ DimPlot(emb_int, reduction = "umap", label = "TRUE", label.box = TRUE)
 
 Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
 ```{r}
-emb_int.markers1 <- FindAllMarkers(emb_int, only.pos = F, min.pct = 0.25, logfc.threshold = 0.25)
+emb_int.markers <- FindAllMarkers(emb_int, only.pos = F, min.pct = 0.25, logfc.threshold = 1) # 0.25 is the default threshold 
 
-emb_int.markers1 %>% 
-  group_by(cluster) %>%
-  slice_max(n = 2, order_by = avg_log2FC)
-
-emb_int.markers2 <- FindAllMarkers(emb_int, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
-
-emb_int.markers2 %>% 
+emb_int.markers %>% 
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
 
-write.csv(emb_int.markers,"./emb_int_markers.csv", row.names = TRUE)
+write.csv(emb_int.markers,"./Output/emb_int_markers.csv", row.names = TRUE)
 ```
 
 
-Find all markers for cluster 2
+Find all cluster specific markers (i.e., cluster 2)
 ```{r}
 #emb_int2.markers <- FindMarkers(emb_int, ident.1 = 2, min.pct = 0.25)
 #head(emb_int2.markers, n = 5)
 ```
 
-Find all markers distinguishing cluster 5 from clusters 0 and 3
+Find all markers distinguishing specific clusters (i.e., 5 from clusters 0 and 3) 
 ```{r}
 #emb_int5.markers <- FindMarkers(emb_int, ident.1 = 5, ident.2 = c(0, 3), min.pct = 0.25)
 #head(emb_int5.markers, n = 5)
@@ -311,10 +305,9 @@ Find all markers distinguishing cluster 5 from clusters 0 and 3
 Differential expression with ROC test
 ```{r}
 #emb_int0.markers <- FindMarkers(emb_int, ident.1 = 0, logfc.threshold = 0.25, test.use = "roc", only.pos = TRUE)
+
 #head(emb_int0.markers)
 ```
-
-
 
 # Perform gene ontology
 
@@ -322,6 +315,7 @@ Differential expression with ROC test
 library(reticulate)
 #use_condaenv("kw_fig5", required = TRUE)
 #py_install("tissue_enrichment_analysis", pip = T)
+
 tea <- import("tissue_enrichment_analysis")
 tissue_df <- tea$fetch_dictionary("tissue")
 phenotype_df <- tea$fetch_dictionary("phenotype")
@@ -378,16 +372,10 @@ my_ontology_plot <- function(input_df, xlabel){
 }
 ```
 
-
 ```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb_int.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), tissue_df), 
+my_ontology_plot(my_tea_analysis(emb_int.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1.2), tissue_df), 
                  "Tissue Ontology")
-
-#my_ontology_plot(my_tea_analysis(emb_int.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.25), tissue_df), 
-#                 "Tissue Ontology")
 ```
-
-
 
 #Pull out cluster specific CLECs 
 
@@ -396,7 +384,6 @@ emb_int.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj 
 
 DoHeatmap(emb_int, features = top10clecs$gene,raster=F)
 ```
-
 
 # Find marker clecs in each cluster
 ```{r}
