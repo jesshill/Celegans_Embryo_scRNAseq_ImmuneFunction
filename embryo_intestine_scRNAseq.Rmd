@@ -387,12 +387,12 @@ DoHeatmap(emb_int, features = top10clecs$gene,raster=F)
 
 # Find marker clecs in each cluster
 ```{r}
-emb_int.markers %>% 
+emb_int_marker_clecs <- emb_int.markers %>% 
   group_by(cluster) %>%
   filter(grepl("clec*",gene), p_val_adj < .01) %>%
   slice_max(n = 10, order_by = avg_log2FC)
 
-write.csv(emb_int.markers,"/Users/jessicahill/Desktop/Work/embryo_intestine_scRNAseq/emb_int_marker_clecs.csv", row.names = TRUE)
+write.csv(emb_int.markers,"./Output/emb_int_marker_clecs.csv", row.names = TRUE)
 ```
 
 
