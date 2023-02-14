@@ -47,21 +47,17 @@ genes.df <- getBM(mart = mart,
       )
 
 mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
-genes.df$chromosome_name = NULL # deletes column in the df, frees up a little memory 
+genes.df$chromosome_name = NULL
 
 c(nrow(genes.df), nrow(emb_int.data))
 ```
 
-
-
 There are `r nrow(emb_int.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
-
-
 
 ```{r}
 emb_int.data.filt <- emb_int.data[rownames(emb_int.data) %in% genes.df$wbps_gene_id,]
 
-# The two datastructures do not have the same order of WBGeneIDs
+# The two data structures do not have the same order of WBGeneIDs
 identical(rownames(emb_int.data.filt), genes.df$wbps_gene_id)
 
 # Use match to make sure they are in the same order
@@ -77,35 +73,35 @@ rownames(emb_int.data.filt) <- genes.df[
 
 # are there NAs?
 sum(!is.na(rownames(emb_int.data.filt)))
+
 head(emb_int.data.filt)
 ```
 
-
-
 ```{r}
 emb_int <- CreateSeuratObject(counts = emb_int.data.filt, project = "emb_int_pool", min.cells = 3, min.features = 200)
+
 emb_int
 ```
-
-
 
 ```{r}
 length(unique(genes.df$wbps_gene_id))
 length(unique(rownames(emb_int)))
-#rownames(emb_int)[!(rownames(emb_int) %in% genes.df$wbps_gene_id)]
+rownames(emb_int)[!(rownames(emb_int) %in% genes.df$wbps_gene_id)]
 emb_int
 ```
 
-
-
 # Quality control metrics
+
+- `nFeature_RNA` is the number of genes detected in each cell. 
+- `nCount_RNA` is the total number of molecules detected within a cell (AKA total UMIs per cell)
+- Low `nFeature_RNA` indicates that the cell may be dead or dying or an empty droplet
+- High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
+
 
 show QC metrics for the first 5 cells 
 ```{r}
 head(emb_int@meta.data, 5)
 ```
-
-
 
 Mitochondrial genome percentage 
 ```{r}
@@ -114,19 +110,10 @@ emb_int[["percent.mt"]] <- PercentageFeatureSet(emb_int, features = mitoIndices)
 ```
 
 
-
-- `nFeature_RNA` is the number of genes detected in each cell. 
-- `nCount_RNA` is the total number of molecules detected within a cell (AKA total UMIs per cell)
-- Low `nFeature_RNA` indicates that the cell may be dead or dying or an empty droplet
-- High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
-
-
-
 Visualize QC metrics as a violin plot
 ```{r}
 VlnPlot(emb_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
-
 
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -137,24 +124,20 @@ plot1 + plot2
 ```
 
 
-
 # Filter based on features
 
 cells being filtered due to mito percent: 
 ```{r}
-sum(emb_int$percent.mt > 50)/ length(emb_int$percent.mt) # only 6.5%
+sum(emb_int$percent.mt > 50)/ length(emb_int$percent.mt)
 
-emb_int <- subset(emb_int, subset = nFeature_RNA > 200 & nFeature_RNA < 6000 & nCount_RNA < 50000 & percent.mt < 50)
+emb_int <- subset(emb_int, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
-
-
 
 # Visualize after filtering
 ```{r}
 VlnPlot(emb_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
 FeatureScatter(emb_int, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 ```
-
 
 
 # Normalize the data
@@ -169,8 +152,6 @@ Scale.factor: Sets the scale factor for cell-level normalization
 emb_int <- NormalizeData(emb_int, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
 
-
-
 # Feature selection
 
 Identify highly variable features to focus on in downstream analysis
@@ -179,6 +160,7 @@ emb_int <- FindVariableFeatures(emb_int, selection.method = "vst", nfeatures = 2
 
 # Identify the 10 most highly variable genes
 top10 <- head(VariableFeatures(emb_int), 10)
+top10
 
 # plot variable features with and without labels
 plot1 <- VariableFeaturePlot(emb_int)
