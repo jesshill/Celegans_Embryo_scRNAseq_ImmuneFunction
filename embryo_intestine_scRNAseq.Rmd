@@ -417,14 +417,14 @@ DoHeatmap(emb_int, features = top10irgs$gene,raster=F)
 
 ---
 
-# Remove contamination clusters (based on tissue ontology)
-intestinal clusters = 0, 1, 2, 3, 4, 5, 7
-contamination = 6, 8, 9
+# Remove contamination clusters (based on tissue ontology data)
+contamination clusters = 1, 11, 12, 13
+
 ```{r}
-emb_int_specificClusters <- RunUMAP(subset(emb_int, idents = c('6','8','9'), invert = TRUE), dims = 1:5)
+emb_int_specificClusters <- RunUMAP(subset(emb_int, idents = c('1','11','12', '13'), invert = TRUE), dims = 1:10)
+
 DimPlot(emb_int_specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
 ```
-
 
 # now rerun PCA and re-lcuster 
 ```{r}
