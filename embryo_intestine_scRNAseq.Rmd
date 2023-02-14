@@ -84,8 +84,6 @@ head(emb_int.data.filt)
 
 ```{r}
 emb_int <- CreateSeuratObject(counts = emb_int.data.filt, project = "emb_int_pool", min.cells = 3, min.features = 200)
-
-emb_int
 ```
 
 ```{r}
@@ -119,7 +117,6 @@ Visualize QC metrics as a violin plot
 VlnPlot(emb_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
-
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 ```{r}
 plot1 <- FeatureScatter(emb_int, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
@@ -136,7 +133,6 @@ sum(emb_int$percent.mt > 50)/ length(emb_int$percent.mt)
 
 emb_int <- subset(emb_int, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
-
 
 # Visualize after filtering
 ```{r}
@@ -210,7 +206,6 @@ DimHeatmap(emb_int, dims = 1, cells = 500, balanced = TRUE)
 ```{r}
 DimHeatmap(emb_int, dims = 1:6, cells = 500, balanced = TRUE)
 ```
-
 
 # Determine dataset dimensionality
 
