@@ -21,81 +21,66 @@ mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite
 
 genes.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "wbps_gene_id"),
-      value = list("caelegprjna13758", rownames(emb_non_int.data)),
+      value = list("caelegprjna13758", rownames(emb.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
       )
 
-mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id'] # only 12
-genes.df$chromosome_name = NULL # deletes column in the df, frees up a little memory 
+mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id'] 
 
-c(nrow(genes.df), nrow(emb_non_int.data))
+genes.df$chromosome_name = NULL 
 
+c(nrow(genes.df), nrow(emb.data))
 
-# there are genes missing
-nrow(emb_non_int.data)-nrow(genes.df)
+# are there are genes missing?
+nrow(emb.data)-nrow(genes.df)
 ```
 
-
-
-There are `r nrow(emb_non_int.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
-
-
+There are `r nrow(emb.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 
 ```{r}
-emb_non_int.data.filt <- emb_non_int.data[rownames(emb_non_int.data) %in% genes.df$wbps_gene_id,]
+emb.data.filt <- emb.data[rownames(emb.data) %in% genes.df$wbps_gene_id,]
 
 # The two datastructures do not have the same order of WBGeneIDs
-identical(rownames(emb_non_int.data.filt), genes.df$wbps_gene_id)
+identical(rownames(emb.data.filt), genes.df$wbps_gene_id)
 
 # Use match to make sure they are in the same order
-identical(rownames(emb_non_int.data.filt),
-          genes.df[match(rownames(emb_non_int.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+identical(rownames(emb.data.filt),
+          genes.df[match(rownames(emb.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
 )
 
 # now replace the WBGeneIDs with gene names
-rownames(emb_non_int.data.filt) <- genes.df[
-  match(rownames(emb_non_int.data.filt),
+rownames(emb.data.filt) <- genes.df[
+  match(rownames(emb.data.filt),
         genes.df$wbps_gene_id)
   ,]$external_gene_id
 
 # are there NAs?
-sum(!is.na(rownames(emb_non_int.data.filt)))
-head(emb_non_int.data.filt)
+sum(!is.na(rownames(emb.data.filt)))
+head(emb.data.filt)
 ```
-
-
 
 ```{r}
-emb_non_int <- CreateSeuratObject(counts = emb_non_int.data.filt, project = "emb_non_int_pool", min.cells = 3, min.features = 200)
-emb_non_int
+emb <- CreateSeuratObject(counts = emb.data.filt, project = "emb_all-cells", min.cells = 3, min.features = 200)
 ```
-
-
 
 ```{r}
 length(unique(genes.df$wbps_gene_id))
-length(unique(rownames(emb_non_int)))
-#rownames(emb_non_int)[!(rownames(emb_non_int) %in% genes.df$wbps_gene_id)]
-emb_non_int
+length(unique(rownames(emb)))
+rownames(emb)[!(rownames(emb) %in% genes.df$wbps_gene_id)]
 ```
-
-
 
 # Quality control metrics
 
 show QC metrics for the first 5 cells 
 ```{r}
-head(emb_non_int@meta.data, 5)
+head(emb@meta.data, 5)
 ```
-
-
 
 Mitochondrial genome percentage 
 ```{r}
-mitoIndices = which(rownames(emb_non_int) %in% mitoList)
-emb_non_int[["percent.mt"]] <- PercentageFeatureSet(emb_non_int, features = mitoIndices)
+mitoIndices = which(rownames(emb) %in% mitoList)
+emb[["percent.mt"]] <- PercentageFeatureSet(emb, features = mitoIndices)
 ```
-
 
 
 - `nFeature_RNA` is the number of genes detected in each cell. 
@@ -104,12 +89,10 @@ emb_non_int[["percent.mt"]] <- PercentageFeatureSet(emb_non_int, features = mito
 - High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
 
 
-
 Visualize QC metrics as a violin plot
 ```{r}
-VlnPlot(emb_non_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(emb, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
-
 
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
