@@ -94,34 +94,27 @@ Visualize QC metrics as a violin plot
 VlnPlot(emb, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
-
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 ```{r}
-plot1 <- FeatureScatter(emb_non_int, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
-plot2 <- FeatureScatter(emb_non_int, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 <- FeatureScatter(emb, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 ```
-
-
 
 # Filter based on features
 
 cells being filtered due to mito percent: 
 ```{r}
-sum(emb_non_int$percent.mt > 50)/ length(emb_non_int$percent.mt)
+sum(emb$percent.mt > 50)/ length(emb$percent.mt)
 
-emb_non_int <- subset(emb_non_int, subset = nFeature_RNA > 200 & nFeature_RNA < 6000 & nCount_RNA < 50000 & percent.mt < 50)
+emb <- subset(emb, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
-
-
 
 # Visualize after filtering
 ```{r}
-VlnPlot(emb_non_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-FeatureScatter(emb_non_int, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+VlnPlot(emb, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+FeatureScatter(emb, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 ```
-
-
 
 # Normalize the data
 
