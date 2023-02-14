@@ -399,7 +399,7 @@ emb_int_marker_clecs <- emb_int.markers %>%
 write.csv(emb_int_marker_clecs,"./Output/emb_int_marker_clecs.csv", row.names = TRUE)
 ```
 
---- 
+--- ignore for now
 
 # Pull out cluster specific SPPs 
 ```{r fig.height=4, fig.width=7}
@@ -436,29 +436,48 @@ ElbowPlot(emb_int_specificClusters)
 ```
 
 ```{r}
-emb_int_specificClusters <- FindNeighbors(emb_int_specificClusters, dims = 1:5)
-emb_int_specificClusters <- FindClusters(emb_int_specificClusters, resolution = 0.7)
+# Choose the number of PCs to use for re-clustering 
+emb_int_specificClusters <- FindNeighbors(emb_int_specificClusters, dims = 1:7)
 
-emb_int_specificClusters <- RunUMAP(emb_int_specificClusters, dims = 1:5)
-DimPlot(emb_int_specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
+# check new clusters with Clustree
+emb_int_specific_recluster <- FindClusters(
+  object = emb_int_specificClusters,
+  reduction.type = "pca",
+  resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+  dims.use = 1:7,
+  save.SNN = TRUE
+)
+
+clustree(emb_int_specific_recluster, prefix = "RNA_snn_res.")
+
+
+emb_int_specific_recluster <- FindClusters(emb_int_specificClusters, resolution = 1.2)
+
+emb_int_specific_recluster <- RunUMAP(emb_int_specific_recluster, dims = 1:7)
+
+DimPlot(emb_int_specific_recluster, reduction = "umap", label = "TRUE", label.box = TRUE)
 ```
 
-# Find marker genes
+# Find new marker genes
 ```{r}
-emb_int_specificClusters.markers <- FindAllMarkers(emb_int_specificClusters, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
-emb_int_specificClusters.markers %>% 
+emb_int_specific_recluster.markers <- FindAllMarkers(emb_int_specific_recluster, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+
+emb_int_specific_recluster.markers %>% 
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
+
+write.csv(emb_int_specific_recluster.markers,"./Output/emb_int_specific_recluster_markers.csv", row.names = TRUE)
 ```
 
-# Perform gene ontology
+# Perform new gene ontology
 ```{r}
-emb_int_specificClusters.markers <- emb_int_specificClusters.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
-emb_int_specificClusters.markers <- emb_int_specificClusters.markers %>% rename(WBGeneID = wbps_gene_id)
+emb_int_specific_recluster.markers <- emb_int_specific_recluster.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
+
+emb_int_specific_recluster.markers <- emb_int_specific_recluster.markers %>% rename(WBGeneID = wbps_gene_id)
 ```
 
 ```{r}
-clusters <- unique(emb_int_specificClusters.markers$cluster)
+clusters <- unique(emb_int_specific_recluster.markers$cluster)
 my_tea_analysis <- function(input_df, tea_dict){
   tea_df <- data.frame()
   for (i in clusters){
@@ -503,94 +522,31 @@ my_ontology_plot <- function(input_df, xlabel){
 ```
 
 ```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb_int_specificClusters.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), tissue_df), "Tissue Ontology")
-
-#my_ontology_plot(my_tea_analysis(emb_int_specificClusters.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.25), tissue_df), "Tissue Ontology")
+my_ontology_plot(my_tea_analysis(emb_int_specific_recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), tissue_df), "Tissue Ontology")
 ```
 
-
-
-# Pull out cluster marker genes 
+# Pull out new cluster marker genes 
 ```{r}
-emb_int_specificClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
+emb_int_specific_recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
 
-DoHeatmap(emb_int_specificClusters, features = top3$gene,raster=F)
+DoHeatmap(emb_int_specific_recluster, features = top3$gene,raster=F)
 ```
 
-
-
-# Pull out cluster specific CLECs 
+# Pull out new cluster specific CLECs 
 ```{r}
-emb_int_specificClusters.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top15clecs
+emb_int_specific_recluster.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
 
-DoHeatmap(emb_int_specificClusters, features = top15clecs$gene,raster=F)
+DoHeatmap(emb_int_specific_recluster, features = top10clecs$gene,raster=F)
 ```
 
-
-
-# Pull out cluster specific SPPs 
-```{r}
-emb_int_specificClusters.markers %>% group_by(cluster) %>% filter(grepl("^spp",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top15spps
-
-DoHeatmap(emb_int_specificClusters, features = top15spps$gene,raster=F)
-```
-
-
-
-# Pull out cluster specific IRGs 
-```{r}
-emb_int_specificClusters.markers %>% group_by(cluster) %>% filter(grepl("^irg",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10irgs
-
-DoHeatmap(emb_int_specificClusters, features = top10irgs$gene,raster=F)
-```
-
-
+# plot genes of interest
 
 ```{r}
-emb_int_specificClusters.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=1, wt=avg_log2FC) -> top1clecs
-
 FeaturePlot(emb_int_specificClusters, features =top1clecs$gene,raster=F)
-```
-
-
----------------------------------------------------------------
-
-# murry data:
--anterior enriched clecs: 166, 42, 10, 26, 37, 17, 36, 167, 28, 75, 34, 33, 160, 41, 4
--mid and posterior enriched clecs:  56, 85, 57, 227, 150, 72, 24, 80, 53, 78, 63, 8, 265
--posterior enriched clecs: 50, 82, 83, 61, 48, 49, 84
-
-```{r}
-#intestine maker genes = "cpr-1", "elt-2", "pqm-1", "mtl-2", "ges-1"
-#contamination marker genes = "myo-3", "hlh-1", "ceh-13", "odr-7", "ceh-19", "cat-4", "bas-1", "gcy-8"
-
-#Murray clecs - Posterior = "clec-50","clec-82","clec-83","clec-61","clec-48","clec-49","clec-84"
-#Murray clecs - Anterior = "clec-166","clec-42","clec-10","clec-26","clec-37","clec-17","clec-36","clec-167","clec-28","clec-75","clec-34","clec-33","clec-160","clec-41","clec-4"
-#Murray clecs - Mid/Posterior = "clec-56","clec-85","clec-57","clec-227","clec-150","clec-72","clec-24","clec-80","clec-53","clec-78","clec-63","clec-8","clec-265"
-
 VlnPlot(emb_int_specificClusters, features = c("clec-167","clec-266","clec-40","clec-47"))
-VlnPlot(emb_int_specificClusters, features = c("clec-32","clec-33","clec-25","clec-26"))
-VlnPlot(emb_int_specificClusters, features = c("clec-38","clec-36","clec-37","clec-35"))
-VlnPlot(emb_int_specificClusters, features = c("clec-31","clec-28","clec-22","clec-27"))
-
-VlnPlot(emb_int_specificClusters, features = c("clec-41", "clec-67"))
 FeaturePlot(emb_int_specificClusters, features = c("clec-41", "clec-67"))
 
-FeaturePlot(emb_int_specificClusters, features = c("clec-167","clec-266","clec-40","clec-47"))
-FeaturePlot(emb_int_specificClusters, features = c("clec-32","clec-33","clec-25","clec-26"))
-FeaturePlot(emb_int_specificClusters, features = c("clec-38","clec-36","clec-37","clec-35"))
-FeaturePlot(emb_int_specificClusters, features = c("clec-31","clec-28","clec-22","clec-27"))
-              
-#VlnPlot(emb_int_specificClusters, features = c("clec-50","clec-82","clec-83","clec-61","clec-48","clec-49","clec-84"))
-#FeaturePlot(emb_int_specificClusters, features = c("clec-50","clec-82","clec-83","clec-61","clec-48","clec-49","clec-84"))
 
-VlnPlot(emb_int_specificClusters, features = c("myo-3", "hlh-1", "ceh-13", "hil-7", "odr-7", "ceh-19", "cat-4", "bas-1", "gcy-8"))
-
-#anterior > mid > posterior
-FeaturePlot(emb_int_specificClusters, features = c("clec-166","clec-42","clec-57", "clec-227","clec-82", "clec-49"))
-```
-
-```{r}
 FeaturePlot(emb_int_specificClusters, pt.size = 0.1,
             features = (emb_int_specificClusters.markers %>% 
   group_by(cluster) %>%
@@ -598,48 +554,3 @@ FeaturePlot(emb_int_specificClusters, pt.size = 0.1,
 )
 ```
 
-
-
-
------------------------------------------------------------------------
-
-# Rob's stuff for removing clusters
-
-```{r}
-emb_int_subset <- CreateSeuratObject(counts = emb_int.data.filt, project = "emb_int_pool", min.cells = 3, min.features = 200)
-emb_int_subset <- subset(emb_int_subset, 
-                         subset = nFeature_RNA > 1000 & nFeature_RNA < 6000 & nCount_RNA < 50000,
-                         cells = colnames(subset(emb_int, idents = c('3','5','6','8'), invert = TRUE)))
-emb_int_subset <- NormalizeData(emb_int_subset, normalization.method = "LogNormalize", scale.factor = 10000)
-emb_int_subset <- FindVariableFeatures(emb_int_subset, selection.method = "vst", nfeatures = 2000)
-top10 <- head(VariableFeatures(emb_int_subset), 10)
-plot1 <- VariableFeaturePlot(emb_int_subset)
-LabelPoints(plot = plot1, points = top10, repel = TRUE)
-
-```
-
-```{r}
-int.filt.genes <- rownames(emb_int_subset)
-emb_int_subset <- ScaleData(emb_int_subset, features = int.filt.genes)
-emb_int_subset <- RunPCA(emb_int_subset, features = VariableFeatures(object = emb_int_subset))
-DimPlot(emb_int_subset, reduction = "pca")
-```
-```{r}
-ElbowPlot(emb_int_subset)
-```
-```{r}
-emb_int_subset <- FindNeighbors(emb_int_subset, dims = 1:10)
-emb_int_subset <- FindClusters(emb_int_subset, resolution = 0.5)
-```
-
-```{r}
-emb_int_subset <- RunUMAP(emb_int_subset, dims = 1:6)
-DimPlot(emb_int_subset, reduction = "umap", label = "TRUE", label.box = TRUE)
-```
-
-```{r fig.width=5, fig.height=4}
-DimPlot(emb_int_subset, reduction = "umap", label = TRUE, label.box = TRUE)
-# pdf(file = "./plots/embryo_intestine_labeled_umap.pdf", width = 5, height = 4)
-# DimPlot(emb_int_subset, reduction = "umap", label = TRUE, label.box = TRUE)
-# dev.off()
-```
