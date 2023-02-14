@@ -133,6 +133,7 @@ sum(emb_int$percent.mt > 50)/ length(emb_int$percent.mt)
 emb_int <- subset(emb_int, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
 
+
 # Visualize after filtering
 ```{r}
 VlnPlot(emb_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
@@ -168,7 +169,6 @@ LabelPoints(plot = plot1, points = top10, repel = TRUE)
 ```
 
 
-
 # Normalization
 
 Scale the data so that each gene has a mean expression of 0 and variance of 1 across all cells
@@ -176,7 +176,6 @@ Scale the data so that each gene has a mean expression of 0 and variance of 1 ac
 all.genes <- rownames(emb_int)
 emb_int <- ScaleData(emb_int, features = all.genes)
 ```
-
 
 
 # Linear dimensionality reduction 
@@ -192,6 +191,7 @@ print(emb_int[["pca"]], dims = 1:5, nfeatures = 5)
 ```
 
 ```{r}
+# top genes associated with reduction components
 VizDimLoadings(emb_int, dims = 1:2, reduction = "pca")
 ```
 
