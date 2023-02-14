@@ -208,7 +208,6 @@ DimHeatmap(emb_int, dims = 1:6, cells = 500, balanced = TRUE)
 ```
 
 
-
 # Determine dataset dimensionality
 
 How many components should we include? 
@@ -225,7 +224,6 @@ JackStrawPlot(emb_int, dims = 1:20)
 ```
 
 
-
 An alternative, more approximate technique is the elbow plot, which ranges principle components based on the percentage of variance explained by each PC.
 
 ```{r}
@@ -235,13 +233,12 @@ ElbowPlot(emb_int)
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
 
 
-
 # Cell clustering
 
 Choose the number of PCs to use for clustering 
 ```{r}
 emb_int <- FindNeighbors(emb_int, dims = 1:10)
-view(emb_int)
+
 
 ## Find clusters using Clustree
 # generate a vector of different resolutions to see which one performs best 
@@ -253,22 +250,17 @@ emb_int_clust <- FindClusters(
   save.SNN = TRUE
 )
 
-
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
 clustree(emb_int_clust, prefix = "RNA_snn_res.")
-
-view(emb_int_clust)
 
 
 ## Find clusters using original Surat package methods
 # choose the appropriate resolution for the given dimensions using the Clustree data
 emb_int <- FindClusters(emb_int, resolution = 1)
-view(emb_int)
 
 ## Look at cluster IDs of the first 5 cells
 head(Idents(emb_int), 5)
 ```
-
 
 
 # Non-linear dimensional reduction (UMAP/tSNE)
@@ -283,18 +275,24 @@ DimPlot(emb_int, reduction = "umap", label = "TRUE", label.box = TRUE)
 ```
 
 
-
 # Find differentially expressed features (aka marker genes)
 
 Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
 ```{r}
-emb_int.markers <- FindAllMarkers(emb_int, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+emb_int.markers1 <- FindAllMarkers(emb_int, only.pos = F, min.pct = 0.25, logfc.threshold = 0.25)
 
-emb_int.markers %>% 
+emb_int.markers1 %>% 
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
-write.csv(emb_int.markers,"/Users/jessicahill/Desktop/Work/embryo_intestine_scRNAseq/emb_int_markers.csv", row.names = TRUE)
+emb_int.markers2 <- FindAllMarkers(emb_int, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+
+emb_int.markers2 %>% 
+  group_by(cluster) %>%
+  slice_max(n = 2, order_by = avg_log2FC)
+
+
+write.csv(emb_int.markers,"./emb_int_markers.csv", row.names = TRUE)
 ```
 
 
