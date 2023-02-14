@@ -536,6 +536,11 @@ DoHeatmap(emb_int_specific_recluster, features = top10clecs$gene,raster=F)
 
 # plot genes of interest
 
+From John Murray dataset 
+    - intestine_anterior: ZC204.12, cpr-1, ceh-37
+    - intestine_middle_and_posterior: irg-7, pal-1, cpr-1, ceh-37
+    - intestine_far_posterior: irg-7, faah-1, pbo-4, psa-3
+
 ```{r}
 FeaturePlot(emb_int_specific_recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F)
 
@@ -547,4 +552,14 @@ FeaturePlot(emb_int_specific_recluster, pt.size = 0.1,
   group_by(cluster) %>%
   slice_max(n = 1, order_by = avg_log2FC))$gene
 )
+
+# genes from murray data
+FeaturePlot(emb_int_specific_recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F)
+VlnPlot(emb_int_specific_recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'))
+
+FeaturePlot(emb_int_specific_recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F)
+VlnPlot(emb_int_specific_recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'))
+
+FeaturePlot(emb_int_specific_recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F)
+VlnPlot(emb_int_specific_recluster, features = c('faah-1', 'pbo-4', 'psa-3'))
 ```
