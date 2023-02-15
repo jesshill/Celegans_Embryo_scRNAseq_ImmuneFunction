@@ -125,51 +125,45 @@ LogNormalize: Feature counts for each cell are divided by the total counts for t
 Scale.factor: Sets the scale factor for cell-level normalization
 
 ```{r}
-emb_non_int <- NormalizeData(emb_non_int, normalization.method = "LogNormalize", scale.factor = 10000)
+emb <- NormalizeData(emb, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
-
-
 
 # Feature selection
 
 Identify highly variable features to focus on in downstream analysis
 ```{r}
-emb_non_int <- FindVariableFeatures(emb_non_int, selection.method = "vst", nfeatures = 2000)
+emb <- FindVariableFeatures(emb, selection.method = "vst", nfeatures = 2000)
 
 # Identify the 10 most highly variable genes
-top10 <- head(VariableFeatures(emb_non_int), 10)
+top10 <- head(VariableFeatures(emb), 10)
 
 # plot variable features with and without labels
-plot1 <- VariableFeaturePlot(emb_non_int)
+plot1 <- VariableFeaturePlot(emb)
 LabelPoints(plot = plot1, points = top10, repel = TRUE)
 ```
-
-
 
 # Normalization
 
 Scale the data so that each gene has a mean expression of 0 and variance of 1 across all cells
 ```{r}
-all.genes <- rownames(emb_non_int)
-emb_non_int <- ScaleData(emb_non_int, features = all.genes)
+all.genes <- rownames(emb)
+emb <- ScaleData(emb, features = all.genes)
 ```
-
-
 
 # Linear dimensionality reduction 
 
 PCA linear dimensionality reduction
 ```{r}
-emb_non_int <- RunPCA(emb_non_int, features = VariableFeatures(object = emb_non_int))
+emb <- RunPCA(emb, features = VariableFeatures(object = emb))
 ```
 
 Examine and visualize PCA results a few different ways
 ```{r}
-print(emb_non_int[["pca"]], dims = 1:5, nfeatures = 5)
+print(emb[["pca"]], dims = 1:5, nfeatures = 5)
 ```
 
 ```{r}
-VizDimLoadings(emb_non_int, dims = 1:2, reduction = "pca")
+VizDimLoadings(emb, dims = 1:2, reduction = "pca")
 ```
 
 ```{r}
