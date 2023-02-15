@@ -167,18 +167,16 @@ VizDimLoadings(emb, dims = 1:2, reduction = "pca")
 ```
 
 ```{r}
-DimPlot(emb_non_int, reduction = "pca")
+DimPlot(emb, reduction = "pca")
 ```
 
 ```{r}
-DimHeatmap(emb_non_int, dims = 1, cells = 500, balanced = TRUE)
+DimHeatmap(emb, dims = 1, cells = 500, balanced = TRUE)
 ```
 
 ```{r}
-DimHeatmap(emb_non_int, dims = 1:6, cells = 500, balanced = TRUE)
+DimHeatmap(emb, dims = 1:6, cells = 500, balanced = TRUE)
 ```
-
-
 
 # Determine dataset dimensionality
 
