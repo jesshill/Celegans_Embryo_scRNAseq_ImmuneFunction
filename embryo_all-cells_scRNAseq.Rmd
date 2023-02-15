@@ -183,58 +183,43 @@ DimHeatmap(emb, dims = 1:6, cells = 500, balanced = TRUE)
 How many components should we include? 
 Use resampling test
 ```{r}
-emb_non_int <- JackStraw(emb_non_int, num.replicate = 100)
-emb_non_int <- ScoreJackStraw(emb_non_int, dims = 1:20)
+emb <- JackStraw(emb, num.replicate = 100)
+emb <- ScoreJackStraw(emb, dims = 1:10)
 ```
 
 The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
-
-```{r}
-JackStrawPlot(emb_non_int, dims = 1:20)
-```
-
 
 
 An alternative, more approximate technique is the elbow plot, which ranges principle components based on the percentage of variance explained by each PC.
 
 ```{r}
-ElbowPlot(emb_non_int)
+ElbowPlot(emb)
 ```
 
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
-
-
 
 # Cell clustering
 
 Choose the number of PCs to use for clustering 
 ```{r}
-emb_non_int <- FindNeighbors(emb_non_int, dims = 1:15)
-view(emb_non_int)
+emb <- FindNeighbors(emb, dims = 1:5)
 
-## Find clusters using Clustree
-# generate a vector of different resolutions to see which one performs best 
-emb_non_int_clust <- FindClusters(
-  object = emb_non_int,
+emb_clust <- FindClusters(
+  object = emb,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:15,
+  dims.use = 1:5,
   save.SNN = TRUE
 )
 
-## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
-clustree(emb_non_int_clust, prefix = "RNA_snn_res.")
-
-view(emb_non_int_clust)
-
+clustree(emb_clust, prefix = "RNA_snn_res.")
 
 ## Find clusters using original Surat package methods
 # choose the appropriate resolution for the given dimensions using the Clustree data
-emb_non_int <- FindClusters(emb_non_int, resolution = 0.8)
-view(emb_non_int)
+emb <- FindClusters(emb, resolution = 0.8)
 
 ## Look at cluster IDs of the first 5 cells
-head(Idents(emb_non_int), 5)
+head(Idents(emb), 5)
 ```
 
 
