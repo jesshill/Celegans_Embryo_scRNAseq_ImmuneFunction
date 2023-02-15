@@ -183,8 +183,8 @@ DimHeatmap(emb, dims = 1:6, cells = 500, balanced = TRUE)
 How many components should we include? 
 Use resampling test
 ```{r}
-emb <- JackStraw(emb, num.replicate = 100)
-emb <- ScoreJackStraw(emb, dims = 1:10)
+#emb <- JackStraw(emb, num.replicate = 100)
+#emb <- ScoreJackStraw(emb, dims = 1:20)
 ```
 
 The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
@@ -214,28 +214,22 @@ emb_clust <- FindClusters(
 
 clustree(emb_clust, prefix = "RNA_snn_res.")
 
-## Find clusters using original Surat package methods
-# choose the appropriate resolution for the given dimensions using the Clustree data
-emb <- FindClusters(emb, resolution = 0.8)
+# Now find clusters using original Surat package methods, and choose the appropriate resolution for the given dimensions using the Clustree data
 
-## Look at cluster IDs of the first 5 cells
-head(Idents(emb), 5)
+emb1 <- FindClusters(emb, resolution = 1.2) #1.2 didnt look clustered
+emb2 <- FindClusters(emb, resolution = 0.8)
 ```
-
-
 
 # Non-linear dimensional reduction (UMAP/tSNE)
 
 ```{r}
-emb_non_int <- RunUMAP(emb_non_int, dims = 1:15)
+emb2 <- RunUMAP(emb, dims = 1:5)
 ```
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
-DimPlot(emb_non_int, reduction = "umap", label = "TRUE", label.box = TRUE)
+DimPlot(emb, reduction = "umap", label = "TRUE", label.box = TRUE)
 ```
-
-
 
 # Find differentially expressed features (aka marker genes)
 
