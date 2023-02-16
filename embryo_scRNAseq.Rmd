@@ -29,7 +29,7 @@ mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite
 
 genes.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "wbps_gene_id"),
-      value = list("caelegprjna13758", rownames(emb.GFP1.data)),
+      value = list("caelegprjna13758", rownames(emb.GFP2.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
       )
 
@@ -37,37 +37,37 @@ mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 
 genes.df$chromosome_name = NULL 
 
-c(nrow(genes.df), nrow(emb.GFP1.data))
+c(nrow(genes.df), nrow(emb.GFP2.data))
 
 # are there are genes missing?
-nrow(emb.GFP1.data)-nrow(genes.df)
+nrow(emb.GFP2.data)-nrow(genes.df)
 ```
 
 There are `r nrow(emb.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 
 ```{r}
-emb.GFP1.data.filt <- emb.GFP1.data[rownames(emb.GFP1.data) %in% genes.df$wbps_gene_id,]
+emb.GFP2.data.filt <- emb.GFP2.data[rownames(emb.GFP2.data) %in% genes.df$wbps_gene_id,]
 
 # The two datastructures do not have the same order of WBGeneIDs
-identical(rownames(emb.GFP1.data.filt), genes.df$wbps_gene_id)
+identical(rownames(emb.GFP2.data.filt), genes.df$wbps_gene_id)
 
 # Use match to make sure they are in the same order
-identical(rownames(emb.GFP1.data.filt),
-          genes.df[match(rownames(emb.GFP1.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+identical(rownames(emb.GFP2.data.filt),
+          genes.df[match(rownames(emb.GFP2.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
           )
 
 # now replace the WBGeneIDs with gene names
-rownames(emb.GFP1.data.filt) <- genes.df[
-  match(rownames(emb.GFP1.data.filt),
+rownames(emb.GFP2.data.filt) <- genes.df[
+  match(rownames(emb.GFP2.data.filt),
         genes.df$wbps_gene_id)
   ,]$external_gene_id
 
 # are there NAs?
-sum(!is.na(rownames(emb.GFP1.data.filt)))
+sum(!is.na(rownames(emb.GFP2.data.filt)))
 ```
 
 ```{r}
-emb <- CreateSeuratObject(counts = emb.GFP1.data.filt, project = "emb_GFP1", min.cells = 3, min.features = 200)
+emb <- CreateSeuratObject(counts = emb.GFP2.data.filt, project = "emb_GFP2", min.cells = 3, min.features = 200)
 ```
 
 ```{r}
@@ -209,7 +209,7 @@ The elbow plot is helpful when determining how many PCs we need to capture the m
 
 Choose the number of PCs to use for clustering 
 ```{r}
-emb <- FindNeighbors(emb, dims = 1:5)
+emb <- FindNeighbors(emb, dims = 1:7)
 
 emb_clust <- FindClusters(
   object = emb,
@@ -223,143 +223,32 @@ clustree(emb_clust, prefix = "RNA_snn_res.")
 
 # Now find clusters using original Surat package methods, and choose the appropriate resolution for the given dimensions using the Clustree data
 
-emb1 <- FindClusters(emb, resolution = 1.2) #1.2 didn't look clustered
-emb2 <- FindClusters(emb, resolution = 0.8) #
-emb3 <- FindClusters(emb, resolution = 0.4)
+emb1 <- FindClusters(emb, resolution = 1.2)
+#emb2 <- FindClusters(emb, resolution = 0.8) #
+#emb3 <- FindClusters(emb, resolution = 0.4)
 ```
 
 # Non-linear dimensional reduction (UMAP/tSNE)
 
 ```{r}
-emb2 <- RunUMAP(emb2, dims = 1:5)
+emb1 <- RunUMAP(emb1, dims = 1:7)
 ```
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
-DimPlot(emb2, reduction = "umap", label = "TRUE", label.box = TRUE)
+DimPlot(emb1, reduction = "umap", label = "TRUE", label.box = TRUE)
 ```
 
 # Find differentially expressed features (aka marker genes)
 
 Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
 ```{r}
-emb_non_int.markers <- FindAllMarkers(emb_non_int, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+emb1.markers <- FindAllMarkers(emb1, only.pos = F, min.pct = 0.25, logfc.threshold = 0.25)
 
-emb_non_int.markers %>% 
+emb1.markers %>% 
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
-write.csv(emb_non_int.markers,"/Users/jessicahill/Desktop/Work/embryo_intestine_scRNAseq/emb_non_int_markers.csv", row.names = TRUE)
-```
-
-Find all markers for cluster 2
-```{r}
-#emb_non_int2.markers <- FindMarkers(emb_non_int, ident.1 = 2, min.pct = 0.25)
-#head(emb_non_int2.markers, n = 5)
-```
-
-Find all markers distinguishing cluster 5 from clusters 0 and 3
-```{r}
-#emb_non_int5.markers <- FindMarkers(emb_non_int, ident.1 = 5, ident.2 = c(0, 3), min.pct = 0.25)
-#head(emb_non_int5.markers, n = 5)
-```
-
-Differential expression with ROC test
-```{r}
-#emb_non_int0.markers <- FindMarkers(emb_non_int, ident.1 = 0, logfc.threshold = 0.25, test.use = "roc", only.pos = TRUE)
-#head(emb_non_int0.markers)
-```
-
-
-
-# Perform gene ontology
-
-```{r}
-library(reticulate)
-#use_condaenv("kw_fig5", required = TRUE)
-#py_install("tissue_enrichment_analysis", pip = T)
-tea <- import("tissue_enrichment_analysis")
-tissue_df <- tea$fetch_dictionary("tissue")
-phenotype_df <- tea$fetch_dictionary("phenotype")
-go_df <- tea$fetch_dictionary("go")
-```
-
-```{r}
-emb_non_int.markers <- emb_non_int.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
-emb_non_int.markers <- emb_non_int.markers %>% rename(WBGeneID = wbps_gene_id)
-```
-
-```{r}
-clusters <- unique(emb_non_int.markers$cluster)
-my_tea_analysis <- function(input_df, tea_dict){
-  tea_df <- data.frame()
-  for (i in clusters){
-  tea_set <- tea$enrichment_analysis(
-    (input_df %>% 
-       filter(cluster == i))$WBGeneID, 
-    tissue_df = tea_dict 
-    # %>% 
-    #   filter(wbid %in% (input_df %>% 
-    #                       filter(cluster %in% clusters))$WBGeneID)
-  )
-  if(nrow(tea_set) == 0){
-    next
-  } else {
-  tea_df <- bind_rows(tea_df, data.frame(tea_set, cluster = i))
-  }
-}
-tea_df
-}
-
-reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
-    new_x <- paste(x, within, sep = sep)
-    stats::reorder(new_x, by, FUN = fun)
-}
-scale_x_reordered <- function(..., sep = "___") {
-    reg <- paste0(sep, ".+$")
-    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
-}
-my_ontology_plot <- function(input_df, xlabel){
-  input_df %>%
-  filter(Q.value < 0.001,  Observed > 50) %>% 
-  ggplot(aes(x = reorder_within(Term, -log10(Q.value), cluster), y = -log10(Q.value))) +
-  geom_point(aes(size = Observed)) +
-  coord_flip() +
-  scale_x_reordered() +
-  facet_grid(cluster~., scales = "free_y") +
-  theme_bw() +
-  xlab(xlabel) +
-  guides(size = guide_legend(title = "# genes")) +
-  scale_size_continuous(breaks = c(20,100,200))
-}
-```
-
-
-```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb_non_int.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), tissue_df), "Tissue Ontology")
-
-#my_ontology_plot(my_tea_analysis(emb_non_int.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.25), tissue_df), "Tissue Ontology")
-```
-
-
-
-#Pull out cluster specific targets 
-
-```{r fig.height=4, fig.width=7}
-emb_non_int.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
-
-DoHeatmap(emb_non_int, features = top10clecs$gene,raster=F)
-```
-
-
-
-# Find markers in each cluster
-```{r}
-emb_non_int.markers %>% 
-  group_by(cluster) %>%
-  filter(grepl("clec*",gene), p_val_adj < .01) %>%
-  slice_max(n = 10, order_by = avg_log2FC)
-
-write.csv(emb_non_int.markers,"/Users/jessicahill/Desktop/Work/embryo_intestine_scRNAseq/emb_non_int_marker_clecs.csv", row.names = TRUE)
+write.csv(emb1.markers,"/Users/jessicahill/Documents/GitHub/Celegans_Embryo_scRNAseq_ImmuneFunction/Output/GFP1/emb_GFP1_markers.csv", row.names = TRUE)
 ```
 
