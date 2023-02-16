@@ -1,5 +1,5 @@
 ---
-title: "embryo_all-cells_scRNAseq"
+title: "embryo_scRNAseq"
 author: "Jessica Hill"
 date: "2/18/2022"
 output: html_document
@@ -12,7 +12,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ---
 
 ```{r}
-emb.data <- Read10X_h5("./10x_cloud_analysis/all_pooled_count/raw_feature_bc_matrix.h5")
+emb.all.data <- Read10X_h5("./10x_cloud_analysis/all_pooled_count/raw_feature_bc_matrix.h5")
+
+emb.unsort1.data <- Read10X_h5("./10x_cloud_analysis/unsort_1_count/raw_feature_bc_matrix.h5")
+
+emb.unsort2.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
+
+
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
@@ -229,7 +235,7 @@ emb2 <- RunUMAP(emb2, dims = 1:5)
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
-DimPlot(emb, reduction = "umap", label = "TRUE", label.box = TRUE)
+DimPlot(emb2, reduction = "umap", label = "TRUE", label.box = TRUE)
 ```
 
 # Find differentially expressed features (aka marker genes)
