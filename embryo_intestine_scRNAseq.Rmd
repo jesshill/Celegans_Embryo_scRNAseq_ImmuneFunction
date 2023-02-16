@@ -38,7 +38,7 @@ library(clustree)
 # Get started!
 
 ```{r}
-emb_int.data <- Read10X_h5("./10x_cloud_analysis/GFPsort_pooled_count/raw_feature_bc_matrix.h5")
+emb_int.data <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5")
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
