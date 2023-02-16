@@ -209,7 +209,7 @@ The elbow plot is helpful when determining how many PCs we need to capture the m
 
 Choose the number of PCs to use for clustering 
 ```{r}
-emb <- FindNeighbors(emb, dims = 1:7)
+emb <- FindNeighbors(emb, dims = 1:8)
 
 emb_clust <- FindClusters(
   object = emb,
@@ -231,7 +231,7 @@ emb1 <- FindClusters(emb, resolution = 1.2)
 # Non-linear dimensional reduction (UMAP/tSNE)
 
 ```{r}
-emb1 <- RunUMAP(emb1, dims = 1:7)
+emb1 <- RunUMAP(emb1, dims = 1:8)
 ```
 
 ```{r}
@@ -249,6 +249,6 @@ emb1.markers %>%
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
-write.csv(emb1.markers,"/Users/jessicahill/Documents/GitHub/Celegans_Embryo_scRNAseq_ImmuneFunction/Output/GFP1/emb_GFP1_markers.csv", row.names = TRUE)
+write.csv(emb1.markers,"/Users/jessicahill/Documents/GitHub/Celegans_Embryo_scRNAseq_ImmuneFunction/Output/GFP2/emb_GFP2_markers.csv", row.names = TRUE)
 ```
 
