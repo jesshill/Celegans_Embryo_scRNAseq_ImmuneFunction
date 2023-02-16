@@ -9,36 +9,36 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Calculating Trajectories with Monocle 3 and Seurat 
-## Compiled: July 23, 2020
-### http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/monocle3.html 
+Calculating Trajectories with Monocle 3 and Seurat 
+Compiled: July 23, 2020
+http://htmlpreview.github.io/?https://github.com/satijalab/seurat-wrappers/blob/master/docs/monocle3.html 
 
 ---
 
-## This vingette demonstrates how to run trajectory inference and pseudotime calculations with Monocle 3 on Seurat objects.
+# This vingette demonstrates how to run trajectory inference and pseudotime calculations with Monocle 3 on Seurat objects.
 
 The single-cell transcriptional landscape of mammalian organogenesis
 Junyue Cao, Malte Spielmann, Xiaojie Qiu, Xingfan Huang, Daniel M. Ibrahim, Andrew J. Hill, Fan Zhang, Stefan Mundlos, Lena Christiansen, Frank J. Steemers, Cole Trapnell & Jay Shendure
 
 
-## other useful websites: 
+# other useful websites: 
 
 https://broadinstitute.github.io/2019_scWorkshop/feature-selection-and-cluster-analysis.html#seurat-tutorial
 
 https://cole-trapnell-lab.github.io/monocle3/docs/trajectories/#order-cells
 
+# Prerequisites to install:
 
+R v4.1.3
+Seurat v4.1.0 
+BiocManager v3.14 
+SeuratWrappers
+SeuratData
+Monocle 3 v2.22.0 
 
-## Prerequisites to install:
-# R v4.1.3
-# Seurat v4.1.0 
-# BiocManager v3.14 
-# SeuratWrappers
-# SeuratData
-# Monocle 3 v2.22.0 
+# Install Packages (don't install from source code, use binaries)
 
-
-## Install Packages (don't install from source code, use binaries)
+```{r}
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install(version = "3.14")
@@ -57,9 +57,11 @@ devtools::install_github('satijalab/seurat-data', force = TRUE)
 
 devtools::install_github('cole-trapnell-lab/leidenbase')
 devtools::install_github('cole-trapnell-lab/monocle3')
+```
 
+# Packages to load
 
-## Packages to load
+```{r}
 library(monocle3)
 library(Seurat)
 library(SeuratData)
@@ -67,40 +69,151 @@ library(SeuratWrappers)
 library(ggplot2)
 library(patchwork)
 library(magrittr)
+```
 
+# load in data
 
-# load in example data HCA Bone Marrow 40k
+```{r}
 InstallData("hcabm40k")
 data("hcabm40k")
+```
 
-
-## STEP 1 ##
-
-# Splits object based on a single attribute into a list of subsetted objects, one for each level of the attribute.
+```{r}
 hcabm40k <- SplitObject(hcabm40k, split.by = "orig.ident")
 
-# log normalize data then identify variable features 
 for (i in seq_along(hcabm40k)) {
-  hcabm40k[[i]] <- NormalizeData(hcabm40k[[i]]) %>% FindVariableFeatures()
+    hcabm40k[[i]] <- NormalizeData(hcabm40k[[i]]) %>% FindVariableFeatures()
 }
-
-# choose the features to use when integrating multiple datasets. 
 features <- SelectIntegrationFeatures(hcabm40k)
-
-# scale and centers features in the dataset. Run PCA dimensionality reduction. 
 for (i in seq_along(along.with = hcabm40k)) {
-  hcabm40k[[i]] <- ScaleData(hcabm40k[[i]], features = features) %>% RunPCA(features = features)
+    hcabm40k[[i]] <- ScaleData(hcabm40k[[i]], features = features) %>% RunPCA(features = features)
 }
+```
 
-
-## STEP 2 ##
-
-# find a set of anchors between a list of Seurat objects. 
+```{r}
 anchors <- FindIntegrationAnchors(hcabm40k, reference = c(1, 2), reduction = "rpca", dims = 1:30)
+integrated <- IntegrateData(anchors, dims = 1:30)
+```
+
+```{r}
+integrated <- ScaleData(integrated)
+integrated <- RunPCA(integrated)
+integrated <- RunUMAP(integrated, dims = 1:30, reduction.name = "UMAP")
+integrated <- FindNeighbors(integrated, dims = 1:30)
+integrated <- FindClusters(integrated)
+DimPlot(integrated, group.by = c("orig.ident", "ident"))
+```
+
+```{r}
+cds <- as.cell_data_set(integrated)
+cds <- cluster_cells(cds)
+p1 <- plot_cells(cds, show_trajectory_graph = FALSE)
+p2 <- plot_cells(cds, color_cells_by = "partition", show_trajectory_graph = FALSE)
+wrap_plots(p1, p2)
+```
+
+```{r}
+cds <- as.Seurat(cds)
+
+integrated.sub <- subset(as.Seurat(cds), monocle3_partitions == 1)
+cds <- as.cell_data_set(integrated.sub)
+cds <- learn_graph(cds)
+plot_cells(cds, label_groups_by_cluster = FALSE, label_leaves = FALSE, label_branch_points = FALSE)
+```
+
+```{r}
+max.avp <- which.max(unlist(FetchData(integrated.sub, "AVP")))
+max.avp <- colnames(integrated.sub)[max.avp]
+cds <- order_cells(cds, root_cells = max.avp)
+plot_cells(cds, color_cells_by = "pseudotime", label_cell_groups = FALSE, label_leaves = FALSE, 
+    label_branch_points = FALSE)
+```
+
+```{r}
+# Set the assay back as 'integrated'
+integrated.sub <- as.Seurat(cds, assay = "integrated")
+FeaturePlot(integrated.sub, "monocle3_pseudotime")
+```
+
+---
+
+```{r}
+emb.GFP2.data <- Read10X_h5("./10x_cloud_analysis/GFP_2_count/raw_feature_bc_matrix.h5")
+
+
+
+mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+genes.df <- getBM(mart = mart, 
+      filters = c("species_id_1010", "wbps_gene_id"),
+      value = list("caelegprjna13758", rownames(emb.GFP2.data)),
+      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
+      )
+
+mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id'] 
+
+genes.df$chromosome_name = NULL 
+
+c(nrow(genes.df), nrow(emb.GFP2.data))
+
+nrow(emb.GFP2.data)-nrow(genes.df)
+
+
+
+emb.GFP2.data.filt <- emb.GFP2.data[rownames(emb.GFP2.data) %in% genes.df$wbps_gene_id,]
+
+# The two datastructures do not have the same order of WBGeneIDs
+identical(rownames(emb.GFP2.data.filt), genes.df$wbps_gene_id)
+
+# Use match to make sure they are in the same order
+identical(rownames(emb.GFP2.data.filt),
+          genes.df[match(rownames(emb.GFP2.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+          )
+
+# now replace the WBGeneIDs with gene names
+rownames(emb.GFP2.data.filt) <- genes.df[
+  match(rownames(emb.GFP2.data.filt),
+        genes.df$wbps_gene_id)
+  ,]$external_gene_id
+
+# are there NAs?
+sum(!is.na(rownames(emb.GFP2.data.filt)))
+
+
+
+emb <- CreateSeuratObject(counts = emb.GFP2.data.filt, project = "emb_GFP2", min.cells = 3, min.features = 200)
+```
+
+
+# STEP 1
+
+```{r}
+# Splits object based on a single attribute into a list of subset-ed objects, one for each level of the attribute.
+emb_split <- SplitObject(emb, split.by = "orig.ident") 
+
+# log normalize data then identify variable features
+for (i in seq_along(emb_split)) {
+  emb_split[[i]] <- NormalizeData(emb_split[[i]]) %>% FindVariableFeatures()
+} 
+
+# choose the features to use when integrating multiple datasets.
+features <- SelectIntegrationFeatures(emb_split) 
+
+# scale and centers features in the dataset. Run PCA dimensionality reduction.
+for (i in seq_along(along.with = emb_split)) {
+  emb_split[[i]] <- ScaleData(emb_split[[i]], features = features) %>% RunPCA(features = features) 
+}
+```
+
+# STEP 2
+
+```{r}
+# find a set of anchors between a list of Seurat objects. 
+anchors <- FindIntegrationAnchors(emb_split, reference = c(1, 2), reduction = "rpca", dims = 1:30)
 
 # Perform dataset integration using a pre-computed AnchorSet.
 integrated <- IntegrateData(anchors, dims = 1:30)
-
+```
 
 ## STEP 3 ##
 integrated <- ScaleData(integrated)

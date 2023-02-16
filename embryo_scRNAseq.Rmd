@@ -251,4 +251,3 @@ emb1.markers %>%
 
 write.csv(emb1.markers,"/Users/jessicahill/Documents/GitHub/Celegans_Embryo_scRNAseq_ImmuneFunction/Output/GFP2/emb_GFP2_markers.csv", row.names = TRUE)
 ```
-
