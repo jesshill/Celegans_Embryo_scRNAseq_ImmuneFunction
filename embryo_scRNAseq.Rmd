@@ -209,7 +209,7 @@ The elbow plot is helpful when determining how many PCs we need to capture the m
 
 Choose the number of PCs to use for clustering 
 ```{r}
-emb <- FindNeighbors(emb, dims = 1:6)
+emb <- FindNeighbors(emb, dims = 1:10)
 
 emb_clust <- FindClusters(
   object = emb,
@@ -224,14 +224,14 @@ clustree(emb_clust, prefix = "RNA_snn_res.")
 # Now find clusters using original Surat package methods, and choose the appropriate resolution for the given dimensions using the Clustree data
 
 emb1 <- FindClusters(emb, resolution = 1.2)
-#emb2 <- FindClusters(emb, resolution = 0.8) #
-#emb3 <- FindClusters(emb, resolution = 0.4)
+#emb2 <- FindClusters(emb, resolution = 0.8)
+emb3 <- FindClusters(emb, resolution = 0.4)
 ```
 
 # Non-linear dimensional reduction (UMAP/tSNE)
 
 ```{r}
-emb1 <- RunUMAP(emb1, dims = 1:6)
+emb1 <- RunUMAP(emb1, dims = 1:10)
 ```
 
 ```{r}
@@ -249,5 +249,5 @@ emb1.markers %>%
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
-write.csv(emb1.markers,"/Users/jessicahill/Documents/GitHub/Celegans_Embryo_scRNAseq_ImmuneFunction/Output/unsort1/emb_unsort1_markers.csv", row.names = TRUE)
+write.csv(emb1.markers,"/Users/jessicahill/Documents/GitHub/Celegans_Embryo_scRNAseq_ImmuneFunction/Output/unsort2/emb_unsort2_markers.csv", row.names = TRUE)
 ```
