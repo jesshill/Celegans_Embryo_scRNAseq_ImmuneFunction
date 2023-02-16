@@ -18,7 +18,9 @@ emb.unsort1.data <- Read10X_h5("./10x_cloud_analysis/unsort_1_count/raw_feature_
 
 emb.unsort2.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
 
+emb.GFP1.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
 
+emb.GFP2.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
