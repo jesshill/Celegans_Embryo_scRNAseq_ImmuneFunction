@@ -18,9 +18,9 @@ emb.unsort1.data <- Read10X_h5("./10x_cloud_analysis/unsort_1_count/raw_feature_
 
 emb.unsort2.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
 
-emb.GFP1.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
+emb.GFP1.data <- Read10X_h5("./10x_cloud_analysis/GFP_1_count/raw_feature_bc_matrix.h5")
 
-emb.GFP2.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
+emb.GFP2.data <- Read10X_h5("./10x_cloud_analysis/GFP_2_count/raw_feature_bc_matrix.h5")
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
@@ -29,7 +29,7 @@ mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite
 
 genes.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "wbps_gene_id"),
-      value = list("caelegprjna13758", rownames(emb.data)),
+      value = list("caelegprjna13758", rownames(emb.GFP1.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
       )
 
@@ -37,38 +37,37 @@ mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 
 genes.df$chromosome_name = NULL 
 
-c(nrow(genes.df), nrow(emb.data))
+c(nrow(genes.df), nrow(emb.GFP1.data))
 
 # are there are genes missing?
-nrow(emb.data)-nrow(genes.df)
+nrow(emb.GFP1.data)-nrow(genes.df)
 ```
 
 There are `r nrow(emb.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 
 ```{r}
-emb.data.filt <- emb.data[rownames(emb.data) %in% genes.df$wbps_gene_id,]
+emb.GFP1.data.filt <- emb.GFP1.data[rownames(emb.GFP1.data) %in% genes.df$wbps_gene_id,]
 
 # The two datastructures do not have the same order of WBGeneIDs
-identical(rownames(emb.data.filt), genes.df$wbps_gene_id)
+identical(rownames(emb.GFP1.data.filt), genes.df$wbps_gene_id)
 
 # Use match to make sure they are in the same order
-identical(rownames(emb.data.filt),
-          genes.df[match(rownames(emb.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
-)
+identical(rownames(emb.GFP1.data.filt),
+          genes.df[match(rownames(emb.GFP1.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+          )
 
 # now replace the WBGeneIDs with gene names
-rownames(emb.data.filt) <- genes.df[
-  match(rownames(emb.data.filt),
+rownames(emb.GFP1.data.filt) <- genes.df[
+  match(rownames(emb.GFP1.data.filt),
         genes.df$wbps_gene_id)
   ,]$external_gene_id
 
 # are there NAs?
-sum(!is.na(rownames(emb.data.filt)))
-head(emb.data.filt)
+sum(!is.na(rownames(emb.GFP1.data.filt)))
 ```
 
 ```{r}
-emb <- CreateSeuratObject(counts = emb.data.filt, project = "emb_all-cells", min.cells = 3, min.features = 200)
+emb <- CreateSeuratObject(counts = emb.GFP1.data.filt, project = "emb_GFP1", min.cells = 3, min.features = 200)
 ```
 
 ```{r}
