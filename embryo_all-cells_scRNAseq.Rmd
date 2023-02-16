@@ -216,14 +216,15 @@ clustree(emb_clust, prefix = "RNA_snn_res.")
 
 # Now find clusters using original Surat package methods, and choose the appropriate resolution for the given dimensions using the Clustree data
 
-emb1 <- FindClusters(emb, resolution = 1.2) #1.2 didnt look clustered
-emb2 <- FindClusters(emb, resolution = 0.8)
+emb1 <- FindClusters(emb, resolution = 1.2) #1.2 didn't look clustered
+emb2 <- FindClusters(emb, resolution = 0.8) #
+emb3 <- FindClusters(emb, resolution = 0.4)
 ```
 
 # Non-linear dimensional reduction (UMAP/tSNE)
 
 ```{r}
-emb2 <- RunUMAP(emb, dims = 1:5)
+emb2 <- RunUMAP(emb2, dims = 1:5)
 ```
 
 ```{r}
