@@ -12,8 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ---
 
 ```{r}
-emb.all.data <- Read10X_h5("./10x_cloud_analysis/all_pooled_count/raw_feature_bc_matrix.h5")
-
 emb.unsort1.data <- Read10X_h5("./10x_cloud_analysis/unsort_1_count/raw_feature_bc_matrix.h5")
 
 emb.unsort2.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
@@ -29,7 +27,7 @@ mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite
 
 genes.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "wbps_gene_id"),
-      value = list("caelegprjna13758", rownames(emb.unsort2.data)),
+      value = list("caelegprjna13758", rownames(emb.GFP2.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
       )
 
@@ -37,56 +35,117 @@ mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 
 genes.df$chromosome_name = NULL 
 
-c(nrow(genes.df), nrow(emb.unsort2.data))
+c(nrow(genes.df), nrow(emb.GFP2.data))
 
 # are there are genes missing?
-nrow(emb.unsort2.data)-nrow(genes.df)
+nrow(emb.GFP2.data)-nrow(genes.df)
 ```
 
 There are `r nrow(emb.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 
 ```{r}
+emb.unsort1.data.filt <- emb.unsort1.data[rownames(emb.unsort1.data) %in% genes.df$wbps_gene_id,]
+
 emb.unsort2.data.filt <- emb.unsort2.data[rownames(emb.unsort2.data) %in% genes.df$wbps_gene_id,]
 
+emb.GFP1.data.filt <- emb.GFP1.data[rownames(emb.GFP1.data) %in% genes.df$wbps_gene_id,]
+
+emb.GFP2.data.filt <- emb.GFP2.data[rownames(emb.GFP2.data) %in% genes.df$wbps_gene_id,]
+
 # The two datastructures do not have the same order of WBGeneIDs
+identical(rownames(emb.unsort1.data.filt), genes.df$wbps_gene_id)
 identical(rownames(emb.unsort2.data.filt), genes.df$wbps_gene_id)
+identical(rownames(emb.GFP1.data.filt), genes.df$wbps_gene_id)
+identical(rownames(emb.GFP2.data.filt), genes.df$wbps_gene_id)
 
 # Use match to make sure they are in the same order
+identical(rownames(emb.unsort1.data.filt),
+          genes.df[match(rownames(emb.unsort1.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+          )
+
 identical(rownames(emb.unsort2.data.filt),
           genes.df[match(rownames(emb.unsort2.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
           )
 
+identical(rownames(emb.GFP1.data.filt),
+          genes.df[match(rownames(emb.GFP1.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+          )
+
+identical(rownames(emb.GFP2.data.filt),
+          genes.df[match(rownames(emb.GFP2.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+          )
+
 # now replace the WBGeneIDs with gene names
+rownames(emb.unsort1.data.filt) <- genes.df[
+  match(rownames(emb.unsort1.data.filt),
+        genes.df$wbps_gene_id)
+  ,]$external_gene_id
+
 rownames(emb.unsort2.data.filt) <- genes.df[
   match(rownames(emb.unsort2.data.filt),
         genes.df$wbps_gene_id)
   ,]$external_gene_id
 
+rownames(emb.GFP1.data.filt) <- genes.df[
+  match(rownames(emb.GFP1.data.filt),
+        genes.df$wbps_gene_id)
+  ,]$external_gene_id
+
+rownames(emb.GFP2.data.filt) <- genes.df[
+  match(rownames(emb.GFP2.data.filt),
+        genes.df$wbps_gene_id)
+  ,]$external_gene_id
+
 # are there NAs?
+sum(!is.na(rownames(emb.unsort1.data.filt)))
 sum(!is.na(rownames(emb.unsort2.data.filt)))
+sum(!is.na(rownames(emb.GFP1.data.filt)))
+sum(!is.na(rownames(emb.GFP2.data.filt)))
 ```
 
 ```{r}
-emb <- CreateSeuratObject(counts = emb.unsort2.data.filt, project = "emb_unsort2", min.cells = 3, min.features = 200)
+emb.unsort1 <- CreateSeuratObject(counts = emb.unsort1.data.filt, project = "emb_unsort1", min.cells = 3, min.features = 200)
+
+emb.unsort2 <- CreateSeuratObject(counts = emb.unsort2.data.filt, project = "emb_unsort2", min.cells = 3, min.features = 200)
+
+emb.GFP1 <- CreateSeuratObject(counts = emb.GFP1.data.filt, project = "emb_GFP1", min.cells = 3, min.features = 200)
+
+emb.GFP2 <- CreateSeuratObject(counts = emb.GFP2.data.filt, project = "emb_GFP2", min.cells = 3, min.features = 200)
 ```
 
 ```{r}
 length(unique(genes.df$wbps_gene_id))
-length(unique(rownames(emb)))
-rownames(emb)[!(rownames(emb) %in% genes.df$wbps_gene_id)]
+length(unique(rownames(emb.unsort1)))
+rownames(emb.unsort1)[!(rownames(emb.unsort1) %in% genes.df$wbps_gene_id)]
+
+length(unique(genes.df$wbps_gene_id))
+length(unique(rownames(emb.unsort2)))
+rownames(emb.unsort2)[!(rownames(emb.unsort2) %in% genes.df$wbps_gene_id)]
+
+length(unique(genes.df$wbps_gene_id))
+length(unique(rownames(emb.GFP1)))
+rownames(emb.GFP1)[!(rownames(emb.GFP1) %in% genes.df$wbps_gene_id)]
+
+length(unique(genes.df$wbps_gene_id))
+length(unique(rownames(emb.GFP2)))
+rownames(emb.GFP2)[!(rownames(emb.GFP2) %in% genes.df$wbps_gene_id)]
 ```
 
 # Quality control metrics
 
-show QC metrics for the first 5 cells 
-```{r}
-head(emb@meta.data, 5)
-```
-
 Mitochondrial genome percentage 
 ```{r}
-mitoIndices = which(rownames(emb) %in% mitoList)
-emb[["percent.mt"]] <- PercentageFeatureSet(emb, features = mitoIndices)
+mitoIndices = which(rownames(emb.unsort1) %in% mitoList)
+emb.unsort1[["percent.mt"]] <- PercentageFeatureSet(emb.unsort1, features = mitoIndices)
+
+mitoIndices = which(rownames(emb.unsort2) %in% mitoList)
+emb.unsort2[["percent.mt"]] <- PercentageFeatureSet(emb.unsort2, features = mitoIndices)
+
+mitoIndices = which(rownames(emb.GFP1) %in% mitoList)
+emb.GFP1[["percent.mt"]] <- PercentageFeatureSet(emb.GFP1, features = mitoIndices)
+
+mitoIndices = which(rownames(emb.GFP2) %in% mitoList)
+emb.GFP2[["percent.mt"]] <- PercentageFeatureSet(emb.GFP2, features = mitoIndices)
 ```
 
 
@@ -98,13 +157,28 @@ emb[["percent.mt"]] <- PercentageFeatureSet(emb, features = mitoIndices)
 
 Visualize QC metrics as a violin plot
 ```{r}
-VlnPlot(emb, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(emb.unsort1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(emb.unsort2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(emb.GFP1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(emb.GFP2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 ```{r}
-plot1 <- FeatureScatter(emb, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
-plot2 <- FeatureScatter(emb, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 <- FeatureScatter(emb.unsort1, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb.unsort1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 + plot2
+
+plot1 <- FeatureScatter(emb.unsort2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb.unsort2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 + plot2
+
+plot1 <- FeatureScatter(emb.GFP1, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb.GFP1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 + plot2
+
+plot1 <- FeatureScatter(emb.GFP2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb.GFP2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 ```
 
@@ -112,13 +186,30 @@ plot1 + plot2
 
 cells being filtered due to mito percent: 
 ```{r}
-sum(emb$percent.mt > 50)/ length(emb$percent.mt)
+sum(emb.unsort1$percent.mt > 50)/ length(emb.unsort1$percent.mt)
+emb.unsort1 <- subset(emb.unsort1, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 
-emb <- subset(emb, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
+sum(emb.unsort2$percent.mt > 50)/ length(emb.unsort2$percent.mt)
+emb.unsort2 <- subset(emb.unsort2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
+
+sum(emb.GFP1$percent.mt > 50)/ length(emb.GFP1$percent.mt)
+emb.GFP1 <- subset(emb.GFP1, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
+
+sum(emb.GFP2$percent.mt > 50)/ length(emb.GFP2$percent.mt)
+emb.GFP2 <- subset(emb.GFP2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
 
 # Visualize after filtering
 ```{r}
+VlnPlot(emb.unsort1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+FeatureScatter(emb.unsort1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+
+VlnPlot(emb.unsort2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+FeatureScatter(emb.unsort2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+
+VlnPlot(emb, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+FeatureScatter(emb, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+
 VlnPlot(emb, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
 FeatureScatter(emb, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 ```

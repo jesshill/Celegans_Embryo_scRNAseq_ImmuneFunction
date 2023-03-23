@@ -301,7 +301,7 @@ FeaturePlot(emb_int, features = c("elt-2","elt-7", 'ges-1'),raster=F)
 #VlnPlot(emb_int, features = c("elt-2","elt-7", 'ges-1'))
 
 FeaturePlot(emb_int, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
-VlnPlot(emb_int, features = c("chs-1", "myo-2", "myo-3"))
+VlnPlot(emb_int, features = c("chs-1", "myo-2", "myo-3", "elt-2", "ges-1"))
 ```
 
 

@@ -11,5 +11,23 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
-
+library(Seurat)
+library(SeuratData)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
 ```
+
+
+```{r}
+emb.unsort1.data <- Read10X_h5("./10x_cloud_analysis/unsort_1_count/raw_feature_bc_matrix.h5")
+
+emb.unsort2.data <- Read10X_h5("./10x_cloud_analysis/unsort_2_count/raw_feature_bc_matrix.h5")
+
+emb.GFP1.data <- Read10X_h5("./10x_cloud_analysis/GFP_1_count/raw_feature_bc_matrix.h5")
+
+emb.GFP2.data <- Read10X_h5("./10x_cloud_analysis/GFP_2_count/raw_feature_bc_matrix.h5")
+```
+
+
+
