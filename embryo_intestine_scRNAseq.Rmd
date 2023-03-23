@@ -278,15 +278,32 @@ DimPlot(emb_int, reduction = "umap", label = "TRUE", label.box = TRUE)
 
 Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
 ```{r}
-emb_int.markers <- FindAllMarkers(emb_int, only.pos = F, min.pct = 0.25, logfc.threshold = 1) # 0.25 is the default threshold 
+emb_int.markers <- FindAllMarkers(emb_int, only.pos = T, min.pct = 0.25, logfc.threshold = 1.4) # 0.25 is the default threshold 
 
 emb_int.markers %>% 
-  group_by(cluster) %>%
+  group_by(cluster) %>% filter(p_val_adj < .01) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
 
-write.csv(emb_int.markers,"./Output/emb_int_markers.csv", row.names = TRUE)
+write.csv(emb_int.markers,"./Output/GFP_pooled/emb_int_markers.csv", row.names = TRUE)
 ```
+
+
+```{r}
+# for justin
+
+emb_int.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
+
+DoHeatmap(emb_int, features = top2$gene,raster=F)
+
+
+FeaturePlot(emb_int, features = c("elt-2","elt-7", 'ges-1'),raster=F)
+#VlnPlot(emb_int, features = c("elt-2","elt-7", 'ges-1'))
+
+FeaturePlot(emb_int, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
+VlnPlot(emb_int, features = c("chs-1", "myo-2", "myo-3"))
+```
+
 
 
 Find all cluster specific markers (i.e., cluster 2)
