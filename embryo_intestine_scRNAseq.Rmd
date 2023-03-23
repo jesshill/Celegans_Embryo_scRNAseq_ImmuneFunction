@@ -572,7 +572,6 @@ FeaturePlot(emb_int_specific_recluster, pt.size = 0.1,
 
 # genes from murray data
 FeaturePlot(emb_int_specific_recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 3)
-VlnPlot(emb_int_specific_recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), , ncol = 3)
 
 FeaturePlot(emb_int_specific_recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 4)
 VlnPlot(emb_int_specific_recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), ncol = 4)
