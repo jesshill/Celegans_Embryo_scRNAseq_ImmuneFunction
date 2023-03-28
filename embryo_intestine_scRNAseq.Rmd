@@ -285,7 +285,7 @@ emb_int.markers %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
 
-write.csv(emb_int.markers,"./Output/GFP_pooled/emb_int_markers.csv", row.names = TRUE)
+write.csv(emb_int.markers,"./Output/GFP_pooled/emb_int_markers_unthresholded.csv", row.names = TRUE)
 ```
 
 
