@@ -200,10 +200,12 @@ print(emb.GFPpooled[["pca"]], dims = 1:5, nfeatures = 5)
 ```{r}
 # top genes associated with reduction components
 VizDimLoadings(emb.GFPpooled, dims = 1:2, reduction = "pca")
+ggsave("./Output/GFP_pooled/emb.GFPpooled.DimLoadings.png")
 ```
 
 ```{r}
 DimPlot(emb.GFPpooled, reduction = "pca")
+ggsave("./Output/GFP_pooled/emb.GFPpooled.DimLoadings.png")
 ```
 
 ```{r}
