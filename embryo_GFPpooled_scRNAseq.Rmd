@@ -205,15 +205,17 @@ ggsave("./Output/GFP_pooled/emb.GFPpooled.DimLoadings.png")
 
 ```{r}
 DimPlot(emb.GFPpooled, reduction = "pca")
-ggsave("./Output/GFP_pooled/emb.GFPpooled.DimLoadings.png")
+ggsave("./Output/GFP_pooled/emb.GFPpooled.DimPlot.png")
 ```
 
 ```{r}
 DimHeatmap(emb.GFPpooled, dims = 1, cells = 500, balanced = TRUE)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.HeatMap1.png")
 ```
 
 ```{r}
 DimHeatmap(emb.GFPpooled, dims = 1:6, cells = 500, balanced = TRUE)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.HeatMap1-6.png")
 ```
 
 # Determine dataset dimensionality
