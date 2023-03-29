@@ -276,7 +276,7 @@ emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1)
 ```
 
 
-# Non-linear dimensional reduction (UMAP/tSNE)
+# Non-linear dimensional reduction (UMAP)
 
 ```{r}
 emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:10)
@@ -360,11 +360,13 @@ go_df <- tea$fetch_dictionary("go")
 
 ```{r}
 emb.GFPpooled.markers <- emb.GFPpooled.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
-emb.GFPpooled.markers <- emb.GFPpooled.markers %>% rename(WBGeneID = wbps_gene_id)
+
+emb.GFPpooled.markers <- rename(emb.GFPpooled.markers, WBGeneID = 'wbps_gene_id')
 ```
 
 ```{r}
 clusters <- unique(emb.GFPpooled.markers$cluster)
+
 my_tea_analysis <- function(input_df, tea_dict){
   tea_df <- data.frame()
   for (i in clusters){
@@ -409,9 +411,9 @@ my_ontology_plot <- function(input_df, xlabel){
 ```
 
 ```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1.5), tissue_df), "Tissue Ontology")
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
 
-ggsave("./Output/GFP_pooled/emb.GFPpooled.VlnPlot-NegCtrls.png")
+#ggsave("./Output/GFP_pooled/emb.GFPpooled.GO.png")
 ```
 
 #Pull out cluster specific CLECs 
