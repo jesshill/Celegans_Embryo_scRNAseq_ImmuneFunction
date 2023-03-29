@@ -255,7 +255,7 @@ emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:10)
 ## Find clusters using Clustree
 # generate a vector of different resolutions to see which one performs best 
 emb.GFPpooled.clust <- FindClusters(
-  object = emb_int,
+  object = emb.GFPpooled,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
   dims.use = 1:10,
@@ -264,14 +264,12 @@ emb.GFPpooled.clust <- FindClusters(
 
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
 clustree(emb.GFPpooled.clust, prefix = "RNA_snn_res.")
+ggsave("./Output/GFP_pooled/emb.GFPpooled.Clustree.png")
 
 
 ## Find clusters using original Surat package methods
 # choose the appropriate resolution for the given dimensions using the Clustree data
 emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1)
-
-## Look at cluster IDs of the first 5 cells
-head(Idents(emb.GFPpooled), 5)
 ```
 
 
@@ -284,6 +282,7 @@ emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:10)
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
 DimPlot(emb.GFPpooled, reduction = "umap", label = "TRUE", label.box = TRUE)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.UMAP.png")
 ```
 
 
