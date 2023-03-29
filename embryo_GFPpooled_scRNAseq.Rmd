@@ -55,9 +55,12 @@ mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes.df$chromosome_name = NULL
 
 c(nrow(genes.df), nrow(emb.GFPpooled.data))
+
+# there are genes missing
+nrow(emb.GFPpooled.data)-nrow(genes.df)
 ```
 
-There are `r nrow(emb_int.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
+There are `r nrow(emb.GFPpooled.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 
 ```{r}
 emb.GFPpooled.data.filt <- emb.GFPpooled.data[rownames(emb.GFPpooled.data) %in% genes.df$wbps_gene_id,]
