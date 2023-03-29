@@ -302,10 +302,25 @@ The elbow plot is helpful when determining how many PCs we need to capture the m
 
 ```{r}
 ElbowPlot(emb.unsort1) # can try 3 or 5
-ElbowPlot(emb.unsort2) # can try 5
-ElbowPlot(emb.GFP1) # can try 4 or 5
-ElbowPlot(emb.GFP2) # can try 3 or 5
+ggsave("./Output/unsort1/emb.unsort1.elbowplot.png")
 ```
+
+```{r}
+ElbowPlot(emb.unsort2) # can try 5
+ggsave("./Output/unsort2/emb.unsort2.elbowplot.png")
+```
+
+```{r}
+ElbowPlot(emb.GFP1) # can try 4 or 5
+ggsave("./Output/GFP1/emb.GFP1.elbowplot.png")
+```
+
+```{r}
+ElbowPlot(emb.GFP2) # can try 3 or 5
+ggsave("./Output/GFP2/emb.GFP2.elbowplot.png")
+```
+
+
 
 
 # Cell clustering
@@ -318,6 +333,8 @@ emb.GFP1 <- FindNeighbors(emb.GFP1, dims = 1:5)
 emb.GFP2 <- FindNeighbors(emb.GFP2, dims = 1:5)
 
 
+# adjust for each sample
+
 emb_clust.GFP2 <- FindClusters(
   object = emb.GFP2,
   reduction.type = "pca",
@@ -326,10 +343,12 @@ emb_clust.GFP2 <- FindClusters(
   save.SNN = TRUE
 )
 
+
 clustree(emb_clust.unsort1, prefix = "RNA_snn_res.")
 clustree(emb_clust.unsort2, prefix = "RNA_snn_res.")
 clustree(emb_clust.GFP1, prefix = "RNA_snn_res.")
 clustree(emb_clust.GFP2, prefix = "RNA_snn_res.")
+
 
 # Now find clusters using original Surat package methods, and choose the appropriate resolution for the given dimensions using the Clustree data
 
@@ -338,6 +357,9 @@ emb.unsort2 <- FindClusters(emb.unsort2, resolution = 1)
 emb.GFP1 <- FindClusters(emb.GFP1, resolution = 1.2)
 emb.GFP2 <- FindClusters(emb.GFP2, resolution = 1.2)
 ```
+
+
+
 
 # Non-linear dimensional reduction (UMAP/tSNE)
 
@@ -350,15 +372,32 @@ emb.GFP2 <- RunUMAP(emb.GFP2, dims = 1:5)
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
+
 DimPlot(emb.unsort1, reduction = "umap", label = "TRUE", label.box = TRUE)
-DimPlot(emb.unsort2, reduction = "umap", label = "TRUE", label.box = TRUE)
-DimPlot(emb.GFP1, reduction = "umap", label = "TRUE", label.box = TRUE)
-DimPlot(emb.GFP2, reduction = "umap", label = "TRUE", label.box = TRUE)
+ggsave("./Output/unsort1/emb.unsort1.umap.png")
 ```
+
+```{r}
+DimPlot(emb.unsort2, reduction = "umap", label = "TRUE", label.box = TRUE)
+ggsave("./Output/unsort2/emb.unsort2.umap.png")
+```
+
+```{r}
+DimPlot(emb.GFP1, reduction = "umap", label = "TRUE", label.box = TRUE)
+ggsave("./Output/GFP1/emb.GFP1.umap.png")
+```
+
+```{r}
+DimPlot(emb.GFP2, reduction = "umap", label = "TRUE", label.box = TRUE)
+ggsave("./Output/GFP2/emb.GFP2.umap.png")
+```
+
+
 
 # Find differentially expressed features (aka marker genes)
 
 Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
+
 ```{r}
 emb.unsort1.markers <- FindAllMarkers(emb.unsort1, only.pos = T, min.pct = 0.25, logfc.threshold = 0.25)
 
