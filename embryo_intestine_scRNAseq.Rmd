@@ -38,7 +38,7 @@ library(clustree)
 # Get started!
 
 ```{r}
-emb_int.data <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5")
+emb.GFPpooled.data <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5")
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
@@ -47,49 +47,49 @@ mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite
 
 genes.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "wbps_gene_id"),
-      value = list("caelegprjna13758", rownames(emb_int.data)),
+      value = list("caelegprjna13758", rownames(emb.GFPpooled.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
       )
 
 mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes.df$chromosome_name = NULL
 
-c(nrow(genes.df), nrow(emb_int.data))
+c(nrow(genes.df), nrow(emb.GFPpooled.data))
 ```
 
 There are `r nrow(emb_int.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 
 ```{r}
-emb_int.data.filt <- emb_int.data[rownames(emb_int.data) %in% genes.df$wbps_gene_id,]
+emb.GFPpooled.data.filt <- emb.GFPpooled.data[rownames(emb.GFPpooled.data) %in% genes.df$wbps_gene_id,]
 
 # The two data structures do not have the same order of WBGeneIDs
-identical(rownames(emb_int.data.filt), genes.df$wbps_gene_id)
+identical(rownames(emb.GFPpooled.data.filt), genes.df$wbps_gene_id)
 
 # Use match to make sure they are in the same order
-identical(rownames(emb_int.data.filt),
-          genes.df[match(rownames(emb_int.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+identical(rownames(emb.GFPpooled.data.filt),
+          genes.df[match(rownames(emb.GFPpooled.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
 )
 
 # now replace the WBGeneIDs with gene names
-rownames(emb_int.data.filt) <- genes.df[
-  match(rownames(emb_int.data.filt),
+rownames(emb.GFPpooled.data.filt) <- genes.df[
+  match(rownames(emb.GFPpooled.data.filt),
         genes.df$wbps_gene_id)
   ,]$external_gene_id
 
 # are there NAs?
-sum(!is.na(rownames(emb_int.data.filt)))
+sum(!is.na(rownames(emb.GFPpooled.data.filt)))
 
-head(emb_int.data.filt)
+head(emb.GFPpooled.data.filt)
 ```
 
 ```{r}
-emb_int <- CreateSeuratObject(counts = emb_int.data.filt, project = "emb_int_pool", min.cells = 3, min.features = 200)
+emb.GFPpooled <- CreateSeuratObject(counts = emb.GFPpooled.data.filt, project = "emb_GFPpooled", min.cells = 3, min.features = 200)
 ```
 
 ```{r}
 length(unique(genes.df$wbps_gene_id))
-length(unique(rownames(emb_int)))
-rownames(emb_int)[!(rownames(emb_int) %in% genes.df$wbps_gene_id)]
+length(unique(rownames(emb.GFPpooled)))
+rownames(emb.GFPpooled)[!(rownames(emb.GFPpooled) %in% genes.df$wbps_gene_id)]
 ```
 
 # Quality control metrics
@@ -102,25 +102,25 @@ rownames(emb_int)[!(rownames(emb_int) %in% genes.df$wbps_gene_id)]
 
 show QC metrics for the first 5 cells 
 ```{r}
-head(emb_int@meta.data, 5)
+head(emb.GFPpooled@meta.data, 5)
 ```
 
 Mitochondrial genome percentage 
 ```{r}
-mitoIndices = which(rownames(emb_int) %in% mitoList)
-emb_int[["percent.mt"]] <- PercentageFeatureSet(emb_int, features = mitoIndices)
+mitoIndices = which(rownames(emb.GFPpooled) %in% mitoList)
+emb.GFPpooled[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled, features = mitoIndices)
 ```
 
 
 Visualize QC metrics as a violin plot
 ```{r}
-VlnPlot(emb_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 ```{r}
-plot1 <- FeatureScatter(emb_int, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
-plot2 <- FeatureScatter(emb_int, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 ```
 
@@ -129,15 +129,15 @@ plot1 + plot2
 
 cells being filtered due to mito percent: 
 ```{r}
-sum(emb_int$percent.mt > 50)/ length(emb_int$percent.mt)
+sum(emb.GFPpooled$percent.mt > 50)/ length(emb.GFPpooled$percent.mt)
 
-emb_int <- subset(emb_int, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
+emb.GFPpooled <- subset(emb.GFPpooled, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
 
 # Visualize after filtering
 ```{r}
-VlnPlot(emb_int, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-FeatureScatter(emb_int, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 ```
 
 
@@ -150,21 +150,20 @@ LogNormalize: Feature counts for each cell are divided by the total counts for t
 Scale.factor: Sets the scale factor for cell-level normalization
 
 ```{r}
-emb_int <- NormalizeData(emb_int, normalization.method = "LogNormalize", scale.factor = 10000)
+emb.GFPpooled <- NormalizeData(emb.GFPpooled, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
 
 # Feature selection
 
 Identify highly variable features to focus on in downstream analysis
 ```{r}
-emb_int <- FindVariableFeatures(emb_int, selection.method = "vst", nfeatures = 2000)
+emb.GFPpooled <- FindVariableFeatures(emb.GFPpooled, selection.method = "vst", nfeatures = 2000)
 
 # Identify the 10 most highly variable genes
-top10 <- head(VariableFeatures(emb_int), 10)
-top10
+top10 <- head(VariableFeatures(emb.GFPpooled), 10)
 
 # plot variable features with and without labels
-plot1 <- VariableFeaturePlot(emb_int)
+plot1 <- VariableFeaturePlot(emb.GFPpooled)
 LabelPoints(plot = plot1, points = top10, repel = TRUE)
 ```
 
@@ -173,8 +172,8 @@ LabelPoints(plot = plot1, points = top10, repel = TRUE)
 
 Scale the data so that each gene has a mean expression of 0 and variance of 1 across all cells
 ```{r}
-all.genes <- rownames(emb_int)
-emb_int <- ScaleData(emb_int, features = all.genes)
+all.genes <- rownames(emb.GFPpooled)
+emb.GFPpooled <- ScaleData(emb.GFPpooled, features = all.genes)
 ```
 
 
@@ -182,29 +181,29 @@ emb_int <- ScaleData(emb_int, features = all.genes)
 
 PCA linear dimensionality reduction
 ```{r}
-emb_int <- RunPCA(emb_int, features = VariableFeatures(object = emb_int))
+emb.GFPpooled <- RunPCA(emb.GFPpooled, features = VariableFeatures(object = emb.GFPpooled))
 ```
 
 Examine and visualize PCA results a few different ways
 ```{r}
-print(emb_int[["pca"]], dims = 1:5, nfeatures = 5)
+print(emb.GFPpooled[["pca"]], dims = 1:5, nfeatures = 5)
 ```
 
 ```{r}
 # top genes associated with reduction components
-VizDimLoadings(emb_int, dims = 1:2, reduction = "pca")
+VizDimLoadings(emb.GFPpooled, dims = 1:2, reduction = "pca")
 ```
 
 ```{r}
-DimPlot(emb_int, reduction = "pca")
+DimPlot(emb.GFPpooled, reduction = "pca")
 ```
 
 ```{r}
-DimHeatmap(emb_int, dims = 1, cells = 500, balanced = TRUE)
+DimHeatmap(emb.GFPpooled, dims = 1, cells = 500, balanced = TRUE)
 ```
 
 ```{r}
-DimHeatmap(emb_int, dims = 1:6, cells = 500, balanced = TRUE)
+DimHeatmap(emb.GFPpooled, dims = 1:6, cells = 500, balanced = TRUE)
 ```
 
 # Determine dataset dimensionality
@@ -212,21 +211,21 @@ DimHeatmap(emb_int, dims = 1:6, cells = 500, balanced = TRUE)
 How many components should we include? 
 Use resampling test
 ```{r}
-emb_int <- JackStraw(emb_int, num.replicate = 100)
-emb_int <- ScoreJackStraw(emb_int, dims = 1:20)
+emb.GFPpooled <- JackStraw(emb.GFPpooled, num.replicate = 100)
+emb.GFPpooled <- ScoreJackStraw(emb.GFPpooled, dims = 1:20)
 ```
 
 The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
 
 ```{r}
-JackStrawPlot(emb_int, dims = 1:20)
+JackStrawPlot(emb.GFPpooled, dims = 1:20)
 ```
 
 
 An alternative, more approximate technique is the elbow plot, which ranges principle components based on the percentage of variance explained by each PC.
 
 ```{r}
-ElbowPlot(emb_int)
+ElbowPlot(emb.GFPpooled)
 ```
 
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
@@ -236,12 +235,12 @@ The elbow plot is helpful when determining how many PCs we need to capture the m
 
 Choose the number of PCs to use for clustering 
 ```{r}
-emb_int <- FindNeighbors(emb_int, dims = 1:10)
+emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:10)
 
 
 ## Find clusters using Clustree
 # generate a vector of different resolutions to see which one performs best 
-emb_int_clust <- FindClusters(
+emb.GFPpooled.clust <- FindClusters(
   object = emb_int,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
@@ -250,27 +249,27 @@ emb_int_clust <- FindClusters(
 )
 
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
-clustree(emb_int_clust, prefix = "RNA_snn_res.")
+clustree(emb.GFPpooled.clust, prefix = "RNA_snn_res.")
 
 
 ## Find clusters using original Surat package methods
 # choose the appropriate resolution for the given dimensions using the Clustree data
-emb_int <- FindClusters(emb_int, resolution = 1)
+emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1)
 
 ## Look at cluster IDs of the first 5 cells
-head(Idents(emb_int), 5)
+head(Idents(emb.GFPpooled), 5)
 ```
 
 
 # Non-linear dimensional reduction (UMAP/tSNE)
 
 ```{r}
-emb_int <- RunUMAP(emb_int, dims = 1:10)
+emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:10)
 ```
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
-DimPlot(emb_int, reduction = "umap", label = "TRUE", label.box = TRUE)
+DimPlot(emb.GFPpooled, reduction = "umap", label = "TRUE", label.box = TRUE)
 ```
 
 
@@ -278,51 +277,51 @@ DimPlot(emb_int, reduction = "umap", label = "TRUE", label.box = TRUE)
 
 Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
 ```{r}
-emb_int.markers <- FindAllMarkers(emb_int, only.pos = T, min.pct = 0.25, logfc.threshold = 1.4) # 0.25 is the default threshold 
+emb.GFPpooled.markers <- FindAllMarkers(emb.GFPpooled, only.pos = T, min.pct = 0.25, logfc.threshold = 1.4) # 0.25 is the default threshold 
 
-emb_int.markers %>% 
+emb.GFPpooled.markers %>% 
   group_by(cluster) %>% filter(p_val_adj < .01) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
 
-write.csv(emb_int.markers,"./Output/GFP_pooled/emb_int_markers_unthresholded.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.markers,"./Output/GFP_pooled/emb_GFPpooled_markers_unthresholded.csv", row.names = TRUE)
 ```
 
 
 ```{r}
 # for justin
 
-emb_int.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
+emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
-DoHeatmap(emb_int, features = top2$gene,raster=F)
+DoHeatmap(emb.GFPpooled, features = top2$gene,raster=F)
 
 
-FeaturePlot(emb_int, features = c("elt-2","elt-7", 'ges-1'),raster=F)
-#VlnPlot(emb_int, features = c("elt-2","elt-7", 'ges-1'))
+FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'),raster=F)
+#VlnPlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'))
 
-FeaturePlot(emb_int, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
-VlnPlot(emb_int, features = c("chs-1", "myo-2", "myo-3", "elt-2", "ges-1"))
+FeaturePlot(emb.GFPpooled, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
+VlnPlot(emb.GFPpooled, features = c("chs-1", "myo-2", "myo-3", "elt-2", "ges-1"))
 ```
 
 
 
 Find all cluster specific markers (i.e., cluster 2)
 ```{r}
-#emb_int2.markers <- FindMarkers(emb_int, ident.1 = 2, min.pct = 0.25)
-#head(emb_int2.markers, n = 5)
+#emb.GFPpooled2.markers <- FindMarkers(emb.GFPpooled, ident.1 = 2, min.pct = 0.25)
+#head(emb.GFPpooled2.markers, n = 5)
 ```
 
 Find all markers distinguishing specific clusters (i.e., 5 from clusters 0 and 3) 
 ```{r}
-#emb_int5.markers <- FindMarkers(emb_int, ident.1 = 5, ident.2 = c(0, 3), min.pct = 0.25)
-#head(emb_int5.markers, n = 5)
+#emb.GFPpooled5.markers <- FindMarkers(emb.GFPpooled, ident.1 = 5, ident.2 = c(0, 3), min.pct = 0.25)
+#head(emb.GFPpooled5.markers, n = 5)
 ```
 
 Differential expression with ROC test
 ```{r}
-#emb_int0.markers <- FindMarkers(emb_int, ident.1 = 0, logfc.threshold = 0.25, test.use = "roc", only.pos = TRUE)
+#emb.GFPpooled0.markers <- FindMarkers(emb.GFPpooled, ident.1 = 0, logfc.threshold = 0.25, test.use = "roc", only.pos = TRUE)
 
-#head(emb_int0.markers)
+#head(emb.GFPpooled0.markers)
 ```
 
 # Perform gene ontology
@@ -339,12 +338,12 @@ go_df <- tea$fetch_dictionary("go")
 ```
 
 ```{r}
-emb_int.markers <- emb_int.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
-emb_int.markers <- emb_int.markers %>% rename(WBGeneID = wbps_gene_id)
+emb.GFPpooled.markers <- emb.GFPpooled.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
+emb.GFPpooled.markers <- emb.GFPpooled.markers %>% rename(WBGeneID = wbps_gene_id)
 ```
 
 ```{r}
-clusters <- unique(emb_int.markers$cluster)
+clusters <- unique(emb.GFPpooled.markers$cluster)
 my_tea_analysis <- function(input_df, tea_dict){
   tea_df <- data.frame()
   for (i in clusters){
@@ -389,42 +388,42 @@ my_ontology_plot <- function(input_df, xlabel){
 ```
 
 ```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb_int.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1.2), tissue_df), 
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1.5), tissue_df), 
                  "Tissue Ontology")
 ```
 
 #Pull out cluster specific CLECs 
 
 ```{r fig.height=4, fig.width=7}
-emb_int.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
+emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
 
-DoHeatmap(emb_int, features = top10clecs$gene,raster=F)
+DoHeatmap(emb.GFPpooled, features = top10clecs$gene,raster=F)
 ```
 
 # Find marker clecs in each cluster
 ```{r}
-emb_int_marker_clecs <- emb_int.markers %>% 
+emb.GFPpooled.markers.clecs <- emb.GFPpooled.markers %>% 
   group_by(cluster) %>%
   filter(grepl("clec*",gene), p_val_adj < .01) %>%
   slice_max(n = 10, order_by = avg_log2FC)
 
-write.csv(emb_int_marker_clecs,"./Output/emb_int_marker_clecs.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.markers.clecs,"./Output/emb_GFPpooled_marker_clecs.csv", row.names = TRUE)
 ```
 
 --- ignore for now
 
 # Pull out cluster specific SPPs 
 ```{r fig.height=4, fig.width=7}
-emb_int.markers %>% group_by(cluster) %>% filter(grepl("^spp",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10spps
+emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("^spp",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10spps
 
-DoHeatmap(emb_int, features = top10spps$gene,raster=F)
+DoHeatmap(emb.GFPpooled, features = top10spps$gene,raster=F)
 ```
 
 # Pull out cluster specific IRGs 
 ```{r fig.height=4, fig.width=7}
-emb_int.markers %>% group_by(cluster) %>% filter(grepl("^irg",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10irgs
+emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("^irg",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10irgs
 
-DoHeatmap(emb_int, features = top10irgs$gene,raster=F)
+DoHeatmap(emb.GFPpooled, features = top10irgs$gene,raster=F)
 ```
 
 ---
@@ -433,63 +432,63 @@ DoHeatmap(emb_int, features = top10irgs$gene,raster=F)
 contamination clusters = 1, 11, 12, 13
 
 ```{r}
-emb_int_specificClusters <- RunUMAP(subset(emb_int, idents = c('1','11','12', '13'), invert = TRUE), dims = 1:10)
+emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('1','11','12', '13'), invert = TRUE), dims = 1:10)
 
-DimPlot(emb_int_specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
+DimPlot(emb.GFPpooled.specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
 ```
 
 # now rerun PCA and re-lcuster 
 ```{r}
-emb_int_specificClusters <- RunPCA(emb_int_specificClusters, features = VariableFeatures(object = emb_int_specificClusters))
+emb.GFPpooled.specificClusters <- RunPCA(emb.GFPpooled.specificClusters, features = VariableFeatures(object = emb.GFPpooled.specificClusters))
 
-DimPlot(emb_int_specificClusters, reduction = "pca")
+DimPlot(emb.GFPpooled.specificClusters, reduction = "pca")
 
-ElbowPlot(emb_int_specificClusters)
+ElbowPlot(emb.GFPpooled.specificClusters)
 ```
 
 ```{r}
 # Choose the number of PCs to use for re-clustering 
-emb_int_specificClusters <- FindNeighbors(emb_int_specificClusters, dims = 1:7)
+emb.GFPpooled.specificClusters <- FindNeighbors(emb.GFPpooled.specificClusters, dims = 1:7)
 
 # check new clusters with Clustree
-emb_int_specific_recluster <- FindClusters(
-  object = emb_int_specificClusters,
+emb.GFPpooled.specificClusters.recluster <- FindClusters(
+  object = emb.GFPpooled.specificClusters,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
   dims.use = 1:7,
   save.SNN = TRUE
 )
 
-clustree(emb_int_specific_recluster, prefix = "RNA_snn_res.")
+clustree(emb.GFPpooled.specificClusters.recluster, prefix = "RNA_snn_res.")
 
 
-emb_int_specific_recluster <- FindClusters(emb_int_specificClusters, resolution = 1.2)
+emb.GFPpooled.specificClusters.recluster <- FindClusters(emb.GFPpooled.specificClusters, resolution = 1.2)
 
-emb_int_specific_recluster <- RunUMAP(emb_int_specific_recluster, dims = 1:7)
+emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:7)
 
-DimPlot(emb_int_specific_recluster, reduction = "umap", label = "TRUE", label.box = TRUE)
+DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE)
 ```
 
 # Find new marker genes
 ```{r}
-emb_int_specific_recluster.markers <- FindAllMarkers(emb_int_specific_recluster, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+emb.GFPpooled.specificClusters.recluster.markers <- FindAllMarkers(emb.GFPpooled.specificClusters.recluster, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
-emb_int_specific_recluster.markers %>% 
+emb.GFPpooled.specificClusters.recluster.markers %>% 
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
-write.csv(emb_int_specific_recluster.markers,"./Output/emb_int_specific_recluster_markers.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.specificClusters.recluster.markers,"./Output/emb_GFPpooled_specificClusters_recluster_markers.csv", row.names = TRUE)
 ```
 
 # Perform new gene ontology
 ```{r}
-emb_int_specific_recluster.markers <- emb_int_specific_recluster.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
+emb.GFPpooled.specificClusters.recluster.markers <- emb.GFPpooled.specificClusters.recluster.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
 
-emb_int_specific_recluster.markers <- emb_int_specific_recluster.markers %>% rename(WBGeneID = wbps_gene_id)
+emb.GFPpooled.specificClusters.recluster.markers <- emb.GFPpooled.specificClusters.recluster.markers %>% rename(WBGeneID = wbps_gene_id)
 ```
 
 ```{r}
-clusters <- unique(emb_int_specific_recluster.markers$cluster)
+clusters <- unique(emb.GFPpooled.specificClusters.recluster.markers$cluster)
 my_tea_analysis <- function(input_df, tea_dict){
   tea_df <- data.frame()
   for (i in clusters){
@@ -534,21 +533,21 @@ my_ontology_plot <- function(input_df, xlabel){
 ```
 
 ```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb_int_specific_recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), tissue_df), "Tissue Ontology")
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), tissue_df), "Tissue Ontology")
 ```
 
 # Pull out new cluster marker genes 
 ```{r}
-emb_int_specific_recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
+emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
 
-DoHeatmap(emb_int_specific_recluster, features = top3$gene,raster=F)
+DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top3$gene,raster=F)
 ```
 
 # Pull out new cluster specific CLECs 
 ```{r}
-emb_int_specific_recluster.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
+emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
 
-DoHeatmap(emb_int_specific_recluster, features = top10clecs$gene,raster=F)
+DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top10clecs$gene,raster=F)
 ```
 
 # plot genes of interest
@@ -559,23 +558,24 @@ From John Murray dataset
     - intestine_far_posterior: irg-7, faah-1, pbo-4, psa-3
 
 ```{r}
-FeaturePlot(emb_int_specific_recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F)
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F)
 
-VlnPlot(emb_int_specific_recluster, features = c("elt-2","elt-7", 'ges-1'))
+VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'))
 
 # top marker gene for each cluster
-FeaturePlot(emb_int_specific_recluster, pt.size = 0.1,
-            features = (emb_int_specific_recluster.markers %>% 
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, pt.size = 0.1,
+            features = (emb.GFPpooled.specificClusters.recluster.markers %>% 
   group_by(cluster) %>%
   slice_max(n = 1, order_by = avg_log2FC))$gene
 )
 
 # genes from murray data
-FeaturePlot(emb_int_specific_recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 3)
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 3)
 
-FeaturePlot(emb_int_specific_recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 4)
-VlnPlot(emb_int_specific_recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), ncol = 4)
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 4)
+VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), ncol = 4)
 
-FeaturePlot(emb_int_specific_recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 3)
-VlnPlot(emb_int_specific_recluster, features = c('faah-1', 'pbo-4', 'psa-3'), ncol = 3)
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 3)
+VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), ncol = 3)
 ```
+
