@@ -116,7 +116,7 @@ Visualize QC metrics as a violin plot
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 
-ggsave("./Output/GFPpooled/emb.GFPpooled.vlnplot.png")
+ggsave("./Output/GFP_pooled/emb.GFPpooled.VlnPlot.png")
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -124,6 +124,8 @@ FeatureScatter is typically used to visualize feature-feature relationships, but
 plot1 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
+
+ggsave("./Output/GFP_pooled/emb.GFPpooled.FeatureScatter.png")
 ```
 
 
@@ -139,7 +141,10 @@ emb.GFPpooled <- subset(emb.GFPpooled, subset = nFeature_RNA > 200 & nFeature_RN
 # Visualize after filtering
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+ggsave("./Output/GFP_pooled/emb.GFPpooled.VlnPlot.filt.png")
+
 FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Output/GFP_pooled/emb.GFPpooled.FeatureScatter.filt.png")
 ```
 
 
@@ -167,6 +172,7 @@ top10 <- head(VariableFeatures(emb.GFPpooled), 10)
 # plot variable features with and without labels
 plot1 <- VariableFeaturePlot(emb.GFPpooled)
 LabelPoints(plot = plot1, points = top10, repel = TRUE)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.VarFeatures.png")
 ```
 
 
