@@ -247,21 +247,35 @@ emb.unsort1.top10 <- head(VariableFeatures(emb.unsort1), 10)
 emb.unsort2.top10 <- head(VariableFeatures(emb.unsort2), 10)
 emb.GFP1.top10 <- head(VariableFeatures(emb.GFP1), 10)
 emb.GFP2.top10 <- head(VariableFeatures(emb.GFP2), 10)
+```
 
-
+```{r}
 # plot variable features with and without labels
 plot1 <- VariableFeaturePlot(emb.unsort1)
 LabelPoints(plot = plot1, points = emb.unsort1.top10, repel = TRUE)
+ggsave("./Output/unsort1/emb.unsort1.variablefeatures.png")
+```
 
+```{r}
 plot1 <- VariableFeaturePlot(emb.unsort2)
 LabelPoints(plot = plot1, points = emb.unsort2.top10, repel = TRUE)
+ggsave("./Output/unsort2/emb.unsort2.variablefeatures.png")
+```
 
+```{r}
 plot1 <- VariableFeaturePlot(emb.GFP1)
 LabelPoints(plot = plot1, points = emb.GFP1.top10, repel = TRUE)
+ggsave("./Output/GFP1/emb.GFP1.variablefeatures.png")
+```
 
+```{r}
 plot1 <- VariableFeaturePlot(emb.GFP2)
 LabelPoints(plot = plot1, points = emb.GFP2.top10, repel = TRUE)
+ggsave("./Output/GFP2/emb.GFP2.variablefeatures.png")
 ```
+
+
+
 
 # Normalization
 
