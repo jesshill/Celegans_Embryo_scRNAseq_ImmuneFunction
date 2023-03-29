@@ -115,6 +115,8 @@ emb.GFPpooled[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled, features = 
 Visualize QC metrics as a violin plot
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+
+ggsave("./Output/GFPpooled/emb.GFPpooled.vlnplot.png")
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
