@@ -158,9 +158,19 @@ emb.GFP2[["percent.mt"]] <- PercentageFeatureSet(emb.GFP2, features = mitoIndice
 Visualize QC metrics as a violin plot
 ```{r}
 VlnPlot(emb.unsort1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+ggsave("./Output/unsort1/emb.unsort1.vlnplot.png")
+
+
 VlnPlot(emb.unsort2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+ggsave("./Output/unsort2/emb.unsort2.vlnplot.png")
+
+
 VlnPlot(emb.GFP1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+ggsave("./Output/GFP1/emb.GFP1.vlnplot.png")
+
+
 VlnPlot(emb.GFP2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+ggsave("./Output/GFP2/emb.GFP2.vlnplot.png")
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -169,18 +179,35 @@ plot1 <- FeatureScatter(emb.unsort1, feature1 = "nCount_RNA", feature2 = "percen
 plot2 <- FeatureScatter(emb.unsort1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 
+ggsave("./Output/unsort1/emb.unsort1.featurescatter.png")
+```
+
+```{r}
 plot1 <- FeatureScatter(emb.unsort2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.unsort2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 
+ggsave("./Output/unsort2/emb.unsort2.featurescatter.png")
+```
+
+```{r}
 plot1 <- FeatureScatter(emb.GFP1, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.GFP1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 
+ggsave("./Output/GFP1/emb.GFP1.featurescatter.png")
+```
+
+```{r}
 plot1 <- FeatureScatter(emb.GFP2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.GFP2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
+
+ggsave("./Output/GFP2/emb.GFP2.featurescatter.png")
 ```
+
+
+
 
 # Filter based on features
 
@@ -205,33 +232,35 @@ emb.GFP2 <- subset(emb.GFP2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 &
 # Visualize after filtering
 ```{r}
 VlnPlot(emb.unsort1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-ggsave("./Output/unsort1/emb.unsort1.vlnplot.png")
+ggsave("./Output/unsort1/emb.unsort1.vlnplot.filt.png")
 
 FeatureScatter(emb.unsort1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-ggsave("./Output/unsort1/emb.unsort1.featurescatter.png")
+ggsave("./Output/unsort1/emb.unsort1.featurescatter.filt.png")
 ```
 
 ```{r}
 VlnPlot(emb.unsort2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-FeatureScatter(emb.unsort2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Output/unsort2/emb.unsort2.vlnplot.filt.png")
 
-ggsave("./Output/unsort1/emb.unsort1.variablefeatures.png")
+FeatureScatter(emb.unsort2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Output/unsort2/emb.unsort2.featurescatter.filt.png")
 ```
 
 ```{r}
 VlnPlot(emb.GFP1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-FeatureScatter(emb.GFP1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Output/GFP1/emb.GFP1.vlnplot.filt.png")
 
-ggsave("./Output/unsort1/emb.unsort1.variablefeatures.png")
+FeatureScatter(emb.GFP1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Output/GFP1/emb.GFP1.featurescatter.filt.png")
 ```
 
 ```{r}
 VlnPlot(emb.GFP2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+ggsave("./Output/GFP2/emb.GFP2.vlnplot.filt.png")
+
 FeatureScatter(emb.GFP2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-
-ggsave("./Output/unsort1/emb.unsort1.variablefeatures.png")
+ggsave("./Output/GFP2/emb.GFP2.featurescatter.filt.png")
 ```
-
 
 
 
