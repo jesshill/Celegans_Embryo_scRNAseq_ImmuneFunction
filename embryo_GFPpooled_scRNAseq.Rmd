@@ -372,7 +372,7 @@ my_tea_analysis <- function(input_df, tea_dict){
   for (i in clusters){
   tea_set <- tea$enrichment_analysis(
     (input_df %>% 
-       filter(cluster == i))$WBGeneID, 
+       filter('cluster' == i))$WBGeneID, 
     tissue_df = tea_dict 
     # %>% 
     #   filter(wbid %in% (input_df %>% 
