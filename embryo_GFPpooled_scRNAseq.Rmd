@@ -360,7 +360,7 @@ go_df <- tea$fetch_dictionary("go")
 
 ```{r}
 emb.GFPpooled.markers <- emb.GFPpooled.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
-emb.GFPpooled.markers <- emb.GFPpooled.markers %>% rename(WBGeneID = genes.df$wbps_gene_id)
+emb.GFPpooled.markers <- emb.GFPpooled.markers %>% rename(WBGeneID = wbps_gene_id)
 ```
 
 ```{r}
