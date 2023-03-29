@@ -199,20 +199,42 @@ sum(emb.GFP2$percent.mt > 50)/ length(emb.GFP2$percent.mt)
 emb.GFP2 <- subset(emb.GFP2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
 
+
+
+
 # Visualize after filtering
 ```{r}
 VlnPlot(emb.unsort1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-FeatureScatter(emb.unsort1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Output/unsort1/emb.unsort1.vlnplot.png")
 
+FeatureScatter(emb.unsort1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Output/unsort1/emb.unsort1.featurescatter.png")
+```
+
+```{r}
 VlnPlot(emb.unsort2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
 FeatureScatter(emb.unsort2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 
+ggsave("./Output/unsort1/emb.unsort1.variablefeatures.png")
+```
+
+```{r}
 VlnPlot(emb.GFP1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
 FeatureScatter(emb.GFP1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 
+ggsave("./Output/unsort1/emb.unsort1.variablefeatures.png")
+```
+
+```{r}
 VlnPlot(emb.GFP2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
 FeatureScatter(emb.GFP2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+
+ggsave("./Output/unsort1/emb.unsort1.variablefeatures.png")
 ```
+
+
+
+
 
 # Normalize the data
 
