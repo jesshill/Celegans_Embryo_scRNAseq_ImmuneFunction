@@ -290,14 +290,14 @@ ggsave("./Output/GFP_pooled/emb.GFPpooled.UMAP.png")
 
 Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
 ```{r}
-emb.GFPpooled.markers <- FindAllMarkers(emb.GFPpooled, only.pos = T, min.pct = 0.25, logfc.threshold = 1.4) # 0.25 is the default threshold 
+emb.GFPpooled.markers <- FindAllMarkers(emb.GFPpooled, only.pos = T, min.pct = 0.25, logfc.threshold = 1) # 0.25 is the default threshold 
 
 emb.GFPpooled.markers %>% 
   group_by(cluster) %>% filter(p_val_adj < .01) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
 
-write.csv(emb.GFPpooled.markers,"./Output/GFP_pooled/emb_GFPpooled_markers_unthresholded.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.markers,"./Output/GFP_pooled/emb_GFPpooled_markers.csv", row.names = TRUE)
 ```
 
 
@@ -307,13 +307,22 @@ write.csv(emb.GFPpooled.markers,"./Output/GFP_pooled/emb_GFPpooled_markers_unthr
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
 DoHeatmap(emb.GFPpooled, features = top2$gene,raster=F)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
 
 
 FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'),raster=F)
-#VlnPlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'))
+ggsave("./Output/GFP_pooled/emb.GFPpooled.FeaturePlot-PostCtrls.png")
+
+VlnPlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'))
+ggsave("./Output/GFP_pooled/emb.GFPpooled.VlnPlot-PostCtrls.png")
+
 
 FeaturePlot(emb.GFPpooled, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
+
+
 VlnPlot(emb.GFPpooled, features = c("chs-1", "myo-2", "myo-3", "elt-2", "ges-1"))
+ggsave("./Output/GFP_pooled/emb.GFPpooled.VlnPlot-NegCtrls.png")
 ```
 
 
