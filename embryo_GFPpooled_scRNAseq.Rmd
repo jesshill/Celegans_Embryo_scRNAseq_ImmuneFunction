@@ -231,6 +231,7 @@ The JackStrawPlot() function provides a visualization tool for comparing the dis
 
 ```{r}
 JackStrawPlot(emb.GFPpooled, dims = 1:20)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.JackStrawPlot.png")
 ```
 
 
@@ -238,6 +239,7 @@ An alternative, more approximate technique is the elbow plot, which ranges princ
 
 ```{r}
 ElbowPlot(emb.GFPpooled)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ElbowPlot.png")
 ```
 
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
