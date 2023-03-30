@@ -417,7 +417,7 @@ my_ontology_plot <- function(input_df, xlabel){
 ```{r fig.height=15, fig.width=5}
 my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
 
-#ggsave("./Output/GFP_pooled/emb.GFPpooled.GO.png")
+ggsave("./Output/GFP_pooled/emb.GFPpooled.GO.png")
 ```
 
 #Pull out cluster specific CLECs 
@@ -426,6 +426,7 @@ my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
 
 DoHeatmap(emb.GFPpooled, features = top10clecs$gene,raster=F)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.GO.png")
 ```
 
 # Find marker clecs in each cluster
