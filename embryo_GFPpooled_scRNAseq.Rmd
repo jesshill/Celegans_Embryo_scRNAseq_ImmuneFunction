@@ -352,6 +352,8 @@ Differential expression with ROC test
 # Perform gene ontology
 
 ```{r}
+library(reticulate)
+
 tea <- import("tissue_enrichment_analysis")
 tissue_df <- tea$fetch_dictionary("tissue")
 phenotype_df <- tea$fetch_dictionary("phenotype")
