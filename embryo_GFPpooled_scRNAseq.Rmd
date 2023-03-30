@@ -426,7 +426,7 @@ ggsave("./Output/GFP_pooled/emb.GFPpooled.GO.png")
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
 
 DoHeatmap(emb.GFPpooled, features = top10clecs$gene,raster=F)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.GO.png")
+ggsave("./Output/GFP_pooled/emb.GFPpooled.HeatMap-top10clecs.png")
 ```
 
 # Find marker clecs in each cluster
@@ -436,10 +436,10 @@ emb.GFPpooled.markers.clecs <- emb.GFPpooled.markers %>%
   filter(grepl("clec*",gene), p_val_adj < .01) %>%
   slice_max(n = 10, order_by = avg_log2FC)
 
-write.csv(emb.GFPpooled.markers.clecs,"./Output/emb_GFPpooled_marker_clecs.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.markers.clecs,"./Output/GFP_pooled/emb.GFPpooled.marker.clecs.csv", row.names = TRUE)
 ```
 
---- ignore for now
+--- ignore for now ---
 
 # Pull out cluster specific SPPs 
 ```{r fig.height=4, fig.width=7}
@@ -455,7 +455,7 @@ emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("^irg",gene), p_val
 DoHeatmap(emb.GFPpooled, features = top10irgs$gene,raster=F)
 ```
 
----
+--- ignore for now ---
 
 # Remove contamination clusters (based on tissue ontology data)
 contamination clusters = 1, 11, 12, 13
