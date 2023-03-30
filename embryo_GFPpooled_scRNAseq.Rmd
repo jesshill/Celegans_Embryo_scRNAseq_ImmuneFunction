@@ -439,7 +439,7 @@ emb.GFPpooled.markers.clecs <- emb.GFPpooled.markers %>%
 write.csv(emb.GFPpooled.markers.clecs,"./Output/GFP_pooled/emb.GFPpooled.marker.clecs.csv", row.names = TRUE)
 ```
 
---- ignore for now ---
+----- ignore for now -----
 
 # Pull out cluster specific SPPs 
 ```{r fig.height=4, fig.width=7}
@@ -455,15 +455,16 @@ emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("^irg",gene), p_val
 DoHeatmap(emb.GFPpooled, features = top10irgs$gene,raster=F)
 ```
 
---- ignore for now ---
+----- ignore for now -----
 
 # Remove contamination clusters (based on tissue ontology data)
-contamination clusters = 1, 11, 12, 13
+contamination clusters = 1, 10, 11, 12, 13
 
 ```{r}
-emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('1','11','12', '13'), invert = TRUE), dims = 1:10)
+emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('1','10','11','12', '13'), invert = TRUE), dims = 1:10)
 
 DimPlot(emb.GFPpooled.specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
 # now rerun PCA and re-lcuster 
@@ -471,8 +472,10 @@ DimPlot(emb.GFPpooled.specificClusters, reduction = "umap", label = "TRUE", labe
 emb.GFPpooled.specificClusters <- RunPCA(emb.GFPpooled.specificClusters, features = VariableFeatures(object = emb.GFPpooled.specificClusters))
 
 DimPlot(emb.GFPpooled.specificClusters, reduction = "pca")
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 
 ElbowPlot(emb.GFPpooled.specificClusters)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
 ```{r}
