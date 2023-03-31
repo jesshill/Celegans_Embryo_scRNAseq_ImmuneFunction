@@ -420,6 +420,21 @@ my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.
 ggsave("./Output/GFP_pooled/emb.GFPpooled.GO.png")
 ```
 
+#Murray data 
+```{r}
+# intestine_anterior
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 3)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.Murray-Anterior.png") 
+
+# intestine_middle_and_posterior
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 4)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.Murray-Mid.png")
+
+# intestine_far_posterior
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 3)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.Murray-Posterior.png")
+```
+
 #Pull out cluster specific CLECs 
 
 ```{r fig.height=4, fig.width=7}
@@ -582,6 +597,7 @@ DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2$gene,raster=
 ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top2.png")
 ```
 
+
 ----- ignore for now -----
 
 # Pull out new cluster specific CLECs 
@@ -603,8 +619,11 @@ From John Murray dataset
 
 ```{r}
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot-PosCtrls.png")
+
 
 VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'))
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.VlnPlot-PosCtrls.png")
 
 # top marker gene for each cluster
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, pt.size = 0.1,
@@ -612,14 +631,23 @@ FeaturePlot(emb.GFPpooled.specificClusters.recluster, pt.size = 0.1,
   group_by(cluster) %>%
   slice_max(n = 1, order_by = avg_log2FC))$gene
 )
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot.png")
 
 # genes from murray data
+
+# intestine_anterior
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 3)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Anterior.png") 
 
+# intestine_middle_and_posterior
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 4)
-VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), ncol = 4)
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Mid.png")
 
+#VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), ncol = 4)
+
+# intestine_far_posterior
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 3)
-VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), ncol = 3)
-```
+ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Posterior.png")
 
+#VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), ncol = 3)
+```
