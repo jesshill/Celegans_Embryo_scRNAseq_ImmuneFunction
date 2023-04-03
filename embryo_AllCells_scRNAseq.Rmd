@@ -1,0 +1,318 @@
+---
+title: "embryo_intestine_scRNAseq"
+author: "Jessica Hill"
+date: "9/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+
+# Install packages
+```{r}
+#install.packages('Seurat')
+#packageVersion('Seurat')
+#remotes::install_github('satijalab/seurat-wrappers')
+
+#reticulate::py_install(packages = 'umap-learn', envname = 'r-reticulate')
+#BiocManager::install("limma")
+#install.packages("hdf5r")
+#BiocManager::install("biomaRt")
+#install.packages("clustree")
+```
+
+# Load packages
+```{r echo=FALSE}
+library(biomaRt)
+library(Seurat)
+library(tidyverse)
+library(patchwork)
+library(limma)
+library(clustree)
+```
+
+---
+# Get started!
+
+```{r}
+emb.AllCells.data <- Read10X_h5("./10x_cloud_analysis/All_pooled_count/raw_feature_bc_matrix.h5")
+```
+
+Get filternames from https://parasite.wormbase.org/biomart/martview
+```{r}
+mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+genes.df <- getBM(mart = mart, 
+      filters = c("species_id_1010", "wbps_gene_id"),
+      value = list("caelegprjna13758", rownames(emb.AllCells.data)),
+      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
+      )
+
+mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
+genes.df$chromosome_name = NULL
+
+c(nrow(genes.df), nrow(emb.AllCells.data))
+
+# there are genes missing
+nrow(emb.AllCells.data)-nrow(genes.df)
+```
+
+There are `r nrow(emb.GFPpooled.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
+
+```{r}
+emb.AllCells.data.filt <- emb.AllCells.data[rownames(emb.AllCells.data) %in% genes.df$wbps_gene_id,]
+
+# The two data structures do not have the same order of WBGeneIDs
+identical(rownames(emb.AllCells.data.filt), genes.df$wbps_gene_id)
+
+# Use match to make sure they are in the same order
+identical(rownames(emb.AllCells.data.filt),
+          genes.df[match(rownames(emb.AllCells.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
+)
+
+# now replace the WBGeneIDs with gene names
+rownames(emb.AllCells.data.filt) <- genes.df[
+  match(rownames(emb.AllCells.data.filt),
+        genes.df$wbps_gene_id)
+  ,]$external_gene_id
+
+# are there NAs?
+sum(!is.na(rownames(emb.AllCells.data.filt)))
+```
+
+```{r}
+emb.AllCells <- CreateSeuratObject(counts = emb.AllCells.data.filt, project = "emb_AllCells", min.cells = 3, min.features = 200)
+```
+
+```{r}
+length(unique(genes.df$wbps_gene_id))
+length(unique(rownames(emb.AllCells)))
+rownames(emb.AllCells)[!(rownames(emb.AllCells) %in% genes.df$wbps_gene_id)]
+```
+
+# Quality control metrics
+
+- `nFeature_RNA` is the number of genes detected in each cell. 
+- `nCount_RNA` is the total number of molecules detected within a cell (AKA total UMIs per cell)
+- Low `nFeature_RNA` indicates that the cell may be dead or dying or an empty droplet
+- High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
+
+
+show QC metrics for the first 5 cells 
+```{r}
+head(emb.AllCells@meta.data, 5)
+```
+
+Mitochondrial genome percentage 
+```{r}
+mitoIndices = which(rownames(emb.AllCells) %in% mitoList)
+emb.AllCells[["percent.mt"]] <- PercentageFeatureSet(emb.AllCells, features = mitoIndices)
+```
+
+
+Visualize QC metrics as a violin plot
+```{r}
+VlnPlot(emb.AllCells, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+
+ggsave("./Output/all_cells/emb.AllCells.VlnPlot.png")
+```
+
+FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
+```{r}
+plot1 <- FeatureScatter(emb.AllCells, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb.AllCells, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 + plot2
+
+ggsave("./Output/all_cells/emb.AllCells.FeatureScatter.png")
+```
+
+
+# Filter based on features
+
+cells being filtered due to mito percent: 
+```{r}
+sum(emb.AllCells$percent.mt > 50)/ length(emb.AllCells$percent.mt)
+
+emb.AllCells <- subset(emb.AllCells, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
+```
+
+# Visualize after filtering
+```{r}
+VlnPlot(emb.AllCells, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+ggsave("./Output/all_cells/emb.AllCells.VlnPlot.filt.png")
+
+
+FeatureScatter(emb.AllCells, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Output/all_cells/emb.AllCells.FeatureScatter.filt.png")
+```
+
+
+# Normalize the data
+
+Normalize the count data present in the assay. 
+
+LogNormalize: Feature counts for each cell are divided by the total counts for that cell and multiplied by the scale.factor. This is then natural-log transformed using log1p.
+
+Scale.factor: Sets the scale factor for cell-level normalization
+
+```{r}
+emb.AllCells <- NormalizeData(emb.AllCells, normalization.method = "LogNormalize", scale.factor = 10000)
+```
+
+# Feature selection
+
+Identify highly variable features to focus on in downstream analysis
+```{r}
+emb.AllCells <- FindVariableFeatures(emb.AllCells, selection.method = "vst", nfeatures = 2000)
+
+# Identify the 10 most highly variable genes
+top10 <- head(VariableFeatures(emb.AllCells), 10)
+
+# plot variable features with and without labels
+plot1 <- VariableFeaturePlot(emb.AllCells)
+LabelPoints(plot = plot1, points = top10, repel = TRUE)
+ggsave("./Output/all_cells/emb.AllCells.VarFeatures.png")
+```
+
+
+# Normalization
+
+Scale the data so that each gene has a mean expression of 0 and variance of 1 across all cells
+```{r}
+all.genes <- rownames(emb.AllCells)
+emb.AllCells <- ScaleData(emb.AllCells, features = all.genes)
+```
+
+
+# Linear dimensionality reduction 
+
+PCA linear dimensionality reduction
+```{r}
+emb.AllCells <- RunPCA(emb.AllCells, features = VariableFeatures(object = emb.AllCells))
+```
+
+Examine and visualize PCA results a few different ways
+```{r}
+print(emb.AllCells[["pca"]], dims = 1:5, nfeatures = 5)
+```
+
+```{r}
+# top genes associated with reduction components
+VizDimLoadings(emb.AllCells, dims = 1:2, reduction = "pca")
+ggsave("./Output/all_cells/emb.AllCells.DimLoadings.png")
+```
+
+```{r}
+DimPlot(emb.AllCells, reduction = "pca")
+ggsave("./Output/all_cells/emb.AllCells.DimPlot.png")
+```
+
+```{r}
+DimHeatmap(emb.AllCells, dims = 1, cells = 500, balanced = TRUE)
+ggsave("./Output/all_cells/emb.AllCells.HeatMap1.png")
+```
+
+
+# Determine dataset dimensionality
+
+```{r}
+ElbowPlot(emb.AllCells)
+ggsave("./Output/all_cells/emb.AllCells.ElbowPlot.png")
+```
+
+The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
+
+
+# Cell clustering
+
+Choose the number of PCs to use for clustering 
+```{r}
+emb.AllCells <- FindNeighbors(emb.AllCells, dims = 1:4)
+
+
+## Find clusters using Clustree
+# generate a vector of different resolutions to see which one performs best 
+emb.AllCells.clust <- FindClusters(
+  object = emb.AllCells,
+  reduction.type = "pca",
+  resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+  dims.use = 1:10,
+  save.SNN = TRUE
+)
+
+## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
+clustree(emb.AllCells.clust, prefix = "RNA_snn_res.")
+ggsave("./Output/all_cells/emb.AllCells.Clustree.png")
+
+
+## Find clusters using original Surat package methods
+# choose the appropriate resolution for the given dimensions using the Clustree data
+emb.AllCells <- FindClusters(emb.AllCells, resolution = 1.2)
+```
+
+
+# Non-linear dimensional reduction (UMAP)
+
+```{r}
+emb.AllCells <- RunUMAP(emb.AllCells, dims = 1:4)
+```
+
+```{r}
+# Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
+DimPlot(emb.AllCells, reduction = "umap", label = "TRUE", label.box = TRUE)
+ggsave("./Output/all_cells/emb.AllCells.UMAP.png")
+```
+
+
+# Find differentially expressed features (aka marker genes)
+
+Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
+```{r}
+emb.AllCells.markers <- FindAllMarkers(emb.AllCells, only.pos = T, min.pct = 0.25, logfc.threshold = 1) # 0.25 is the default threshold 
+
+emb.AllCells.markers %>% 
+  group_by(cluster) %>% filter(p_val_adj < .01) %>%
+  slice_max(n = 2, order_by = avg_log2FC)
+
+
+write.csv(emb.AllCells.markers,"./Output/all_cells/emb.AllCells.markers.csv", row.names = TRUE)
+```
+
+
+```{r}
+emb.AllCells.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
+
+DoHeatmap(emb.AllCells, features = top2$gene,raster=F)
+ggsave("./Output/all_cells/emb.AllCells.HeatMap-top2.png")
+
+
+FeaturePlot(emb.AllCells, features = c("elt-2", 'ges-1'),raster=F)
+ggsave("./Output/all_cells/emb.AllCells.FeaturePlot-PostCtrls.png")
+
+
+FeaturePlot(emb.AllCells, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
+ggsave("./Output/all_cells/emb.AllCells.FeaturePlot-NegCtrls.png")
+```
+
+
+
+#Murray data 
+```{r}
+# intestine_anterior
+FeaturePlot(emb.AllCells, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 3)
+ggsave("./Output/all_cells/emb.AllCells.Murray-Anterior.png")
+
+
+# intestine_middle_and_posterior
+FeaturePlot(emb.AllCells, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 4)
+ggsave("./Output/all_cells/emb.AllCells.Murray-Mid.png")
+
+
+# intestine_far_posterior
+FeaturePlot(emb.AllCells, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 3)
+ggsave("./Output/all_cells/emb.AllCells.Murray-Posterior.png")
+```
+
