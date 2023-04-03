@@ -502,3 +502,36 @@ emb.GFP2.markers %>%
 
 write.csv(emb.GFP2.markers,"/Users/jessicahill/Documents/GitHub/Celegans_Embryo_scRNAseq_ImmuneFunction/Output/GFP2/emb_GFP2_markers.csv", row.names = TRUE)
 ```
+
+
+
+
+# Heatmap of marker genes per cluster
+
+```{r}
+emb.unsort1.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2_unsort1
+
+DoHeatmap(emb.unsort1, features = top2_unsort1$gene,raster=F)
+ggsave("./Output/unsort1/emb.unsort1.HeatMap-top2.png")
+```
+
+```{r}
+emb.unsort2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2_unsort2
+
+DoHeatmap(emb.unsort2, features = top2_unsort2$gene,raster=F)
+ggsave("./Output/unsort2/emb.unsort2.HeatMap-top2.png")
+```
+
+```{r}
+emb.GFP1.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2_GFP1
+
+DoHeatmap(emb.GFP1, features = top2_GFP1$gene,raster=F)
+ggsave("./Output/GFP1/emb.GFP1.HeatMap-top2.png")
+```
+
+```{r}
+emb.GFP2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2_GFP2
+
+DoHeatmap(emb.GFP2, features = top2_GFP2$gene,raster=F)
+ggsave("./Output/GFP2/emb.GFP2.HeatMap-top2.png")
+```
