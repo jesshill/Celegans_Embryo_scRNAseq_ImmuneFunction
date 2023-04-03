@@ -438,22 +438,22 @@ emb.GFP2 <- RunUMAP(emb.GFP2, dims = 1:5)
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
 
-DimPlot(emb.unsort1, reduction = "umap", label = "FALSE", label.box = TRUE)
+DimPlot(emb.unsort1, reduction = "umap", label = "TRUE", label.box = TRUE)
 ggsave("./Output/unsort1/emb.unsort1.umap.png")
 ```
 
 ```{r}
-DimPlot(emb.unsort2, reduction = "umap", label = "FALSE", label.box = TRUE)
+DimPlot(emb.unsort2, reduction = "umap", label = "TRUE", label.box = TRUE)
 ggsave("./Output/unsort2/emb.unsort2.umap.png")
 ```
 
 ```{r}
-DimPlot(emb.GFP1, reduction = "umap", label = "FALSE", label.box = TRUE)
+DimPlot(emb.GFP1, reduction = "umap", label = "TRUE", label.box = TRUE)
 ggsave("./Output/GFP1/emb.GFP1.umap.png")
 ```
 
 ```{r}
-DimPlot(emb.GFP2, reduction = "umap", label = "FALSE", label.box = TRUE)
+DimPlot(emb.GFP2, reduction = "umap", label = "TRUE", label.box = TRUE)
 ggsave("./Output/GFP2/emb.GFP2.umap.png")
 ```
 
