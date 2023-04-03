@@ -426,7 +426,7 @@ emb.GFP2 <- FindClusters(emb.GFP2, resolution = 1.2)
 
 
 
-# Non-linear dimensional reduction (UMAP/tSNE)
+# Non-linear dimensional reduction (UMAP)
 
 ```{r}
 emb.unsort1 <- RunUMAP(emb.unsort1, dims = 1:5)
