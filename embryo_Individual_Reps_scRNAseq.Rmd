@@ -535,3 +535,40 @@ emb.GFP2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2
 DoHeatmap(emb.GFP2, features = top2_GFP2$gene,raster=F)
 ggsave("./Output/GFP2/emb.GFP2.HeatMap-top2.png")
 ```
+
+
+# Now try integration! 
+
+need to ...
+    overlay all reps now
+    see how both GFP replicates cluster - do they cluster together? 
+
+
+
+```{r setup}
+#install.packages("reticulate") 
+library(reticulate)
+
+use_python("/Users/jessicahill/opt/anaconda3/bin/conda/python")
+```
+
+```{python}
+import sklearn.datasets
+from sklearn.preprocessing import RobustScaler
+import seaborn as sns
+import pandas as pd
+import numpy as np
+import umap
+import umap.plot
+```
+
+```{r}
+top = DimPlot(emb.GFP1, reduction = "umap", label = "TRUE", label.box = TRUE)
+
+bottom = DimPlot(emb.GFP2, reduction = "umap", label = "TRUE", label.box = TRUE)
+```
+
+```{python}
+intersection_mapper = top_mapper * bot_mapper
+union_mapper = top_mapper + bot_mapper
+```
