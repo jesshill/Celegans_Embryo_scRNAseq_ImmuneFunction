@@ -11,6 +11,31 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ---
 
+# Install packages
+```{r}
+#install.packages('Seurat')
+#packageVersion('Seurat')
+#remotes::install_github('satijalab/seurat-wrappers')
+
+#reticulate::py_install(packages = 'umap-learn', envname = 'r-reticulate')
+#BiocManager::install("limma")
+#install.packages("hdf5r")
+#BiocManager::install("biomaRt")
+#install.packages("clustree")
+```
+
+# Load packages
+```{r echo=FALSE}
+library(biomaRt)
+library(Seurat)
+library(tidyverse)
+library(patchwork)
+library(limma)
+library(clustree)
+```
+
+---
+
 ```{r}
 emb.unsort1.data <- Read10X_h5("./10x_cloud_analysis/unsort_1_count/raw_feature_bc_matrix.h5")
 
@@ -21,7 +46,66 @@ emb.GFP1.data <- Read10X_h5("./10x_cloud_analysis/GFP_1_count/raw_feature_bc_mat
 emb.GFP2.data <- Read10X_h5("./10x_cloud_analysis/GFP_2_count/raw_feature_bc_matrix.h5")
 ```
 
+
+
 Get filternames from https://parasite.wormbase.org/biomart/martview
+```{r}
+mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+genes.df <- getBM(mart = mart, 
+      filters = c("species_id_1010", "wbps_gene_id"),
+      value = list("caelegprjna13758", rownames(emb.unsort1.data)),
+      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
+      )
+
+mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id'] 
+
+genes.df$chromosome_name = NULL 
+
+c(nrow(genes.df), nrow(emb.unsort1.data))
+
+# are there are genes missing?
+nrow(emb.unsort1.data)-nrow(genes.df)
+```
+
+```{r}
+mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+genes.df <- getBM(mart = mart, 
+      filters = c("species_id_1010", "wbps_gene_id"),
+      value = list("caelegprjna13758", rownames(emb.unsort2.data)),
+      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
+      )
+
+mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id'] 
+
+genes.df$chromosome_name = NULL 
+
+c(nrow(genes.df), nrow(emb.unsort2.data))
+
+# are there are genes missing?
+nrow(emb.unsort2.data)-nrow(genes.df)
+```
+
+```{r}
+mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+genes.df <- getBM(mart = mart, 
+      filters = c("species_id_1010", "wbps_gene_id"),
+      value = list("caelegprjna13758", rownames(emb.GFP1.data)),
+      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
+      )
+
+mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id'] 
+
+genes.df$chromosome_name = NULL 
+
+c(nrow(genes.df), nrow(emb.GFP1.data))
+
+# are there are genes missing?
+nrow(emb.GFP1.data)-nrow(genes.df)
+```
+
 ```{r}
 mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
@@ -40,6 +124,8 @@ c(nrow(genes.df), nrow(emb.GFP2.data))
 # are there are genes missing?
 nrow(emb.GFP2.data)-nrow(genes.df)
 ```
+
+
 
 There are `r nrow(emb.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 
@@ -537,19 +623,13 @@ ggsave("./Output/GFP2/emb.GFP2.HeatMap-top2.png")
 ```
 
 
-# Now try integration! 
-
-need to ...
-    overlay all reps now
-    see how both GFP replicates cluster - do they cluster together? 
-
-
+# Now try integration and mergeing UMAPs 
 
 ```{r setup}
 #install.packages("reticulate") 
 library(reticulate)
 
-use_python("/Users/jessicahill/opt/anaconda3/bin/conda/python")
+use_condaenv("rstudio")
 ```
 
 ```{python}
