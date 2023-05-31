@@ -288,6 +288,18 @@ DimPlot(emb.GFPpooled, reduction = "umap", label = "TRUE", label.box = TRUE)
 ggsave("./Output/GFP_pooled/emb.GFPpooled.UMAP.png")
 ```
 
+******* need to find out how many cells per group and plot for erin
+```{r}
+n_cells <- FetchData(combined, 
+                     vars = c("ident", "sample")) %>%
+        group_by(sample) %>%
+        dplyr::count(ident) %>% 
+        spread(ident, n) 
+
+# View table
+View(n_cells)
+```
+*******
 
 # Find differentially expressed features (aka marker genes)
 
@@ -353,6 +365,7 @@ Differential expression with ROC test
 
 ```{r}
 library(reticulate)
+use_condaenv("base")
 
 tea <- import("tissue_enrichment_analysis")
 tissue_df <- tea$fetch_dictionary("tissue")
@@ -368,6 +381,7 @@ emb.GFPpooled.markers <- rename(emb.GFPpooled.markers, WBGeneID = wbps_gene_id)
 
 ```{r}
 clusters <- unique(emb.GFPpooled.markers$cluster)
+print(clusters)
 
 my_tea_analysis <- function(input_df, tea_dict){
   tea_df <- data.frame()
