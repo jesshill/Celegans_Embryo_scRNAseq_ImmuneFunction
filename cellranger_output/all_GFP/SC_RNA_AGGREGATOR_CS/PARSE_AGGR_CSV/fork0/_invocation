@@ -1,0 +1,6 @@
+@include "rna/_cr_aggr_stages.mro"
+
+call PARSE_AGGR_CSV(
+    pipestance_root = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH",
+    aggregation_csv = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/aggregation_GFP.csv",
+)

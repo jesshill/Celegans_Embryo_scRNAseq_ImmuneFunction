@@ -1,0 +1,14 @@
+[stdout]
+2023-05-29 00:39:51 [cr_ana::stages::graph_clustering] computing k-nearest neighbors with k = 144
+2023-05-29 00:39:51 [scan_rs::nn] constructing ball tree of 1302 points
+2023-05-29 00:39:51 [scan_rs::nn] querying points for 144 neighbors
+2023-05-29 00:39:51 [cr_ana::stages::graph_clustering] running louvain
+2023-05-29 00:39:51 [cr_ana::louvain] building network for neighbor matrix of shape: (1302,144)
+2023-05-29 00:39:51 [cr_ana::louvain] louvain starting cpm score: -0.000796
+2023-05-29 00:39:51 [cr_ana::louvain] louvain optimized in 5 iterations
+2023-05-29 00:39:51 [cr_ana::louvain] louvain final cpm score: 0.599060
+2023-05-29 00:39:51 [cr_ana::stages::graph_clustering] merging clusters
+2023-05-29 00:39:51 [scan_rs::merge_clusters] computing DE params on 16185 x 552 matrix
+2023-05-29 00:39:51 [scan_rs::merge_clusters] computing DE on 295 vs 257 cells
+2023-05-29 00:39:51 [scan_rs::merge_clusters] computing DE params on 16185 x 493 matrix
+2023-05-29 00:39:51 [scan_rs::merge_clusters] computing DE on 306 vs 187 cells

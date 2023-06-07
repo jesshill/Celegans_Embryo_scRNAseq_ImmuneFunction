@@ -1,0 +1,25 @@
+{
+    "__mem_gb": 2,
+    "__threads": 1,
+    "__vmem_gb": 5,
+    "cluster_keys": [
+        {
+            "cluster_id": 3,
+            "cluster_type": "graphclust",
+            "feature_type": "Gene"
+        },
+        {
+            "cluster_id": 4,
+            "cluster_type": "graphclust",
+            "feature_type": "Gene"
+        },
+        {
+            "cluster_id": 5,
+            "cluster_type": "graphclust",
+            "feature_type": "Gene"
+        }
+    ],
+    "clustering_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/COMBINE_CLUSTERING/fork0/chnk0-u1c4373f45a/files/clustering_h5.h5",
+    "is_antibody_only": false,
+    "matrix_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/PREPROCESS_MATRIX/fork0/join-u1c4373f452/files/preprocessed_matrix_h5.h5"
+}

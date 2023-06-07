@@ -1,0 +1,8 @@
+{
+    "updated_sample_def": {
+        "library_id": "GFP_1",
+        "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/GFP_1/outs/molecule_info.h5",
+        "original_molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/GFP_1/outs/molecule_info.h5"
+    },
+    "updated_sample_defs": []
+}

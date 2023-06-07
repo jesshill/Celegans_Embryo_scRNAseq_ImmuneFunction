@@ -1,0 +1,22 @@
+@include "rna/_sc_rna_analyzer_stages.mro"
+
+call SUMMARIZE_ANALYSIS(
+    matrix_h5                     = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/PREPROCESS_MATRIX/fork0/join-u1c4373f452/files/preprocessed_matrix_h5.h5",
+    pca_h5                        = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_PCA/fork0/join-u1c4373f455/files/pca_h5.h5",
+    clustering_h5                 = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/COMBINE_CLUSTERING/fork0/chnk0-u1c4373f45a/files/clustering_h5.h5",
+    diffexp_h5                    = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_DIFFERENTIAL_EXPRESSION/fork0/join-u1c4373f45a/files/diffexp_h5.h5",
+    tsne_h5                       = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_TSNE/fork0/join-u1c4373f456/files/tsne_h5.h5",
+    umap_h5                       = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_UMAP/fork0/join-u1c4373f456/files/umap_h5.h5",
+    pca_csv                       = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_PCA/fork0/join-u1c4373f455/files/pca_csv",
+    clustering_csv                = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/COMBINE_CLUSTERING/fork0/chnk0-u1c4373f45a/files/clustering_csv",
+    diffexp_csv                   = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_DIFFERENTIAL_EXPRESSION/fork0/join-u1c4373f45a/files/diffexp_csv",
+    tsne_csv                      = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_TSNE/fork0/join-u1c4373f456/files/tsne_csv",
+    umap_csv                      = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_UMAP/fork0/join-u1c4373f456/files/umap_csv",
+    multi_genome_summary          = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_MULTIGENOME_ANALYSIS/fork0/join-u1c4373f455/files/multi_genome_summary.json",
+    multi_genome_csv              = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_MULTIGENOME_ANALYSIS/fork0/join-u1c4373f455/files/multi_genome_csv",
+    multi_genome_json             = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_MULTIGENOME_ANALYSIS/fork0/join-u1c4373f455/files/multi_genome_json",
+    is_multi_genome               = false,
+    chemistry_batch_correction    = false,
+    batch_score_before_correction = null,
+    batch_score_after_correction  = null,
+)
