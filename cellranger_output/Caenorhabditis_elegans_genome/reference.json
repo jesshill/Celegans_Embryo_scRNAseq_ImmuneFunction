@@ -1,0 +1,17 @@
+{
+    "fasta_hash": "35d9a8d4f613329596a3083097ca58ab50d842e2",
+    "genomes": [
+        "Caenorhabditis_elegans_genome"
+    ],
+    "gtf_hash.gz": "7a72ce3d654ca3f61e981160da0e4dbe8e243287",
+    "input_fasta_files": [
+        "Caenorhabditis_elegans.WBcel235.dna.toplevel.fa"
+    ],
+    "input_gtf_files": [
+        "Caenorhabditis_elegans.WBcel235.109.filtered.gtf"
+    ],
+    "mem_gb": 16,
+    "mkref_version": "cellranger-cellranger-7.1.0",
+    "threads": 2,
+    "version": null
+}
