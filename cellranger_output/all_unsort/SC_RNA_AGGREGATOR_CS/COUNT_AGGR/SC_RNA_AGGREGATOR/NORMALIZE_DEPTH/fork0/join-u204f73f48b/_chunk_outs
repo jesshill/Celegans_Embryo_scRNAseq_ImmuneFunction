@@ -1,0 +1,12 @@
+[
+    {
+        "chunk_summary": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/NORMALIZE_DEPTH/fork0/chnk0-u204f73f48c/files/chunk_summary.json",
+        "filtered_matrices_h5": [],
+        "filtered_matrix_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/NORMALIZE_DEPTH/fork0/chnk0-u204f73f48c/files/filtered_matrix_h5.h5",
+        "filtered_nnz": 14000116,
+        "raw_matrices_h5": [],
+        "raw_matrix_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/NORMALIZE_DEPTH/fork0/chnk0-u204f73f48c/files/raw_matrix_h5.h5",
+        "raw_nnz": 37274316,
+        "summary": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/NORMALIZE_DEPTH/fork0/chnk0-u204f73f48c/files/summary.json"
+    }
+]
