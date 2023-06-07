@@ -1,0 +1,3 @@
+title RTA 2.11.3 - D:\Illumina\NextSeq Control Software Temp\210716_NS500697_0227_AHMTGLBGXJ\
+pushd "C:\Program Files\Illumina\RTA\2.11.3"
+"C:\Program Files\Illumina\RTA\2.11.3\RTA.exe" "D:\Illumina\NextSeq Control Software Temp\210716_NS500697_0227_AHMTGLBGXJ" Processing.NumberOfThreads=20 Processing.MaxMinsForRequeueOnError=1 configfile="C:\Program Files\Illumina\RTA\2.11.3\Configs\NextSeq.Configuration.xml" Processing.ThumbnailTileMatch="" 
