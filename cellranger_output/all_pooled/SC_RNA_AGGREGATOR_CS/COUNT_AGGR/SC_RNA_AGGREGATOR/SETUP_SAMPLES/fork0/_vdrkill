@@ -1,0 +1,19 @@
+{
+    "timestamp": "2023-05-28T18:39:20.851470083-06:00",
+    "paths": [
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SETUP_SAMPLES/fork0/chnk0-u173b73f3b5/files/gem_group_index_json.json"
+    ],
+    "errors": null,
+    "events": [
+        {
+            "Timestamp": "2023-05-28T18:37:09.666567817-06:00",
+            "DeltaBytes": 8662
+        },
+        {
+            "Timestamp": "2023-05-28T18:39:20.851470083-06:00",
+            "DeltaBytes": -103
+        }
+    ],
+    "count": 1,
+    "size": 103
+}

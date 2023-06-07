@@ -1,0 +1,16 @@
+{
+    "aggregation_csv": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/outs/aggregation.csv",
+    "count": {
+        "analysis": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/outs/count/analysis",
+        "cloupe": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/outs/count/cloupe.cloupe",
+        "crispr_analysis": null,
+        "filtered_feature_bc_matrix": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/outs/count/filtered_feature_bc_matrix",
+        "filtered_feature_bc_matrix_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/outs/count/filtered_feature_bc_matrix.h5",
+        "summary": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/outs/count/summary.json"
+    },
+    "vdj_b": null,
+    "vdj_reference": null,
+    "vdj_t": null,
+    "vdj_t_gd": null,
+    "web_summary": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/outs/web_summary.html"
+}

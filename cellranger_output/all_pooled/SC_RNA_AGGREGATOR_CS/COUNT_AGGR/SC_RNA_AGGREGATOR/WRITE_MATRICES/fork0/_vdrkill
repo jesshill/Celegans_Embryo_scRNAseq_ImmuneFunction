@@ -1,0 +1,19 @@
+{
+    "timestamp": "2023-05-28T18:39:05.55762909-06:00",
+    "paths": [
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/WRITE_MATRICES/fork0/join-u173b73f3df/files/summary.json"
+    ],
+    "errors": null,
+    "events": [
+        {
+            "Timestamp": "2023-05-28T18:37:51.033687884-06:00",
+            "DeltaBytes": 77351542
+        },
+        {
+            "Timestamp": "2023-05-28T18:39:05.55762909-06:00",
+            "DeltaBytes": -3966
+        }
+    ],
+    "count": 1,
+    "size": 3966
+}

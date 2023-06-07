@@ -1,0 +1,151 @@
+{
+    "name": "ID.all_pooled.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CLOUPE_PREPROCESS.fork0.chnk0",
+    "type": "local",
+    "cwd": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/CLOUPE_PREPROCESS/fork0/chnk0-u173b73f42a/files",
+    "python": {
+        "binpath": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/external/anaconda/bin/python3",
+        "version": "3.9.7 (default, Sep 16 2021, 13:09:58) \n[GCC 7.5.0]"
+    },
+    "rusage": {
+        "self": {
+            "ru_maxrss": 19944,
+            "ru_ixrss": 0,
+            "ru_idrss": 0,
+            "ru_minflt": 473,
+            "ru_majflt": 0,
+            "ru_nswap": 0,
+            "ru_utime": 0.000946,
+            "ru_stime": 0.005631,
+            "ru_inblock": 0,
+            "ru_oublock": 48,
+            "ru_msgsnd": 0,
+            "ru_msgrcv": 0,
+            "ru_nsignals": 0,
+            "ru_nivcsw": 1
+        },
+        "children": {
+            "ru_maxrss": 982456,
+            "ru_ixrss": 0,
+            "ru_idrss": 0,
+            "ru_minflt": 175902,
+            "ru_majflt": 57,
+            "ru_nswap": 0,
+            "ru_utime": 20.904598,
+            "ru_stime": 0.570664,
+            "ru_inblock": 30048,
+            "ru_oublock": 165656,
+            "ru_msgsnd": 0,
+            "ru_msgrcv": 0,
+            "ru_nsignals": 0,
+            "ru_nivcsw": 55
+        }
+    },
+    "used_bytes": {
+        "rss": 902733824,
+        "shared": 69046272,
+        "vmem": 3578335232,
+        "text": 22319104,
+        "stack": 1098960896,
+        "proc_count": 9
+    },
+    "io": {
+        "total": {
+            "read": {
+                "sysc": 7480,
+                "bytes": 32632832
+            },
+            "write": {
+                "sysc": 47,
+                "bytes": 0
+            }
+        },
+        "max": {
+            "read": {
+                "sysc": 3186.233676490434,
+                "bytes": 5130819.727702674
+            },
+            "write": {
+                "sysc": 69.82979253422992,
+                "bytes": 0
+            }
+        },
+        "dev": {
+            "read": {
+                "sysc": 713.5348518949907,
+                "bytes": 1950761.6572953947
+            },
+            "write": {
+                "sysc": 14.627498067328533,
+                "bytes": 0
+            }
+        }
+    },
+    "wallclock": {
+        "start": "2023-05-28T18:39:06.070475567-06:00",
+        "end": "2023-05-28T18:39:20.169313112-06:00",
+        "duration_seconds": 14.098837545
+    },
+    "profile_mode": "disable",
+    "stackvars_flag": "disable",
+    "monitor_flag": "disable",
+    "invocation": {
+        "call": "SC_RNA_AGGREGATOR_CS",
+        "args": {
+            "aggregation_csv": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/aggregation_all.csv",
+            "no_secondary_analysis": false,
+            "normalization_mode": "mapped",
+            "pipestance_root": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH",
+            "sample_desc": "",
+            "sample_id": "all_pooled"
+        },
+        "mro_file": "rna/sc_rna_aggregator_cs.mro"
+    },
+    "version": {
+        "martian": "v4.0.10",
+        "pipelines": "cellranger-7.1.0"
+    },
+    "sge": {
+        "SLURM_CLUSTER_NAME": "alpine",
+        "SLURM_CONF": "/etc/slurm/slurm.conf",
+        "SLURM_CPUS_ON_NODE": "24",
+        "SLURM_EXPORT_ENV": "NONE",
+        "SLURM_GET_USER_ENV": "1",
+        "SLURM_GTIDS": "0",
+        "SLURM_JOBID": "1395617",
+        "SLURM_JOB_ACCOUNT": "csu-general",
+        "SLURM_JOB_CPUS_PER_NODE": "24",
+        "SLURM_JOB_GID": "2001726",
+        "SLURM_JOB_ID": "1395617",
+        "SLURM_JOB_NAME": "make_aggr",
+        "SLURM_JOB_NODELIST": "c3cpu-c11-u1-4",
+        "SLURM_JOB_NUM_NODES": "1",
+        "SLURM_JOB_PARTITION": "amilan",
+        "SLURM_JOB_QOS": "Added as default",
+        "SLURM_JOB_UID": "2001726",
+        "SLURM_JOB_USER": "jesshill@colostate.edu",
+        "SLURM_LOCALID": "0",
+        "SLURM_MEM_PER_CPU": "3840",
+        "SLURM_NNODES": "1",
+        "SLURM_NODEID": "0",
+        "SLURM_NODELIST": "c3cpu-c11-u1-4",
+        "SLURM_NODE_ALIASES": "(null)",
+        "SLURM_NPROCS": "24",
+        "SLURM_NTASKS": "24",
+        "SLURM_PRIO_PROCESS": "0",
+        "SLURM_PROCID": "0",
+        "SLURM_SCRATCH": "/scratch/local/1395617",
+        "SLURM_SCRIPT_CONTEXT": "prolog_task",
+        "SLURM_SUBMIT_DIR": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH",
+        "SLURM_SUBMIT_HOST": "login-ci1",
+        "SLURM_TASKS_PER_NODE": "24",
+        "SLURM_TASK_PID": "3938063",
+        "SLURM_TOPOLOGY_ADDR": "alpine-25g-c11.c3cpu-c11-u1-4",
+        "SLURM_TOPOLOGY_ADDR_PATTERN": "switch.node",
+        "SLURM_WORKING_CLUSTER": "alpine:alpine-slurmctl1:6817:9728:109"
+    },
+    "host": "c3cpu-c11-u1-4.rc.int.colorado.edu",
+    "pid": 3939126,
+    "threads": 2,
+    "memGB": 6,
+    "vmemGB": 9
+}

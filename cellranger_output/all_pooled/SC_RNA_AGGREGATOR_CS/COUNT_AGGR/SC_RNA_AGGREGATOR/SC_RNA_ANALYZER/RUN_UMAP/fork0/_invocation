@@ -1,0 +1,13 @@
+@include "rna/_cr_ana_stages.mro"
+
+call RUN_UMAP_NG as RUN_UMAP(
+    matrix_h5        = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/PREPROCESS_MATRIX/fork0/join-u173b73f3eb/files/preprocessed_matrix_h5.h5",
+    pca_h5           = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_PCA/fork0/join-u173b73f3f1/files/pca_h5.h5",
+    random_seed      = null,
+    n_neighbors      = null,
+    input_pcs        = null,
+    max_dims         = null,
+    min_dist         = null,
+    metric           = null,
+    is_antibody_only = false,
+)

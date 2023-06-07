@@ -1,0 +1,17 @@
+{
+    "timestamp": "0001-01-01T00:00:00Z",
+    "paths": null,
+    "errors": null,
+    "events": [
+        {
+            "Timestamp": "2023-05-28T18:38:09.702748478-06:00",
+            "DeltaBytes": 5482
+        },
+        {
+            "Timestamp": "2023-05-28T18:38:10.201650481-06:00",
+            "DeltaBytes": 6318
+        }
+    ],
+    "count": 0,
+    "size": 0
+}
