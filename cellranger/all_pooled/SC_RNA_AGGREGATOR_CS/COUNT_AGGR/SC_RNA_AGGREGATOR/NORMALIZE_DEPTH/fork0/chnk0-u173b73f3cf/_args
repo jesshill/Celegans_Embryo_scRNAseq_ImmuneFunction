@@ -1,0 +1,59 @@
+{
+    "__mem_gb": 5.6,
+    "__threads": 1,
+    "__vmem_gb": 8.6,
+    "chunk_len": 75041000,
+    "chunk_start": 0,
+    "frac_reads_kept": [
+        0.02950646536624051,
+        0.0384311001977192,
+        0.023540705267487843,
+        1.0
+    ],
+    "gem_group_barcode_ranges": {
+        "1": [
+            0,
+            435665
+        ],
+        "2": [
+            435665,
+            826778
+        ],
+        "3": [
+            826778,
+            991793
+        ],
+        "4": [
+            991793,
+            2933392
+        ]
+    },
+    "gem_group_index": {
+        "1": [
+            "GFP_1",
+            1
+        ],
+        "2": [
+            "GFP_2",
+            1
+        ],
+        "3": [
+            "unsort_1",
+            1
+        ],
+        "4": [
+            "unsort_2",
+            1
+        ]
+    },
+    "molecules": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/MERGE_MOLECULES/fork0/join-u173b73f3b5/files/merged_molecules.h5",
+    "normalization_mode": "mapped",
+    "num_cells": [
+        553,
+        749,
+        201,
+        14570
+    ],
+    "reads_per_library": null,
+    "targeted_depth_factor": 2
+}

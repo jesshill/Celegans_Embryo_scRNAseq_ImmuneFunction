@@ -1,0 +1,28 @@
+@include "rna/sc_rna_aggregator_cs.mro"
+
+call COUNT_AGGR(
+    sample_id             = "all_pooled",
+    sample_desc           = "",
+    sample_defs           = [
+        {
+            "library_id": "GFP_1",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/GFP_1/outs/molecule_info.h5",
+        },
+        {
+            "library_id": "GFP_2",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/GFP_2/outs/molecule_info.h5",
+        },
+        {
+            "library_id": "unsort_1",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/unsort_1/outs/molecule_info.h5",
+        },
+        {
+            "library_id": "unsort_2",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/unsort_2/outs/molecule_info.h5",
+        },
+    ],
+    aggregation_csv       = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/aggregation_all.csv",
+    normalization_mode    = "mapped",
+    no_secondary_analysis = false,
+    is_pd                 = false,
+)

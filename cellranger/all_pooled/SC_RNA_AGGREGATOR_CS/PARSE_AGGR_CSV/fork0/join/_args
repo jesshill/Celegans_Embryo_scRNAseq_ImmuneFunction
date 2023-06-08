@@ -1,0 +1,7 @@
+{
+    "__mem_gb": 1,
+    "__threads": 1,
+    "__vmem_gb": 4,
+    "aggregation_csv": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/aggregation_all.csv",
+    "pipestance_root": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH"
+}

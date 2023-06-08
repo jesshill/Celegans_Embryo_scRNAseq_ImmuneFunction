@@ -1,0 +1,50 @@
+{
+    "timestamp": "2023-05-28T18:38:25.935736277-06:00",
+    "paths": [
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk0-u173b73f3fd/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk0-u173b73f3fd/files/kmeans_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk1-u173b73f3fd/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk1-u173b73f3fd/files/kmeans_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk2-u173b73f3fd/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk2-u173b73f3fd/files/kmeans_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk3-u173b73f3fd/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk3-u173b73f3fd/files/kmeans_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk4-u173b73f3fd/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk4-u173b73f3fd/files/kmeans_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk5-u173b73f3fd/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk5-u173b73f3fd/files/kmeans_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk6-u173b73f3fd/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk6-u173b73f3fd/files/kmeans_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk7-u173b73f3fd/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk7-u173b73f3fd/files/kmeans_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk8-u173b73f3fd/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/chnk8-u173b73f3fd/files/kmeans_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/join-u173b73f3fa/files/kmeans_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_KMEANS/fork0/join-u173b73f3fa/files/kmeans_h5.h5"
+    ],
+    "errors": null,
+    "events": [
+        {
+            "Timestamp": "2023-05-28T18:38:18.427322046-06:00",
+            "DeltaBytes": 6976
+        },
+        {
+            "Timestamp": "2023-05-28T18:38:21.503312139-06:00",
+            "DeltaBytes": 3276146
+        },
+        {
+            "Timestamp": "2023-05-28T18:38:23.410207474-06:00",
+            "DeltaBytes": 3181193
+        },
+        {
+            "Timestamp": "2023-05-28T18:38:24.19755541-06:00",
+            "DeltaBytes": -3218008
+        },
+        {
+            "Timestamp": "2023-05-28T18:38:25.935736277-06:00",
+            "DeltaBytes": -3169760
+        }
+    ],
+    "count": 56,
+    "size": 6387768
+}
