@@ -1,7 +1,0 @@
-{
-    "__mem_gb": 1,
-    "__threads": 1,
-    "__vmem_gb": 4,
-    "filtered_matrices_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/WRITE_MATRICES/fork0/join-u173b73f3df/files/filtered_matrix_h5.h5",
-    "is_multi_genome": false
-}

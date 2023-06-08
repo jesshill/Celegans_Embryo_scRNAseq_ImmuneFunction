@@ -1,1 +1,0 @@
-cellranger aggr --id=all_pooled --csv=aggregation_all.csv
