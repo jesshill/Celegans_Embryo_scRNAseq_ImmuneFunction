@@ -13,15 +13,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Install packages
 ```{r}
-#install.packages('Seurat')
-#packageVersion('Seurat')
-#remotes::install_github('satijalab/seurat-wrappers')
+install.packages('Seurat')
+packageVersion('Seurat')
 
-#reticulate::py_install(packages = 'umap-learn', envname = 'r-reticulate')
 #BiocManager::install("limma")
 #install.packages("hdf5r")
-#BiocManager::install("biomaRt")
-#install.packages("clustree")
+BiocManager::install("biomaRt")
+install.packages("clustree")
+install.packages("tidyverse")
+install.packages("patchwork")
 ```
 
 # Load packages
@@ -30,14 +30,17 @@ library(biomaRt)
 library(Seurat)
 library(tidyverse)
 library(patchwork)
-library(limma)
+#library(limma)
 library(clustree)
+library(patchwork)
 ```
 
 ---
 # Get started!
 
 ```{r}
+emb.GFPpooled.data <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5")
+
 emb.GFPpooled.data <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5")
 ```
 
