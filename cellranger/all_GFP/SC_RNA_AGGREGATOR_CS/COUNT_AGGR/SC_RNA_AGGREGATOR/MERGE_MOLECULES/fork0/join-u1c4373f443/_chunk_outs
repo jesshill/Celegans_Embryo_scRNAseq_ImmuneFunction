@@ -1,0 +1,16 @@
+[
+    {
+        "sample_def": {
+            "library_id": "GFP_1",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/MERGE_MOLECULES/fork0/chnk0-u1c4373f443/files/GFP_1_molecule_info.h5"
+        },
+        "trimmed_molecules": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/MERGE_MOLECULES/fork0/chnk0-u1c4373f443/files/GFP_1_molecule_info.h5"
+    },
+    {
+        "sample_def": {
+            "library_id": "GFP_2",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/MERGE_MOLECULES/fork0/chnk1-u1c4373f443/files/GFP_2_molecule_info.h5"
+        },
+        "trimmed_molecules": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/MERGE_MOLECULES/fork0/chnk1-u1c4373f443/files/GFP_2_molecule_info.h5"
+    }
+]

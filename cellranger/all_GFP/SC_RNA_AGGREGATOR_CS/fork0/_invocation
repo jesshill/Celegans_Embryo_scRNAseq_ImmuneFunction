@@ -1,0 +1,10 @@
+@include "rna/sc_rna_aggregator_cs.mro"
+
+call SC_RNA_AGGREGATOR_CS(
+    sample_id             = "all_GFP",
+    sample_desc           = "",
+    pipestance_root       = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH",
+    aggregation_csv       = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/aggregation_GFP.csv",
+    normalization_mode    = "mapped",
+    no_secondary_analysis = false,
+)
