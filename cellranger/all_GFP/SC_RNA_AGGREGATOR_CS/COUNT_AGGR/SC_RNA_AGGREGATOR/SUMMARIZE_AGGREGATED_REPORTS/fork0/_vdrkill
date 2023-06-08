@@ -1,0 +1,24 @@
+{
+    "timestamp": "2023-05-28T18:40:09.672437541-06:00",
+    "paths": [
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SUMMARIZE_AGGREGATED_REPORTS/fork0/join-u1c4373f465/files/web_summary.html",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SUMMARIZE_AGGREGATED_REPORTS/fork0/join-u1c4373f465/files/web_summary_data.json"
+    ],
+    "errors": null,
+    "events": [
+        {
+            "Timestamp": "2023-05-28T18:40:05.172430919-06:00",
+            "DeltaBytes": 6609
+        },
+        {
+            "Timestamp": "2023-05-28T18:40:06.448506444-06:00",
+            "DeltaBytes": 10090559
+        },
+        {
+            "Timestamp": "2023-05-28T18:40:09.299219101-06:00",
+            "DeltaBytes": -10080217
+        }
+    ],
+    "count": 2,
+    "size": 10080217
+}

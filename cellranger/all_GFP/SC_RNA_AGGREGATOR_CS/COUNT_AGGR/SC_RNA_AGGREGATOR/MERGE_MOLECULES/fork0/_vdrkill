@@ -1,0 +1,29 @@
+{
+    "timestamp": "2023-05-28T18:40:05.181187538-06:00",
+    "paths": [
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/MERGE_MOLECULES/fork0/chnk0-u1c4373f443/files/GFP_1_molecule_info.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/MERGE_MOLECULES/fork0/chnk1-u1c4373f443/files/GFP_2_molecule_info.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/MERGE_MOLECULES/fork0/join-u1c4373f443/files/merged_molecules.h5"
+    ],
+    "errors": null,
+    "events": [
+        {
+            "Timestamp": "2023-05-28T18:39:31.512909684-06:00",
+            "DeltaBytes": 93886353
+        },
+        {
+            "Timestamp": "2023-05-28T18:39:32.497391249-06:00",
+            "DeltaBytes": 90674632
+        },
+        {
+            "Timestamp": "2023-05-28T18:39:37.832641514-06:00",
+            "DeltaBytes": -93865129
+        },
+        {
+            "Timestamp": "2023-05-28T18:40:05.181187538-06:00",
+            "DeltaBytes": -90666279
+        }
+    ],
+    "count": 3,
+    "size": 184531408
+}

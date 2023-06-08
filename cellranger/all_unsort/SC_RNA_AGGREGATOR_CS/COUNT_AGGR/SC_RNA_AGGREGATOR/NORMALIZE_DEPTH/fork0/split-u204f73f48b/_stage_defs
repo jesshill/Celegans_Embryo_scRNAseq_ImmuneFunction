@@ -1,0 +1,22 @@
+{
+    "chunks": [
+        {
+            "frac_reads_kept": [
+                0.023540705267487843,
+                1.0
+            ],
+            "num_cells": [
+                201,
+                14570
+            ],
+            "chunk_start": 0,
+            "chunk_len": 55179949,
+            "reads_per_library": null,
+            "__mem_gb": 4.6
+        }
+    ],
+    "join": {
+        "__mem_gb": 3,
+        "__threads": 2
+    }
+}

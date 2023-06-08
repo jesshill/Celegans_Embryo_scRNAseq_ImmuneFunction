@@ -1,0 +1,28 @@
+@include "rna/_common_cloupe_stages.mro"
+
+call CLOUPE_PREPROCESS(
+    pipestance_type              = "SC_RNA_AGGREGATOR_CS",
+    sample_id                    = "all_pooled",
+    sample_desc                  = "",
+    analysis                     = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/SUMMARIZE_ANALYSIS/fork0/join-u173b73f41b/files/analysis",
+    filtered_gene_bc_matrices_h5 = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/WRITE_MATRICES/fork0/join-u173b73f3df/files/filtered_matrix_h5.h5",
+    metrics_json                 = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SUMMARIZE_AGGREGATED_REPORTS/fork0/join-u173b73f41c/files/summary.json",
+    aggregation_csv              = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/aggregation_all.csv",
+    gem_group_index_json         = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SETUP_SAMPLES/fork0/chnk0-u173b73f3b5/files/gem_group_index_json.json",
+    loupe_alignment_file         = null,
+    tissue_image_paths           = null,
+    dark_images                  = null,
+    tissue_positions             = null,
+    fiducial_positions_list      = null,
+    dzi_info                     = null,
+    dzi_tiles_paths              = null,
+    scale_factors_json           = null,
+    no_secondary_analysis        = false,
+    barcode_whitelist            = null,
+    loupe_map                    = null,
+    product_type                 = "sc",
+    cells_per_sample             = null,
+    cells_per_tag                = null,
+    cells_per_protospacer        = null,
+    spatial_enrichment           = null,
+)

@@ -1,0 +1,97 @@
+[stdout]
+{
+    "cellranger_version": "cellranger-7.1.0",
+    "chemistry_barcode": [
+        {
+            "kind": "gel_bead",
+            "length": 16,
+            "offset": 0,
+            "read_type": "R1",
+            "whitelist": {
+                "name": "3M-february-2018"
+            }
+        }
+    ],
+    "chemistry_description": "Single Cell 3' v3",
+    "chemistry_endedness": "three_prime",
+    "chemistry_name": "SC3Pv3",
+    "chemistry_rna": {
+        "length": null,
+        "min_length": null,
+        "offset": 0,
+        "read_type": "R2"
+    },
+    "chemistry_rna2": null,
+    "chemistry_strandedness": "+",
+    "chemistry_umi": [
+        {
+            "length": 12,
+            "min_length": 10,
+            "offset": 16,
+            "read_type": "R1",
+            "whitelist": null
+        }
+    ],
+    "gem_groups": {
+        "1": {
+            "filter_probes": null,
+            "force_cells": null,
+            "include_introns": true,
+            "recovered_cells": null
+        },
+        "2": {
+            "filter_probes": null,
+            "force_cells": null,
+            "include_introns": true,
+            "recovered_cells": null
+        },
+        "3": {
+            "filter_probes": null,
+            "force_cells": null,
+            "include_introns": true,
+            "recovered_cells": null
+        },
+        "4": {
+            "filter_probes": null,
+            "force_cells": null,
+            "include_introns": true,
+            "recovered_cells": null
+        }
+    },
+    "is_aggregated": true,
+    "libraries": {
+        "0": {
+            "downsampled_feature_read_pairs": 2002775.0304252636,
+            "downsampled_reads": 3326808.1169964382,
+            "feature_read_pairs": 67875803,
+            "raw_read_pairs": 112748446,
+            "usable_read_pairs": 45488993
+        },
+        "1": {
+            "downsampled_feature_read_pairs": 2281677.97700301,
+            "downsampled_reads": 4064318.125852585,
+            "feature_read_pairs": 59370613,
+            "raw_read_pairs": 105755966,
+            "usable_read_pairs": 47303947
+        },
+        "2": {
+            "downsampled_feature_read_pairs": 979126.2707422109,
+            "downsampled_reads": 4218244.004992597,
+            "feature_read_pairs": 41592903,
+            "raw_read_pairs": 179189364,
+            "usable_read_pairs": 20724066
+        },
+        "3": {
+            "downsampled_feature_read_pairs": 69239264.0,
+            "downsampled_reads": 116265931.0,
+            "feature_read_pairs": 69239264,
+            "raw_read_pairs": 116265931,
+            "usable_read_pairs": 35363719
+        }
+    },
+    "molecule_info_type": "count",
+    "reference_fasta_hash": "35d9a8d4f613329596a3083097ca58ab50d842e2",
+    "reference_gtf_hash": "",
+    "reference_gtf_hash.gz": "7a72ce3d654ca3f61e981160da0e4dbe8e243287",
+    "reference_mkref_version": "cellranger-cellranger-7.1.0"
+}

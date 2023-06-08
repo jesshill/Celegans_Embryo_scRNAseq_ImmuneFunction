@@ -1,0 +1,22 @@
+[stdout]
+self_maxrss_mb	79.0
+children_maxrss_mb	39.5
+downsampled
+self_maxrss_mb	1615.6
+children_maxrss_mb	39.5
+created umi matrix
+self_maxrss_mb	2313.0
+children_maxrss_mb	39.5
+2106614 2
+creating barcode strings
+self_maxrss_mb	2729.4
+children_maxrss_mb	39.5
+created barcode strings
+self_maxrss_mb	2729.4
+children_maxrss_mb	39.5
+created read matrix
+self_maxrss_mb	2772.1
+children_maxrss_mb	39.5
+created filtered umi matrix
+self_maxrss_mb	2772.1
+children_maxrss_mb	39.5

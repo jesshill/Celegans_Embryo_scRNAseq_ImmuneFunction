@@ -1,0 +1,30 @@
+{
+    "timestamp": "2023-05-28T18:38:52.831822252-06:00",
+    "paths": [
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_PCA/fork0/chnk0-u173b73f3f1/files/pca_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_PCA/fork0/chnk0-u173b73f3f1/files/pca_h5.h5",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_PCA/fork0/join-u173b73f3f1/files/pca_csv",
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_PCA/fork0/join-u173b73f3f1/files/pca_h5.h5"
+    ],
+    "errors": null,
+    "events": [
+        {
+            "Timestamp": "2023-05-28T18:38:09.747834352-06:00",
+            "DeltaBytes": 16682921
+        },
+        {
+            "Timestamp": "2023-05-28T18:38:18.345943786-06:00",
+            "DeltaBytes": 10147132
+        },
+        {
+            "Timestamp": "2023-05-28T18:38:18.396067024-06:00",
+            "DeltaBytes": -16671507
+        },
+        {
+            "Timestamp": "2023-05-28T18:38:52.831822252-06:00",
+            "DeltaBytes": -10140835
+        }
+    ],
+    "count": 16,
+    "size": 26812342
+}

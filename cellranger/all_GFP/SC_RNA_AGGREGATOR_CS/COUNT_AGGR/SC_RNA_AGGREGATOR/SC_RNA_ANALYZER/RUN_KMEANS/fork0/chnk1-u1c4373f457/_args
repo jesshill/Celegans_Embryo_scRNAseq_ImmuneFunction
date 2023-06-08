@@ -1,0 +1,13 @@
+{
+    "__mem_gb": 3,
+    "__threads": 1,
+    "__vmem_gb": 6,
+    "library": "Gene Expression",
+    "matrix_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/PREPROCESS_MATRIX/fork0/join-u1c4373f452/files/preprocessed_matrix_h5.h5",
+    "max_clusters": null,
+    "n_clusters": 3,
+    "num_bcs": null,
+    "num_pcs": null,
+    "pca_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_GFP/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SC_RNA_ANALYZER/RUN_PCA/fork0/join-u1c4373f455/files/pca_h5.h5",
+    "random_seed": null
+}

@@ -1,0 +1,22 @@
+[stdout]
+2023-05-29 00:41:23 [cr_ana::stages::graph_clustering] computing k-nearest neighbors with k = 270
+2023-05-29 00:41:23 [scan_rs::nn] constructing ball tree of 14771 points
+2023-05-29 00:41:23 [scan_rs::nn] querying points for 270 neighbors
+2023-05-29 00:41:23 [cr_ana::stages::graph_clustering] running louvain
+2023-05-29 00:41:23 [cr_ana::louvain] building network for neighbor matrix of shape: (14771,270)
+2023-05-29 00:41:23 [cr_ana::louvain] louvain starting cpm score: -0.000070
+2023-05-29 00:41:24 [cr_ana::louvain] louvain optimized in 23 iterations
+2023-05-29 00:41:24 [cr_ana::louvain] louvain final cpm score: 0.711003
+2023-05-29 00:41:24 [cr_ana::stages::graph_clustering] merging clusters
+2023-05-29 00:41:24 [scan_rs::merge_clusters] computing DE params on 19415 x 1256 matrix
+2023-05-29 00:41:25 [scan_rs::merge_clusters] computing DE on 756 vs 500 cells
+2023-05-29 00:41:25 [scan_rs::merge_clusters] computing DE params on 19415 x 2391 matrix
+2023-05-29 00:41:25 [scan_rs::merge_clusters] computing DE on 1342 vs 1049 cells
+2023-05-29 00:41:26 [scan_rs::merge_clusters] computing DE params on 19415 x 1431 matrix
+2023-05-29 00:41:26 [scan_rs::merge_clusters] computing DE on 902 vs 529 cells
+2023-05-29 00:41:26 [scan_rs::merge_clusters] computing DE params on 19415 x 1681 matrix
+2023-05-29 00:41:27 [scan_rs::merge_clusters] computing DE on 1001 vs 680 cells
+2023-05-29 00:41:27 [scan_rs::merge_clusters] computing DE params on 19415 x 1089 matrix
+2023-05-29 00:41:27 [scan_rs::merge_clusters] computing DE on 643 vs 446 cells
+2023-05-29 00:41:28 [scan_rs::merge_clusters] computing DE params on 19415 x 1392 matrix
+2023-05-29 00:41:28 [scan_rs::merge_clusters] computing DE on 862 vs 530 cells

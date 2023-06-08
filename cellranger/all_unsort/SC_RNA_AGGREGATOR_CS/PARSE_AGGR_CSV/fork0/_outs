@@ -1,0 +1,16 @@
+{
+    "aggregation_csv": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/SC_RNA_AGGREGATOR_CS/PARSE_AGGR_CSV/fork0/chnk0-u204f73f475/files/aggregation.csv",
+    "count_libraries": [
+        {
+            "library_id": "unsort_1",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/unsort_1/outs/molecule_info.h5"
+        },
+        {
+            "library_id": "unsort_2",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/unsort_2/outs/molecule_info.h5"
+        }
+    ],
+    "disable_count_aggr": false,
+    "disable_vdj_aggr": true,
+    "vdj_aggr_inputs": []
+}

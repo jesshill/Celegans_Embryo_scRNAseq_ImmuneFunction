@@ -1,0 +1,56 @@
+{
+    "__mem_gb": 2.6,
+    "__threads": 2,
+    "__vmem_gb": 5.6,
+    "filtered_matrices_h5": [
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/NORMALIZE_DEPTH/fork0/chnk0-u173b73f3cf/files/filtered_matrix_h5.h5"
+    ],
+    "filtered_nnz": 14905592,
+    "gem_group_index": {
+        "1": [
+            "GFP_1",
+            1
+        ],
+        "2": [
+            "GFP_2",
+            1
+        ],
+        "3": [
+            "unsort_1",
+            1
+        ],
+        "4": [
+            "unsort_2",
+            1
+        ]
+    },
+    "is_pd": false,
+    "molecules": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/MERGE_MOLECULES/fork0/join-u173b73f3b5/files/merged_molecules.h5",
+    "raw_matrices_h5": [
+        "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/NORMALIZE_DEPTH/fork0/chnk0-u173b73f3cf/files/raw_matrix_h5.h5"
+    ],
+    "raw_nnz": 39104384,
+    "sample_defs": [
+        {
+            "library_id": "GFP_1",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/GFP_1/outs/molecule_info.h5",
+            "original_molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/GFP_1/outs/molecule_info.h5"
+        },
+        {
+            "library_id": "GFP_2",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/GFP_2/outs/molecule_info.h5",
+            "original_molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/GFP_2/outs/molecule_info.h5"
+        },
+        {
+            "library_id": "unsort_1",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/unsort_1/outs/molecule_info.h5",
+            "original_molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/unsort_1/outs/molecule_info.h5"
+        },
+        {
+            "library_id": "unsort_2",
+            "molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/unsort_2/outs/molecule_info.h5",
+            "original_molecule_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/unsort_2/outs/molecule_info.h5"
+        }
+    ],
+    "summary": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_pooled/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/NORMALIZE_DEPTH/fork0/join-u173b73f3ce/files/summary.json"
+}

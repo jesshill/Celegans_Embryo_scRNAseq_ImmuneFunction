@@ -1,0 +1,8 @@
+@include "rna/sc_rna_aggregator_cs.mro"
+
+call BUILD_COMBINED_WEB_SUMMARY(
+    vdj_t_data    = null,
+    vdj_b_data    = null,
+    vdj_t_gd_data = null,
+    count_data    = "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SUMMARIZE_AGGREGATED_REPORTS/fork0/join-u204f73f4d2/files/web_summary_data.json",
+)
