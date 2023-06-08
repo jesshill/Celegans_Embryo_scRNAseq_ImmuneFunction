@@ -1,0 +1,318 @@
+Martian Runtime - v4.0.10
+2023-05-28 18:40:21 [build  ] Built with Go version go1.19.1
+2023-05-28 18:40:21 [cmdline] mrp __all_unsort.mro all_unsort --jobmode=local
+2023-05-28 18:40:21 [pid    ] 3940431
+2023-05-28 18:40:21 [environ] CONDA_SHLVL=1
+2023-05-28 18:40:21 [environ] SLURM_MEM_PER_CPU=3840
+2023-05-28 18:40:21 [environ] CONDA_EXE=/curc/sw/anaconda3/2020.11/bin/conda
+2023-05-28 18:40:21 [environ] SLURM_NODEID=0
+2023-05-28 18:40:21 [environ] SLURM_TASK_PID=3938063
+2023-05-28 18:40:21 [environ] SLURM_PRIO_PROCESS=0
+2023-05-28 18:40:21 [environ] LANG=C
+2023-05-28 18:40:21 [environ] SLURM_SUBMIT_DIR=/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH
+2023-05-28 18:40:21 [environ] HOSTNAME=c3cpu-c11-u1-4
+2023-05-28 18:40:21 [environ] ENVIRONMENT=BATCH
+2023-05-28 18:40:21 [environ] CONDA_PREFIX=/curc/sw/anaconda3/2020.11
+2023-05-28 18:40:21 [environ] SLURM_PROCID=0
+2023-05-28 18:40:21 [environ] SLURM_JOB_GID=2001726
+2023-05-28 18:40:21 [environ] SLURM_TASKS_PER_NODE=24
+2023-05-28 18:40:21 [environ] XDG_SESSION_ID=c145552
+2023-05-28 18:40:21 [environ] SLURM_NNODES=1
+2023-05-28 18:40:21 [environ] USER=jesshill@colostate.edu
+2023-05-28 18:40:21 [environ] SLURM_GET_USER_ENV=1
+2023-05-28 18:40:21 [environ] PWD=/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH
+2023-05-28 18:40:21 [environ] SLURM_JOB_NODELIST=c3cpu-c11-u1-4
+2023-05-28 18:40:21 [environ] HOME=/home/jesshill@colostate.edu
+2023-05-28 18:40:21 [environ] SLURM_CLUSTER_NAME=alpine
+2023-05-28 18:40:21 [environ] CONDA_PYTHON_EXE=/curc/sw/anaconda3/2020.11/bin/python
+2023-05-28 18:40:21 [environ] SLURM_NODELIST=c3cpu-c11-u1-4
+2023-05-28 18:40:21 [environ] SLURM_NTASKS=24
+2023-05-28 18:40:21 [environ] SLURM_JOB_CPUS_PER_NODE=24
+2023-05-28 18:40:21 [environ] BASH_ENV=/curc/sw/lmod/8.2.7/init/bash
+2023-05-28 18:40:21 [environ] SLURM_TOPOLOGY_ADDR=alpine-25g-c11.c3cpu-c11-u1-4
+2023-05-28 18:40:21 [environ] SLURM_WORKING_CLUSTER=alpine:alpine-slurmctl1:6817:9728:109
+2023-05-28 18:40:21 [environ] SLURM_JOB_NAME=make_aggr
+2023-05-28 18:40:21 [environ] TMPDIR=/tmp
+2023-05-28 18:40:21 [environ] SLURM_JOBID=1395617
+2023-05-28 18:40:21 [environ] SLURM_CONF=/etc/slurm/slurm.conf
+2023-05-28 18:40:21 [environ] SLURM_NODE_ALIASES=(null)
+2023-05-28 18:40:21 [environ] SLURM_JOB_QOS=Added as default
+2023-05-28 18:40:21 [environ] SLURM_TOPOLOGY_ADDR_PATTERN=switch.node
+2023-05-28 18:40:21 [environ] CONDA_PROMPT_MODIFIER=(base) 
+2023-05-28 18:40:21 [environ] SLURM_CPUS_ON_NODE=24
+2023-05-28 18:40:21 [environ] SLURM_JOB_NUM_NODES=1
+2023-05-28 18:40:21 [environ] SHELL=/bin/bash
+2023-05-28 18:40:21 [environ] SLURM_JOB_UID=2001726
+2023-05-28 18:40:21 [environ] SLURM_JOB_PARTITION=amilan
+2023-05-28 18:40:21 [environ] SLURM_SCRIPT_CONTEXT=prolog_task
+2023-05-28 18:40:21 [environ] SLURM_JOB_USER=jesshill@colostate.edu
+2023-05-28 18:40:21 [environ] SLURM_NPROCS=24
+2023-05-28 18:40:21 [environ] SHLVL=2
+2023-05-28 18:40:21 [environ] SLURM_SUBMIT_HOST=login-ci1
+2023-05-28 18:40:21 [environ] SLURM_JOB_ACCOUNT=csu-general
+2023-05-28 18:40:21 [environ] SLURM_EXPORT_ENV=NONE
+2023-05-28 18:40:21 [environ] SLURM_GTIDS=0
+2023-05-28 18:40:21 [environ] LOGNAME=jesshill@colostate.edu
+2023-05-28 18:40:21 [environ] XDG_RUNTIME_DIR=/run/user/2001726
+2023-05-28 18:40:21 [environ] PATH=/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/lib/bin:/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/external/martian/bin:/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/external/anaconda/bin:/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/bin/tenkit:/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/bin:/curc/sw/anaconda3/2020.11/bin:/curc/sw/anaconda3/2020.11/condabin:/opt/TurboVNC/bin:/usr/lpp/mmfs/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/jesshill@colostate.edu/bin:/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0:/home/jesshill@colostate.edu/bin/bin
+2023-05-28 18:40:21 [environ] SLURM_JOB_ID=1395617
+2023-05-28 18:40:21 [environ] SLURM_SCRATCH=/scratch/local/1395617
+2023-05-28 18:40:21 [environ] CONDA_DEFAULT_ENV=base
+2023-05-28 18:40:21 [environ] SLURM_LOCALID=0
+2023-05-28 18:40:21 [environ] BASH_FUNC_module%%=() {  eval $($LMOD_CMD bash "$@") && eval $(${LMOD_SETTARG_CMD:-:} -s sh)
+}
+2023-05-28 18:40:21 [environ] BASH_FUNC_ml%%=() {  eval $($LMOD_DIR/ml_cmd "$@")
+}
+2023-05-28 18:40:21 [environ] _=/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/cellranger
+2023-05-28 18:40:21 [environ] LC_CTYPE=en_US.UTF-8
+2023-05-28 18:40:21 [environ] PYTHONNOUSERSITE=1
+2023-05-28 18:40:21 [environ] MKL_CBWR=COMPATIBLE
+2023-05-28 18:40:21 [environ] HDF5_USE_FILE_LOCKING=FALSE
+2023-05-28 18:40:21 [environ] RUST_BACKTRACE=1
+2023-05-28 18:40:21 [environ] PYTHONPATH=/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/lib/python:/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/external/martian/adapters/python
+2023-05-28 18:40:21 [environ] TENX_PRODUCT=cellranger
+2023-05-28 18:40:21 [environ] TENX_VERSION=cellranger-7.1.0
+2023-05-28 18:40:21 [environ] TENX_COPYRIGHT=Copyright (c) 2021 10x Genomics, Inc.  All rights reserved.
+2023-05-28 18:40:21 [environ] MROPATH=/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/mro
+2023-05-28 18:40:21 [version] MRO Version=cellranger-7.1.0
+2023-05-28 18:40:21 [options] --jobmode=local
+2023-05-28 18:40:21 [options] --vdrmode=rolling
+2023-05-28 18:40:21 [options] --profile=disable
+2023-05-28 18:40:21 [options] --stackvars=false
+2023-05-28 18:40:21 [options] --zip=false
+2023-05-28 18:40:21 [options] --limit-loadavg=false
+2023-05-28 18:40:21 [options] --noexit=false
+2023-05-28 18:40:21 [options] --nopreflight=false
+2023-05-28 18:40:21 [jobmngr] Job config = /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/external/martian/jobmanagers/config.json
+2023-05-28 18:40:21 [jobmngr] Using 24 logical cores available on system.
+2023-05-28 18:40:21 [jobmngr] Detected cgroup memory limit of 96636764160 bytes.  Using it instead of total system memory 269691535360
+2023-05-28 18:40:21 [jobmngr] Using 86 GB, 96% of system memory.
+2023-05-28 18:40:21 [sysinfo] linux amd64
+2023-05-28 18:40:21 [sysinfo] Linux kernel release version: 4.18.0-305.34.2.el8_4.x86_64
+2023-05-28 18:40:21 [sysinfo] glibc version: 2.28
+2023-05-28 18:40:21 [filesys] Pipestance path /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort
+2023-05-28 18:40:21 [filesys] Pipestance filesystem type nfs
+2023-05-28 18:40:21 [filesys] 708 GB and 1,381,745,473 inodes available.
+2023-05-28 18:40:21 [filesys] Pipestance filesystem nfs mount options: rw,relatime,rw,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=3000,retrans=2,sec=sys,mountaddr=10.225.144.98,mountvers=3,mountport=20048,mountproto=tcp,local_lock=none,addr=10.225.144.98
+2023-05-28 18:40:21 [filesys] Pipestance directory permissions dgrwxr-xr-x owned by uid 2001726 gid 2000928
+2023-05-28 18:40:21 [filesys] Bin path /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/cellranger-7.1.0/external/martian/bin
+2023-05-28 18:40:21 [filesys] Bin filesystem type nfs
+2023-05-28 18:40:21 [filesys] Bin filesystem nfs mount options: rw,relatime,rw,vers=3,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,timeo=3000,retrans=2,sec=sys,mountaddr=10.225.144.98,mountvers=3,mountport=20048,mountproto=tcp,local_lock=none,addr=10.225.144.98
+2023-05-28 18:40:21 [filesys] Executable file permissions -rwxr-xr-x owned by uid 2001726 gid 2000928
+2023-05-28 18:40:21 [user   ] User jesshill@colostate.edu uid 2001726 / gid 2001726
+Serving UI at http://c3cpu-c11-u1-4.rc.int.colorado.edu:36291?auth=N37OqH5P5LZi39W3k0U81JBKI2DOShJCrAzdSZ5HS-A
+
+Running preflight checks (please wait)...
+2023-05-28 18:40:21 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.PARSE_AGGR_CSV
+2023-05-28 18:40:21 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.PARSE_AGGR_CSV.fork0.chnk0.main
+2023-05-28 18:40:21 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.PARSE_AGGR_CSV
+2023-05-28 18:40:21 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CHECK_MOLECULE_INFO_VERSION
+2023-05-28 18:40:21 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CHECK_MOLECULE_INFO_VERSION.fork0.split
+2023-05-28 18:40:22 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CHECK_MOLECULE_INFO_VERSION
+2023-05-28 18:40:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CHECK_MOLECULE_INFO_VERSION.fork0.chnk0.main
+2023-05-28 18:40:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CHECK_MOLECULE_INFO_VERSION.fork0.chnk1.main
+2023-05-28 18:40:23 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CHECK_MOLECULE_INFO_VERSION
+2023-05-28 18:40:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CHECK_MOLECULE_INFO_VERSION.fork0.join
+2023-05-28 18:40:24 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CHECK_MOLECULE_INFO_VERSION
+2023-05-28 18:40:24 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.AGGREGATOR_PREFLIGHT
+2023-05-28 18:40:24 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.AGGREGATOR_PREFLIGHT.fork0.chnk0.main
+2023-05-28 18:40:24 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.AGGREGATOR_PREFLIGHT
+2023-05-28 18:40:24 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SETUP_SAMPLES
+2023-05-28 18:40:24 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SETUP_SAMPLES.fork0.chnk0.main
+2023-05-28 18:40:25 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SETUP_SAMPLES
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.PROCESS_VDJ_PROTO
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.SETUP_VDJ_AGGR
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.RUN_ENCLONE_AGGR
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.WRITE_CLONOTYPE_OUTS
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.WRITE_CONSENSUS_TXT
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.VLOUPE_PREPROCESS
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.WRITE_WEB_SUMMARY_JSON
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.FILL_CLONOTYPE_INFO
+2023-05-28 18:40:25 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.MERGE_MOLECULES
+2023-05-28 18:40:25 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.MERGE_MOLECULES.fork0.split
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.WRITE_ANN_CSV
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.CALCULATE_CLONOTYPE_DIVERSITY
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.BUILD_AGGR_WEB_SUMMARY
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR.WRITE_AGGR_ANN
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR
+2023-05-28 18:40:25 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.MERGE_MOLECULES
+2023-05-28 18:40:25 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.MERGE_MOLECULES.fork0.chnk0.main
+2023-05-28 18:40:25 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.MERGE_MOLECULES.fork0.chnk1.main
+2023-05-28 18:40:25 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.MATCH_VDJ_AGGR_OUTS
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.MATCH_VDJ_AGGR_OUTS
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.SC_VDJ_AGGREGATOR
+2023-05-28 18:40:25 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.COPY_VDJ_REFERENCE
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR.COPY_VDJ_REFERENCE
+2023-05-28 18:40:25 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.VDJ_AGGR
+2023-05-28 18:40:29 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.MERGE_MOLECULES
+2023-05-28 18:40:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.MERGE_MOLECULES.fork0.join
+2023-05-28 18:40:43 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.MERGE_MOLECULES
+2023-05-28 18:40:43 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.CRISPR_AGGR_INPUT_PREP
+2023-05-28 18:40:43 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.CRISPR_AGGR_INPUT_PREP
+2023-05-28 18:40:43 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.NORMALIZE_DEPTH
+2023-05-28 18:40:43 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.NORMALIZE_DEPTH.fork0.split
+2023-05-28 18:40:44 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.NORMALIZE_DEPTH
+2023-05-28 18:40:44 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.NORMALIZE_DEPTH.fork0.chnk0.main
+2023-05-28 18:40:56 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.NORMALIZE_DEPTH
+2023-05-28 18:40:56 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.NORMALIZE_DEPTH.fork0.join
+2023-05-28 18:40:57 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.NORMALIZE_DEPTH
+2023-05-28 18:40:57 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.WRITE_MATRICES
+2023-05-28 18:40:57 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.WRITE_MATRICES.fork0.split
+2023-05-28 18:40:57 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.WRITE_MATRICES
+2023-05-28 18:40:57 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.WRITE_MATRICES.fork0.join
+2023-05-28 18:41:08 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.WRITE_MATRICES
+2023-05-28 18:41:08 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR._CRISPR_ANALYZER.CALL_PROTOSPACERS
+2023-05-28 18:41:08 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR._CRISPR_ANALYZER.CALL_PROTOSPACERS
+2023-05-28 18:41:08 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.ANALYZER_PREFLIGHT
+2023-05-28 18:41:08 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.ANALYZER_PREFLIGHT.fork0.chnk0.main
+2023-05-28 18:41:08 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR._CRISPR_ANALYZER._PERTURBATIONS_BY_TARGET
+2023-05-28 18:41:08 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR._CRISPR_ANALYZER._PERTURBATIONS_BY_TARGET
+2023-05-28 18:41:08 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR._CRISPR_ANALYZER._PERTURBATIONS_BY_FEATURE
+2023-05-28 18:41:08 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR._CRISPR_ANALYZER._PERTURBATIONS_BY_FEATURE
+2023-05-28 18:41:08 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR._CRISPR_ANALYZER.SUMMARIZE_CRISPR_ANALYSIS
+2023-05-28 18:41:08 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR._CRISPR_ANALYZER.SUMMARIZE_CRISPR_ANALYSIS
+2023-05-28 18:41:08 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR._CRISPR_ANALYZER
+2023-05-28 18:41:08 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.ANALYZER_PREFLIGHT
+2023-05-28 18:41:08 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.PREPROCESS_MATRIX
+2023-05-28 18:41:08 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.PREPROCESS_MATRIX.fork0.split
+2023-05-28 18:41:09 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.PREPROCESS_MATRIX
+2023-05-28 18:41:09 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.PREPROCESS_MATRIX.fork0.join
+2023-05-28 18:41:14 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.PREPROCESS_MATRIX
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIGEN_ANALYZER.CALL_ANTIBODIES
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIGEN_ANALYZER.CALL_ANTIBODIES
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_BATCH_CORRECTION_PCA.PCA_PREP
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_BATCH_CORRECTION_PCA.PCA_PREP
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIGEN_ANALYZER.SUMMARIZE_ANTIBODY_ANALYSIS
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIGEN_ANALYZER.SUMMARIZE_ANTIBODY_ANALYSIS
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIBODY_ANALYZER.CALL_ANTIBODIES
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIBODY_ANALYZER.CALL_ANTIBODIES
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIBODY_ANALYZER.SUMMARIZE_ANTIBODY_ANALYSIS
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIBODY_ANALYZER.SUMMARIZE_ANTIBODY_ANALYSIS
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_MULTIGENOME_ANALYSIS
+2023-05-28 18:41:14 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_MULTIGENOME_ANALYSIS.fork0.split
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIGEN_ANALYZER
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_BATCH_CORRECTION_PCA.RUN_PCA2
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_BATCH_CORRECTION_PCA.RUN_PCA2
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER._ANTIBODY_ANALYZER
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_BATCH_CORRECTION_PCA.POST_PCA
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_BATCH_CORRECTION_PCA.POST_PCA
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_BATCH_CORRECTION_PCA
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.CORRECT_CHEMISTRY_BATCH
+2023-05-28 18:41:14 [runtime] (disabled)        ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.CORRECT_CHEMISTRY_BATCH
+2023-05-28 18:41:14 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_PCA
+2023-05-28 18:41:14 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_PCA.fork0.split
+2023-05-28 18:41:14 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_PCA
+2023-05-28 18:41:14 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_PCA.fork0.chnk0.main
+2023-05-28 18:41:14 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_MULTIGENOME_ANALYSIS
+2023-05-28 18:41:14 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_MULTIGENOME_ANALYSIS.fork0.join
+2023-05-28 18:41:15 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_MULTIGENOME_ANALYSIS
+2023-05-28 18:41:22 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_PCA
+2023-05-28 18:41:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_PCA.fork0.join
+2023-05-28 18:41:22 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_PCA
+2023-05-28 18:41:22 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_UMAP
+2023-05-28 18:41:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_UMAP.fork0.split
+2023-05-28 18:41:22 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_GRAPH_CLUSTERING
+2023-05-28 18:41:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_GRAPH_CLUSTERING.fork0.split
+2023-05-28 18:41:22 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS
+2023-05-28 18:41:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.split
+2023-05-28 18:41:22 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_TSNE
+2023-05-28 18:41:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_TSNE.fork0.split
+2023-05-28 18:41:22 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_UMAP
+2023-05-28 18:41:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_UMAP.fork0.chnk0.main
+2023-05-28 18:41:22 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_TSNE
+2023-05-28 18:41:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_TSNE.fork0.chnk0.main
+2023-05-28 18:41:22 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_GRAPH_CLUSTERING
+2023-05-28 18:41:22 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_GRAPH_CLUSTERING.fork0.chnk0.main
+2023-05-28 18:41:23 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS
+2023-05-28 18:41:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.chnk0.main
+2023-05-28 18:41:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.chnk1.main
+2023-05-28 18:41:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.chnk2.main
+2023-05-28 18:41:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.chnk3.main
+2023-05-28 18:41:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.chnk4.main
+2023-05-28 18:41:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.chnk5.main
+2023-05-28 18:41:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.chnk6.main
+2023-05-28 18:41:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.chnk7.main
+2023-05-28 18:41:23 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.chnk8.main
+2023-05-28 18:41:25 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS
+2023-05-28 18:41:25 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS.fork0.join
+2023-05-28 18:41:26 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_KMEANS
+2023-05-28 18:41:28 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_GRAPH_CLUSTERING
+2023-05-28 18:41:28 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_GRAPH_CLUSTERING.fork0.join
+2023-05-28 18:41:28 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_GRAPH_CLUSTERING
+2023-05-28 18:41:28 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.COMBINE_CLUSTERING
+2023-05-28 18:41:28 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.COMBINE_CLUSTERING.fork0.chnk0.main
+2023-05-28 18:41:28 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.COMBINE_CLUSTERING
+2023-05-28 18:41:28 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION
+2023-05-28 18:41:28 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.split
+2023-05-28 18:41:29 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk00.main
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk01.main
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk02.main
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk03.main
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk04.main
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk05.main
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk06.main
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk07.main
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk08.main
+2023-05-28 18:41:29 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.chnk09.main
+2023-05-28 18:41:43 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_UMAP
+2023-05-28 18:41:43 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_UMAP.fork0.join
+2023-05-28 18:41:43 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_UMAP
+2023-05-28 18:41:44 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_TSNE
+2023-05-28 18:41:44 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_TSNE.fork0.join
+2023-05-28 18:41:45 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_TSNE
+2023-05-28 18:41:52 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION
+2023-05-28 18:41:52 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION.fork0.join
+2023-05-28 18:41:53 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.RUN_DIFFERENTIAL_EXPRESSION
+2023-05-28 18:41:53 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.SUMMARIZE_ANALYSIS
+2023-05-28 18:41:53 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.SUMMARIZE_ANALYSIS.fork0.split
+2023-05-28 18:41:53 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.SUMMARIZE_ANALYSIS
+2023-05-28 18:41:53 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.SUMMARIZE_ANALYSIS.fork0.chnk0.main
+2023-05-28 18:41:54 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.SUMMARIZE_ANALYSIS
+2023-05-28 18:41:54 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.SUMMARIZE_ANALYSIS.fork0.join
+2023-05-28 18:41:54 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SC_RNA_ANALYZER.SUMMARIZE_ANALYSIS
+2023-05-28 18:41:54 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SUMMARIZE_AGGREGATED_REPORTS
+2023-05-28 18:41:54 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SUMMARIZE_AGGREGATED_REPORTS.fork0.split
+2023-05-28 18:41:55 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SUMMARIZE_AGGREGATED_REPORTS
+2023-05-28 18:41:55 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SUMMARIZE_AGGREGATED_REPORTS.fork0.join
+2023-05-28 18:42:00 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.SC_RNA_AGGREGATOR.SUMMARIZE_AGGREGATED_REPORTS
+2023-05-28 18:42:00 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.BUILD_COMBINED_WEB_SUMMARY
+2023-05-28 18:42:00 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.BUILD_COMBINED_WEB_SUMMARY.fork0.chnk0.main
+2023-05-28 18:42:00 [runtime] (ready)           ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CLOUPE_PREPROCESS
+2023-05-28 18:42:00 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CLOUPE_PREPROCESS.fork0.split
+2023-05-28 18:42:01 [runtime] (split_complete)  ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CLOUPE_PREPROCESS
+2023-05-28 18:42:01 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CLOUPE_PREPROCESS.fork0.chnk0.main
+2023-05-28 18:42:01 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.BUILD_COMBINED_WEB_SUMMARY
+2023-05-28 18:42:14 [runtime] (chunks_complete) ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CLOUPE_PREPROCESS
+2023-05-28 18:42:14 [runtime] (run:local)       ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CLOUPE_PREPROCESS.fork0.join
+2023-05-28 18:42:15 [runtime] (join_complete)   ID.all_unsort.SC_RNA_AGGREGATOR_CS.COUNT_AGGR.CLOUPE_PREPROCESS
+2023-05-28 18:42:15 [runtime] VDR killed 226 files, 1.1 GB.
+
+Outputs:
+- Copy of the input aggregation CSV: /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/outs/aggregation.csv
+- Aggregation metrics summary HTML:  /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/outs/web_summary.html
+- count:
+    Aggregation metrics summary JSON:       /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/outs/count/summary.json
+    Secondary analysis output CSV:          /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/outs/count/analysis
+    Crispr analysis output:                 null
+    Filtered feature-barcode matrices MEX:  /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/outs/count/filtered_feature_bc_matrix
+    Filtered feature-barcode matrices HDF5: /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/outs/count/filtered_feature_bc_matrix.h5
+    Loupe Browser file:                     /pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/outs/count/cloupe.cloupe
+- vdj_t:                             null
+- vdj_t_gd:                          null
+- vdj_b:                             null
+- V(D)J reference:                   null
+
+2023-05-28 18:42:15 [perform] Serializing pipestance performance data.
+Waiting 6 seconds for UI to do final refresh.
+Pipestance completed successfully!
+
+2023-05-28 18:42:21 Shutting down.
+2023-05-28 18:42:21 [jobmngr] Highest memory usage observed: {
+  "rss": 1720250368,
+  "shared": 499720192,
+  "vmem": 15923724288,
+  "text": 302383104,
+  "stack": 1940557824,
+  "proc_count": 122
+}

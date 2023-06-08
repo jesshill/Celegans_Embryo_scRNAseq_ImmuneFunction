@@ -1,0 +1,39 @@
+{
+    "chemistry_batch_correction": false,
+    "disable_crispr_aggr": true,
+    "gem_group_index": {
+        "1": [
+            "unsort_1",
+            1
+        ],
+        "2": [
+            "unsort_2",
+            1
+        ]
+    },
+    "gem_group_index_json": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/SETUP_SAMPLES/fork0/chnk0-u204f73f478/files/gem_group_index_json.json",
+    "libraries": [
+        {
+            "library_id": 0,
+            "library_type": "Gene Expression",
+            "gem_group": 1,
+            "target_set_name": null,
+            "old_library_index": 0,
+            "old_gem_group": 1,
+            "aggr_id": "unsort_1",
+            "batch_name": "unsort_1",
+            "batch_id": 0
+        },
+        {
+            "library_id": 1,
+            "library_type": "Gene Expression",
+            "gem_group": 2,
+            "target_set_name": null,
+            "old_library_index": 0,
+            "old_gem_group": 1,
+            "aggr_id": "unsort_2",
+            "batch_name": "unsort_2",
+            "batch_id": 1
+        }
+    ]
+}

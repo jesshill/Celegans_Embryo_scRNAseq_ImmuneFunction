@@ -1,0 +1,15 @@
+{
+    "disable_correct_chemistry_batch": true,
+    "disable_run_pca": false,
+    "exclude_genes": null,
+    "force_cells": null,
+    "get_peak_matrix": false,
+    "is_antibody_only": false,
+    "matrix_h5": "/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2022-JLH/all_unsort/SC_RNA_AGGREGATOR_CS/COUNT_AGGR/SC_RNA_AGGREGATOR/WRITE_MATRICES/fork0/join-u204f73f499/files/filtered_matrix_h5.h5",
+    "num_bcs": null,
+    "random_seed": null,
+    "skip": false,
+    "skip_multigenome_analysis": false,
+    "use_bcs": null,
+    "use_genes": null
+}
