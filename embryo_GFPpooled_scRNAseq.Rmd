@@ -39,9 +39,11 @@ library(patchwork)
 # Get started!
 
 ```{r}
-emb.GFPpooled.data <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5") # Robs
+emb.GFPpooled.data1 <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5") # Robs
 
-emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP/outs/count/filtered_feature_bc_matrix.h5") # mine
+emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP/outs/count/filtered_feature_bc_matrix.h5")
+
+#emb.GFP1.data <- Read10X_h5("./cellranger/GFP_1/filtered_feature_bc_matrix.h5")
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
@@ -49,10 +51,15 @@ Get filternames from https://parasite.wormbase.org/biomart/martview
 mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
 genes.df <- getBM(mart = mart, 
-      filters = c("species_id_1010", "wbps_gene_id"),
+      filters = c("species_id_1010", "gene_name"),
       value = list("caelegprjna13758", rownames(emb.GFPpooled.data)),
+      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
+
+genes.df1 <- getBM(mart = mart, 
+      filters = c("species_id_1010", "wbps_gene_id"),
+      value = list("caelegprjna13758", rownames(emb.GFPpooled.data1)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
-      )
+      ) # total is 20061
 
 mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes.df$chromosome_name = NULL
@@ -66,21 +73,20 @@ nrow(emb.GFPpooled.data)-nrow(genes.df)
 There are `r nrow(emb.GFPpooled.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 
 ```{r}
-emb.GFPpooled.data.filt <- emb.GFPpooled.data[rownames(emb.GFPpooled.data) %in% genes.df$wbps_gene_id,]
+emb.GFPpooled.data.filt <- emb.GFPpooled.data[rownames(emb.GFPpooled.data) %in% genes.df$external_gene_id,]
 
 # The two data structures do not have the same order of WBGeneIDs
-identical(rownames(emb.GFPpooled.data.filt), genes.df$wbps_gene_id)
+identical(rownames(emb.GFPpooled.data.filt), genes.df$external_gene_id)
 
 # Use match to make sure they are in the same order
 identical(rownames(emb.GFPpooled.data.filt),
-          genes.df[match(rownames(emb.GFPpooled.data.filt), genes.df$wbps_gene_id),]$wbps_gene_id
-)
+          genes.df[match(rownames(emb.GFPpooled.data.filt), genes.df$external_gene_id),]$external_gene_id)
 
 # now replace the WBGeneIDs with gene names
-rownames(emb.GFPpooled.data.filt) <- genes.df[
-  match(rownames(emb.GFPpooled.data.filt),
-        genes.df$wbps_gene_id)
-  ,]$external_gene_id
+#rownames(emb.GFPpooled.data.filt) <- genes.df[
+#  match(rownames(emb.GFPpooled.data.filt),
+#        genes.df$wbps_gene_id)
+#  ,]$external_gene_id
 
 # are there NAs?
 sum(!is.na(rownames(emb.GFPpooled.data.filt)))
@@ -95,7 +101,7 @@ emb.GFPpooled <- CreateSeuratObject(counts = emb.GFPpooled.data.filt, project = 
 ```{r}
 length(unique(genes.df$wbps_gene_id))
 length(unique(rownames(emb.GFPpooled)))
-rownames(emb.GFPpooled)[!(rownames(emb.GFPpooled) %in% genes.df$wbps_gene_id)]
+rownames(emb.GFPpooled)[!(rownames(emb.GFPpooled) %in% genes.df$external_gene_id)]
 ```
 
 # Quality control metrics
