@@ -312,28 +312,20 @@ write.csv(emb.GFPpooled.markers,"./DESeq2_output2/GFP_pooled/emb_GFPpooled_marke
 ```
 
 
+for justin
 ```{r}
-# for justin
+emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
 
-emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
-
-DoHeatmap(emb.GFPpooled, features = top2$gene,raster=F)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
+DoHeatmap(emb.GFPpooled, features = top3$gene,raster=F)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top3.png")
 
 
 FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'),raster=F)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.FeaturePlot-PostCtrls.png")
-
-VlnPlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'))
-ggsave("./Output/GFP_pooled/emb.GFPpooled.VlnPlot-PostCtrls.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.FeaturePlot-PostCtrls.png")
 
 
 FeaturePlot(emb.GFPpooled, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
-
-
-VlnPlot(emb.GFPpooled, features = c("chs-1", "myo-2", "myo-3", "elt-2", "ges-1"))
-ggsave("./Output/GFP_pooled/emb.GFPpooled.VlnPlot-NegCtrls.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
 ```
 
 
@@ -427,22 +419,22 @@ my_ontology_plot <- function(input_df, xlabel){
 ```{r fig.height=15, fig.width=5}
 my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
 
-ggsave("./Output/GFP_pooled/emb.GFPpooled.GO.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.GO.png")
 ```
 
 #Murray data 
 ```{r}
 # intestine_anterior
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 3)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.Murray-Anterior.png") 
+FeaturePlot(emb.GFPpooled, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 3)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.Murray-Anterior.png") 
 
 # intestine_middle_and_posterior
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 4)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.Murray-Mid.png")
+FeaturePlot(emb.GFPpooled, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 4)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.Murray-Mid.png")
 
 # intestine_far_posterior
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 3)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.Murray-Posterior.png")
+FeaturePlot(emb.GFPpooled, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 3)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.Murray-Posterior.png")
 ```
 
 #Pull out cluster specific CLECs 
@@ -451,7 +443,7 @@ ggsave("./Output/GFP_pooled/emb.GFPpooled.Murray-Posterior.png")
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
 
 DoHeatmap(emb.GFPpooled, features = top10clecs$gene,raster=F)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.HeatMap-top10clecs.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top10clecs.png")
 ```
 
 # Find marker clecs in each cluster
