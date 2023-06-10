@@ -128,7 +128,7 @@ Visualize QC metrics as a violin plot
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 
-ggsave("./DESeq_output2/GFP_pooled/emb.GFPpooled.VlnPlot.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.VlnPlot.png")
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -137,7 +137,7 @@ plot1 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "perc
 plot2 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 
-ggsave("./Output/GFP_pooled/emb.GFPpooled.FeatureScatter.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.FeatureScatter.png")
 ```
 
 
