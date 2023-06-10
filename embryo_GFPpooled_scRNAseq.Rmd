@@ -153,10 +153,10 @@ emb.GFPpooled <- subset(emb.GFPpooled, subset = nFeature_RNA > 200 & nFeature_RN
 # Visualize after filtering
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-ggsave("./Output/GFP_pooled/emb.GFPpooled.VlnPlot.filt.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.VlnPlot.filt.png")
 
 FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-ggsave("./Output/GFP_pooled/emb.GFPpooled.FeatureScatter.filt.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.FeatureScatter.filt.png")
 ```
 
 
@@ -184,7 +184,7 @@ top10 <- head(VariableFeatures(emb.GFPpooled), 10)
 # plot variable features with and without labels
 plot1 <- VariableFeaturePlot(emb.GFPpooled)
 LabelPoints(plot = plot1, points = top10, repel = TRUE)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.VarFeatures.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.VarFeatures.png")
 ```
 
 
@@ -212,22 +212,22 @@ print(emb.GFPpooled[["pca"]], dims = 1:5, nfeatures = 5)
 ```{r}
 # top genes associated with reduction components
 VizDimLoadings(emb.GFPpooled, dims = 1:2, reduction = "pca")
-ggsave("./Output/GFP_pooled/emb.GFPpooled.DimLoadings.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.DimLoadings.png")
 ```
 
 ```{r}
 DimPlot(emb.GFPpooled, reduction = "pca")
-ggsave("./Output/GFP_pooled/emb.GFPpooled.DimPlot.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.DimPlot.png")
 ```
 
 ```{r}
 DimHeatmap(emb.GFPpooled, dims = 1, cells = 500, balanced = TRUE)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.HeatMap1.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap1.png")
 ```
 
 ```{r}
 DimHeatmap(emb.GFPpooled, dims = 1:6, cells = 500, balanced = TRUE)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.HeatMap1-6.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap1-6.png")
 ```
 
 # Determine dataset dimensionality
@@ -243,7 +243,7 @@ The JackStrawPlot() function provides a visualization tool for comparing the dis
 
 ```{r}
 JackStrawPlot(emb.GFPpooled, dims = 1:20)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.JackStrawPlot.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.JackStrawPlot.png")
 ```
 
 
@@ -251,7 +251,7 @@ An alternative, more approximate technique is the elbow plot, which ranges princ
 
 ```{r}
 ElbowPlot(emb.GFPpooled)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ElbowPlot.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ElbowPlot.png")
 ```
 
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
@@ -261,7 +261,7 @@ The elbow plot is helpful when determining how many PCs we need to capture the m
 
 Choose the number of PCs to use for clustering 
 ```{r}
-emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:10)
+emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:6)
 
 
 ## Find clusters using Clustree
@@ -270,45 +270,32 @@ emb.GFPpooled.clust <- FindClusters(
   object = emb.GFPpooled,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:10,
-  save.SNN = TRUE
-)
+  dims.use = 1:6,
+  save.SNN = TRUE)
 
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
 clustree(emb.GFPpooled.clust, prefix = "RNA_snn_res.")
-ggsave("./Output/GFP_pooled/emb.GFPpooled.Clustree.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.Clustree.png")
 
 
 ## Find clusters using original Surat package methods
 # choose the appropriate resolution for the given dimensions using the Clustree data
-emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1)
+emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1.2)
 ```
 
 
 # Non-linear dimensional reduction (UMAP)
 
 ```{r}
-emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:10)
+emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:6)
 ```
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
 DimPlot(emb.GFPpooled, reduction = "umap", label = "TRUE", label.box = TRUE)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.UMAP.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.UMAP.png")
 ```
 
-******* need to find out how many cells per group and plot for erin
-```{r}
-n_cells <- FetchData(combined, 
-                     vars = c("ident", "sample")) %>%
-        group_by(sample) %>%
-        dplyr::count(ident) %>% 
-        spread(ident, n) 
-
-# View table
-View(n_cells)
-```
-*******
 
 # Find differentially expressed features (aka marker genes)
 
@@ -321,7 +308,7 @@ emb.GFPpooled.markers %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
 
-write.csv(emb.GFPpooled.markers,"./Output/GFP_pooled/emb_GFPpooled_markers.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.markers,"./DESeq2_output2/GFP_pooled/emb_GFPpooled_markers.csv", row.names = TRUE)
 ```
 
 
