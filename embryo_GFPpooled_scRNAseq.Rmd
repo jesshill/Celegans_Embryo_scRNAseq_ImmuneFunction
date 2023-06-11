@@ -444,11 +444,12 @@ ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top10irg.png")
 ```
 ----- ignore for now -----
 
+
 # Remove contamination clusters (based on tissue ontology data)
-contamination clusters = 12 8 4 11
+contamination clusters = 4 11
 
 ```{r}
-emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('12','8','4','11'), invert = TRUE), dims = 1:6)
+emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('4','11'), invert = TRUE), dims = 1:20)
 
 DimPlot(emb.GFPpooled.specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
 ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
@@ -467,23 +468,22 @@ ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.ElbowPlot
 
 ```{r}
 # Choose the number of PCs to use for re-clustering 
-emb.GFPpooled.specificClusters <- FindNeighbors(emb.GFPpooled.specificClusters, dims = 1:5)
+emb.GFPpooled.specificClusters <- FindNeighbors(emb.GFPpooled.specificClusters, dims = 1:20)
 
 # check new clusters with Clustree
 emb.GFPpooled.specificClusters.recluster <- FindClusters(
   object = emb.GFPpooled.specificClusters,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:5,
+  dims.use = 1:20,
   save.SNN = TRUE)
 
 clustree(emb.GFPpooled.specificClusters.recluster, prefix = "RNA_snn_res.")
 ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Clustree.png")
 
-
 emb.GFPpooled.specificClusters.recluster <- FindClusters(emb.GFPpooled.specificClusters, resolution = 1.2)
 
-emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:5)
+emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:20)
 
 DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE)
 ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
@@ -588,13 +588,13 @@ From John Murray dataset
 ```{r}
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F)
 ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot-PosCtrls.png")
-
-
+```
+```{r}
 # top marker gene for each cluster
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, pt.size = 0.1,
             features = (emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC))$gene)
-
-
+```
+```{r}
 # genes from murray data
 # intestine_anterior
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, ncol = 2)
