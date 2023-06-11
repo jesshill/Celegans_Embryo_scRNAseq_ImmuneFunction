@@ -453,16 +453,16 @@ emb.GFPpooled.markers.clecs <- emb.GFPpooled.markers %>%
   filter(grepl("clec*",gene), p_val_adj < .01) %>%
   slice_max(n = 10, order_by = avg_log2FC)
 
-write.csv(emb.GFPpooled.markers.clecs,"./Output/GFP_pooled/emb.GFPpooled.marker.clecs.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.markers.clecs,"./DESeq2_output2/GFP_pooled/emb.GFPpooled.marker.clecs.csv", row.names = TRUE)
 ```
 
 ----- ignore for now -----
-
 # Pull out cluster specific SPPs 
 ```{r fig.height=4, fig.width=7}
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("^spp",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10spps
 
 DoHeatmap(emb.GFPpooled, features = top10spps$gene,raster=F)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top10spp.png")
 ```
 
 # Pull out cluster specific IRGs 
@@ -470,18 +470,18 @@ DoHeatmap(emb.GFPpooled, features = top10spps$gene,raster=F)
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("^irg",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10irgs
 
 DoHeatmap(emb.GFPpooled, features = top10irgs$gene,raster=F)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top10irg.png")
 ```
-
 ----- ignore for now -----
 
 # Remove contamination clusters (based on tissue ontology data)
-contamination clusters = 1, 10, 11, 12, 13
+contamination clusters = 12 8 4 11
 
 ```{r}
-emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('1','10','11','12', '13'), invert = TRUE), dims = 1:10)
+emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('12','8','4','11'), invert = TRUE), dims = 1:6)
 
 DimPlot(emb.GFPpooled.specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
 # now rerun PCA and re-lcuster 
@@ -489,35 +489,34 @@ ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 emb.GFPpooled.specificClusters <- RunPCA(emb.GFPpooled.specificClusters, features = VariableFeatures(object = emb.GFPpooled.specificClusters))
 
 DimPlot(emb.GFPpooled.specificClusters, reduction = "pca")
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.DimPlot.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.DimPlot.png")
 
 ElbowPlot(emb.GFPpooled.specificClusters)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.ElbowPlot.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.ElbowPlot.png")
 ```
 
 ```{r}
 # Choose the number of PCs to use for re-clustering 
-emb.GFPpooled.specificClusters <- FindNeighbors(emb.GFPpooled.specificClusters, dims = 1:7)
+emb.GFPpooled.specificClusters <- FindNeighbors(emb.GFPpooled.specificClusters, dims = 1:5)
 
 # check new clusters with Clustree
 emb.GFPpooled.specificClusters.recluster <- FindClusters(
   object = emb.GFPpooled.specificClusters,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:7,
-  save.SNN = TRUE
-)
+  dims.use = 1:5,
+  save.SNN = TRUE)
 
 clustree(emb.GFPpooled.specificClusters.recluster, prefix = "RNA_snn_res.")
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Clustree.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Clustree.png")
 
 
 emb.GFPpooled.specificClusters.recluster <- FindClusters(emb.GFPpooled.specificClusters, resolution = 1.2)
 
-emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:7)
+emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:5)
 
 DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
 # Find new marker genes
@@ -528,7 +527,7 @@ emb.GFPpooled.specificClusters.recluster.markers %>%
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
-write.csv(emb.GFPpooled.specificClusters.recluster.markers,"./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.markers.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.specificClusters.recluster.markers,"./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.markers.csv", row.names = TRUE)
 ```
 
 # Perform new gene ontology
@@ -565,10 +564,12 @@ reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
     new_x <- paste(x, within, sep = sep)
     stats::reorder(new_x, by, FUN = fun)
 }
+
 scale_x_reordered <- function(..., sep = "___") {
     reg <- paste0(sep, ".+$")
     ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
 }
+
 my_ontology_plot <- function(input_df, xlabel){
   input_df %>%
   filter(Q.value < 0.001,  Observed > 50) %>% 
@@ -587,7 +588,7 @@ my_ontology_plot <- function(input_df, xlabel){
 ```{r fig.height=15, fig.width=5}
 my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
 
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO.png")
 ```
 
 # Pull out new cluster marker genes 
@@ -596,11 +597,9 @@ emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filte
 
 DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2$gene,raster=F)
 
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top2.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top2.png")
 ```
 
-
------ ignore for now -----
 
 # Pull out new cluster specific CLECs 
 ```{r}
