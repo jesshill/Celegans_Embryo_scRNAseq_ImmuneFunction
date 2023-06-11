@@ -251,11 +251,10 @@ ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ElbowPlot.png")
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
 
 
-# Cell clustering
-
+# Cluster the cells
 Choose the number of PCs to use for clustering 
 ```{r}
-emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:6)
+emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:20)
 
 
 ## Find clusters using Clustree
@@ -264,7 +263,7 @@ emb.GFPpooled.clust <- FindClusters(
   object = emb.GFPpooled,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:6,
+  dims.use = 1:20,
   save.SNN = TRUE)
 
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
