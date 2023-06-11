@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Install packages
 ```{r}
 install.packages('Seurat')
-packageVersion('Seurat')
+packageVersion('Seurat') # 4.3.0
 
 install.packages("hdf5r")
 BiocManager::install("biomaRt")
@@ -252,12 +252,15 @@ The elbow plot is helpful when determining how many PCs we need to capture the m
 
 
 # Cluster the cells
-Choose the number of PCs to use for clustering 
+Seurat applies a graph-based clustering approach.
+
+Seurat first constructs a KNN graph based on the euclidean distance in PCA space, and refines the edge weights between any two cells based on the shared overlap in their local neighborhoods (Jaccard similarity). This step is performed using the FindNeighbors() function, and takes as input the previously defined dimensionality of the dataset.
+
+To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
 ```{r}
 emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:20)
 
-
-## Find clusters using Clustree
+# deviation form original seurat pipeline
 # generate a vector of different resolutions to see which one performs best 
 emb.GFPpooled.clust <- FindClusters(
   object = emb.GFPpooled,
@@ -270,17 +273,15 @@ emb.GFPpooled.clust <- FindClusters(
 clustree(emb.GFPpooled.clust, prefix = "RNA_snn_res.")
 ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.Clustree.png")
 
-
-## Find clusters using original Surat package methods
-# choose the appropriate resolution for the given dimensions using the Clustree data
+# now choose the appropriate resolution for the given dimensions using the Clustree data
 emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1.2)
 ```
 
-
-# Non-linear dimensional reduction (UMAP)
-
+# Run non-linear dimensional reduction (UMAP or tSNE)
+Visualize and explore data with UMAP or tSNE.
+The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
 ```{r}
-emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:6)
+emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:20)
 ```
 
 ```{r}
@@ -290,8 +291,7 @@ ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.UMAP.png")
 ```
 
 
-# Find differentially expressed features (aka marker genes)
-
+# Find differentially expressed features (cluster biomarkers)
 Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
 ```{r}
 emb.GFPpooled.markers <- FindAllMarkers(emb.GFPpooled, only.pos = T, min.pct = 0.25, logfc.threshold = 1) # 0.25 is the default threshold 
