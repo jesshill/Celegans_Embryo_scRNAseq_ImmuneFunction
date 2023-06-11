@@ -16,7 +16,6 @@ knitr::opts_chunk$set(echo = TRUE)
 install.packages('Seurat')
 packageVersion('Seurat')
 
-#BiocManager::install("limma")
 install.packages("hdf5r")
 BiocManager::install("biomaRt")
 install.packages("clustree")
@@ -30,7 +29,6 @@ library(biomaRt)
 library(Seurat)
 library(tidyverse)
 library(patchwork)
-#library(limma)
 library(clustree)
 library(patchwork)
 ```
@@ -39,11 +37,9 @@ library(patchwork)
 # Get started!
 
 ```{r}
-emb.GFPpooled.data1 <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5") # Robs
+emb.GFPpooled.data1 <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5") # original analysis 
 
 emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP/outs/count/filtered_feature_bc_matrix.h5")
-
-#emb.GFP1.data <- Read10X_h5("./cellranger/GFP_1/filtered_feature_bc_matrix.h5")
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
