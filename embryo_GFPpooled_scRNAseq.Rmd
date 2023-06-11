@@ -290,11 +290,12 @@ DimPlot(emb.GFPpooled, reduction = "umap", label = "TRUE", label.box = TRUE)
 ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.UMAP.png")
 ```
 
-
 # Find differentially expressed features (cluster biomarkers)
-Find markers for every cluster compared to all remaining cells, report only the positive ones (otherwise = FALSE to also get negative)
+Find markers that define clusters via differential expression. By default, Seurat identifies positive and negative markers of a single cluster compared to all other cells. You can do for all clusters, you can test groups of clusters vs. each other, or against all cells. 
+
+The min.pct argument requires a feature to be detected at a minimum percentage in either of the two groups of cells, and the thresh.test argument requires a feature to be differentially expressed (on average) by some amount between the two groups. max.cells.per.ident can also be set and will downsample each identity class to have no more cells than whatever this is set to. 
 ```{r}
-emb.GFPpooled.markers <- FindAllMarkers(emb.GFPpooled, only.pos = T, min.pct = 0.25, logfc.threshold = 1) # 0.25 is the default threshold 
+emb.GFPpooled.markers <- FindAllMarkers(emb.GFPpooled, only.pos = F, min.pct = 0.25, logfc.threshold = 1.5)
 
 emb.GFPpooled.markers %>% 
   group_by(cluster) %>% filter(p_val_adj < .01) %>%
@@ -304,12 +305,11 @@ emb.GFPpooled.markers %>%
 write.csv(emb.GFPpooled.markers,"./DESeq2_output2/GFP_pooled/emb_GFPpooled_markers.csv", row.names = TRUE)
 ```
 
-
-for justin
+For Justin
 ```{r}
-emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
+emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
-DoHeatmap(emb.GFPpooled, features = top3$gene,raster=F)
+DoHeatmap(emb.GFPpooled, features = top2$gene,raster=F)
 ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top3.png")
 
 
