@@ -603,52 +603,39 @@ ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-t
 
 # Pull out new cluster specific CLECs 
 ```{r}
-emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10clecs
+emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2clecs
 
-DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top10clecs$gene,raster=F)
+DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2clecs$gene,raster=F)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top2clecs.png")
 ```
 
 
------ ignore for now -----
-
 # plot genes of interest
-
 From John Murray dataset 
     - intestine_anterior: ZC204.12, cpr-1, ceh-37
     - intestine_middle_and_posterior: irg-7, pal-1, cpr-1, ceh-37
     - intestine_far_posterior: irg-7, faah-1, pbo-4, psa-3
-
 ```{r}
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot-PosCtrls.png")
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot-PosCtrls.png")
 
-
-VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'))
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.VlnPlot-PosCtrls.png")
 
 # top marker gene for each cluster
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, pt.size = 0.1,
-            features = (emb.GFPpooled.specificClusters.recluster.markers %>% 
-  group_by(cluster) %>%
-  slice_max(n = 1, order_by = avg_log2FC))$gene
-)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot.png")
+            features = (emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC))$gene)
+
 
 # genes from murray data
-
 # intestine_anterior
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 3)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Anterior.png") 
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, ncol = 2)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Anterior.png") 
 
 # intestine_middle_and_posterior
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 4)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Mid.png")
-
-#VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), ncol = 4)
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, ncol = 2)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Mid.png")
 
 # intestine_far_posterior
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 3)
-ggsave("./Output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Posterior.png")
-
-#VlnPlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), ncol = 3)
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 2)
+ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Posterior.png")
 ```
+
