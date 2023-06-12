@@ -21,6 +21,10 @@ BiocManager::install("biomaRt")
 install.packages("clustree")
 install.packages("tidyverse")
 install.packages("patchwork")
+
+library(remotes)
+install_github("prabhakarlab/RCAv2")
+library("RCAv2")
 ```
 
 # Load packages
