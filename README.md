@@ -8,6 +8,6 @@
 - Jessica Hill
 - Robert Williams
 - David King
-- Erin Nishimura 
 - Justin Ellis
-- Kayla Stewart
+- Erin Nishimura 
+
