@@ -37,7 +37,7 @@ library(patchwork)
 
 # Load the data
 ```{r}
-emb.GFPpooled.data1 <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5") # original analysis 
+#emb.GFPpooled.data1 <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5") # original analysis 
 
 emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP/outs/count/filtered_feature_bc_matrix.h5")
 ```
@@ -51,11 +51,11 @@ genes.df <- getBM(mart = mart,
       value = list("caelegprjna13758", rownames(emb.GFPpooled.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
 
-genes.df1 <- getBM(mart = mart, 
-      filters = c("species_id_1010", "wbps_gene_id"),
-      value = list("caelegprjna13758", rownames(emb.GFPpooled.data1)),
-      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
-      ) # total is 20061
+#genes.df1 <- getBM(mart = mart, 
+#      filters = c("species_id_1010", "wbps_gene_id"),
+#      value = list("caelegprjna13758", rownames(emb.GFPpooled.data1)),
+#      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name')
+#      ) # total is 20061
 
 mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes.df$chromosome_name = NULL
