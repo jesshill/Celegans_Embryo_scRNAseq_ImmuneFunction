@@ -445,6 +445,17 @@ ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top10irg.png")
 ----- ignore for now -----
 
 
+# Assign cell type identity to clusters 
+```
+new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono",
+    "NK", "DC", "Platelet")
+names(new.cluster.ids) <- levels(pbmc)
+pbmc <- RenameIdents(pbmc, new.cluster.ids)
+DimPlot(pbmc, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
+```
+
+
+
 # Remove contamination clusters (based on tissue ontology data)
 contamination clusters = 4 11
 
