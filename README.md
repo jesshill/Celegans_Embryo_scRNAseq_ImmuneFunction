@@ -10,4 +10,3 @@
 - David King
 - Erin Nishimura 
 - Justin Ellis
-- Kayla Stewart
