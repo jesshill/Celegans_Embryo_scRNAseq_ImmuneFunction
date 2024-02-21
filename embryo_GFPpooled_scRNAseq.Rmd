@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 install.packages('Seurat')
 packageVersion('Seurat') # 5.0.1
+install.packages('Matrix')
 
 install.packages("hdf5r")
 BiocManager::install("biomaRt")
