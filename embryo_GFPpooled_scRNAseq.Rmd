@@ -14,27 +14,22 @@ knitr::opts_chunk$set(echo = TRUE)
 # Install packages
 ```{r}
 install.packages('Seurat')
-packageVersion('Seurat') # 4.3.0
+packageVersion('Seurat') # 5.0.1
 
 install.packages("hdf5r")
 BiocManager::install("biomaRt")
 install.packages("clustree")
 install.packages("tidyverse")
 install.packages("patchwork")
-
-library(remotes)
-install_github("prabhakarlab/RCAv2")
-library("RCAv2")
 ```
 
 # Load packages
 ```{r echo=FALSE}
 library(biomaRt)
 library(Seurat)
-library(tidyverse)
-library(patchwork)
+#library(tidyverse)
+#library(patchwork)
 library(clustree)
-library(patchwork)
 ```
 
 ---
