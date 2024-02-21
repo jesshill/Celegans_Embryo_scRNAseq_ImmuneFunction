@@ -41,8 +41,6 @@ library(patchwork)
 
 # Load the data
 ```{r}
-#emb.GFPpooled.data1 <- Read10X_h5("./10x_cloud_analysis/GFP_pooled_count/raw_feature_bc_matrix.h5") # original analysis 
-
 emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP/outs/count/filtered_feature_bc_matrix.h5")
 ```
 
@@ -95,7 +93,7 @@ head(emb.GFPpooled.data.filt)
 ```
 
 
-# Initialize the Seurat object with the raw (non-normalized data)
+# Set up the Seurat object
 ```{r}
 emb.GFPpooled <- CreateSeuratObject(counts = emb.GFPpooled.data.filt, project = "emb_GFPpooled", min.cells = 3, min.features = 200)
 ```
