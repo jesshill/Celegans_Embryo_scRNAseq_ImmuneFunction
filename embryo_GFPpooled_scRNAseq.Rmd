@@ -29,7 +29,7 @@ install.packages("patchwork")
 library(biomaRt)
 library(Seurat)
 #library(tidyverse)
-#library(patchwork)
+library(patchwork)
 library(clustree)
 ```
 
