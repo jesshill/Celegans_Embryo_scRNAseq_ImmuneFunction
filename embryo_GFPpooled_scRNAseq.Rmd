@@ -13,22 +13,22 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Install packages
 ```{r}
-install.packages('Seurat')
-packageVersion('Seurat') # 5.0.1
-install.packages('Matrix')
+#install.packages('Seurat')
+#packageVersion('Seurat') # 5.0.1
+#install.packages('Matrix')
 
-install.packages("hdf5r")
-BiocManager::install("biomaRt")
-install.packages("clustree")
-install.packages("tidyverse")
-install.packages("patchwork")
+#install.packages("hdf5r")
+#BiocManager::install("biomaRt")
+#install.packages("clustree")
+#install.packages("tidyverse")
+#install.packages("patchwork")
 ```
 
 # Load packages
 ```{r echo=FALSE}
 library(biomaRt)
 library(Seurat)
-#library(tidyverse)
+library(tidyverse)
 library(patchwork)
 library(clustree)
 ```
