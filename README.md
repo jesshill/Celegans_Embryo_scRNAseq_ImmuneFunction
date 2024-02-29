@@ -7,7 +7,6 @@
 #### Contributers: 
 - Jessica Hill
 - Robert Williams
-- David King
 - Justin Ellis
 - Erin Nishimura 
 
