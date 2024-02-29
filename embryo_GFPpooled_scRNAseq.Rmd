@@ -37,9 +37,7 @@ library(clustree)
 
 # Load the data
 ```{r}
-#emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP/outs/count/filtered_feature_bc_matrix.h5")
-
-emb.GFPpooled.data <- Read10X_h5("./cellranger/all_pooled/outs/count/filtered_feature_bc_matrix.h5")
+emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP/outs/count/filtered_feature_bc_matrix.h5")
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
@@ -123,7 +121,7 @@ emb.GFPpooled[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled, features = 
 Visualize QC metrics as a violin plot
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.VlnPlot.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.VlnPlot.png")
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -132,7 +130,7 @@ plot1 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "perc
 plot2 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.FeatureScatter.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeatureScatter.png")
 ```
 
 
@@ -148,10 +146,10 @@ emb.GFPpooled <- subset(emb.GFPpooled, subset = nFeature_RNA > 200 & nFeature_RN
 Visualize after filtering
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.VlnPlot.filt.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.VlnPlot.filt.png")
 
 FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.FeatureScatter.filt.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeatureScatter.filt.png")
 ```
 
 
@@ -177,7 +175,7 @@ top10 <- head(VariableFeatures(emb.GFPpooled), 10)
 # plot variable features with and without labels
 plot1 <- VariableFeaturePlot(emb.GFPpooled)
 LabelPoints(plot = plot1, points = top10, repel = TRUE)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.VarFeatures.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.VarFeatures.png")
 ```
 
 
@@ -207,22 +205,22 @@ print(emb.GFPpooled[["pca"]], dims = 1:5, nfeatures = 5)
 ```{r}
 # top genes associated with reduction components
 VizDimLoadings(emb.GFPpooled, dims = 1:2, reduction = "pca")
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.DimLoadings.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.DimLoadings.png")
 ```
 
 ```{r}
 DimPlot(emb.GFPpooled, reduction = "pca")
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.DimPlot.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.DimPlot.png")
 ```
 
 ```{r}
 DimHeatmap(emb.GFPpooled, dims = 1, cells = 500, balanced = TRUE)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap1.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap1.png")
 ```
 
 ```{r}
 DimHeatmap(emb.GFPpooled, dims = 1:6, cells = 500, balanced = TRUE)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap1-6.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap1-6.png")
 ```
 
 # Determine dataset dimensionality
@@ -237,14 +235,14 @@ emb.GFPpooled <- ScoreJackStraw(emb.GFPpooled, dims = 1:20)
 The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
 ```{r}
 JackStrawPlot(emb.GFPpooled, dims = 1:20)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.JackStrawPlot.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.JackStrawPlot.png")
 ```
 
 
 An alternative heuristic method generates an ‘Elbow plot’: a ranking of principle components based on the percentage of variance explained by each one.
 ```{r}
 ElbowPlot(emb.GFPpooled)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ElbowPlot.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ElbowPlot.png")
 ```
 
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
@@ -257,7 +255,7 @@ Seurat first constructs a KNN graph based on the euclidean distance in PCA space
 
 To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
 ```{r}
-emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:20)
+emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:8)
 
 # deviation form original seurat pipeline
 # generate a vector of different resolutions to see which one performs best 
@@ -265,12 +263,12 @@ emb.GFPpooled.clust <- FindClusters(
   object = emb.GFPpooled,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:20,
+  dims.use = 1:8,
   save.SNN = TRUE)
 
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
 clustree(emb.GFPpooled.clust, prefix = "RNA_snn_res.")
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.Clustree.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Clustree.png")
 
 # now choose the appropriate resolution for the given dimensions using the Clustree data
 emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1.2)
@@ -280,13 +278,13 @@ emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1.2)
 Visualize and explore data with UMAP or tSNE.
 The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
 ```{r}
-emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:20)
+emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:8)
 ```
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
 DimPlot(emb.GFPpooled, reduction = "umap", label = "TRUE", label.box = TRUE)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.UMAP.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.UMAP.png")
 ```
 
 # Find differentially expressed features (cluster biomarkers)
@@ -301,168 +299,33 @@ emb.GFPpooled.markers %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
 
-write.csv(emb.GFPpooled.markers,"./DESeq2_output2/GFP_pooled/emb_GFPpooled_markers.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.markers,"./Seurat_output/GFP_pooled/emb_GFPpooled_markers.csv", row.names = TRUE)
 ```
 
 ```{r}
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
 DoHeatmap(emb.GFPpooled, features = top2$gene,raster=F)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
 
 
 FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'),raster=F)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.FeaturePlot-PostCtrls.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-PostCtrls.png")
 
 
 FeaturePlot(emb.GFPpooled, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
 ```
 
 
-# Perform gene ontology
-```{r}
-library(reticulate)
-use_condaenv("base")
-
-tea <- import("tissue_enrichment_analysis")
-tissue_df <- tea$fetch_dictionary("tissue")
-phenotype_df <- tea$fetch_dictionary("phenotype")
-go_df <- tea$fetch_dictionary("go")
-```
+# Remove contamination clusters (based on expression of elt-2, elt-7, and ges-1)
+contamination clusters = 3, 8, 10, 11, 12
 
 ```{r}
-emb.GFPpooled.markers <- emb.GFPpooled.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
-
-emb.GFPpooled.markers <- rename(emb.GFPpooled.markers, WBGeneID = wbps_gene_id)
-```
-
-```{r}
-clusters <- unique(emb.GFPpooled.markers$cluster)
-print(clusters)
-
-my_tea_analysis <- function(input_df, tea_dict){
-  tea_df <- data.frame()
-  for (i in clusters){
-  tea_set <- tea$enrichment_analysis(
-    (input_df %>% 
-       filter(cluster == i))$WBGeneID, 
-    tissue_df = tea_dict 
-    # %>% 
-    #   filter(wbid %in% (input_df %>% 
-    #                       filter(cluster %in% clusters))$WBGeneID)
-  )
-  if(nrow(tea_set) == 0){
-    next
-  } else {
-  tea_df <- bind_rows(tea_df, data.frame(tea_set, cluster = i))
-  }
-}
-tea_df
-}
-
-reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
-    new_x <- paste(x, within, sep = sep)
-    stats::reorder(new_x, by, FUN = fun)
-}
-
-scale_x_reordered <- function(..., sep = "___") {
-    reg <- paste0(sep, ".+$")
-    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
-}
-
-my_ontology_plot <- function(input_df, xlabel){
-  input_df %>%
-  filter(Q.value < 0.001,  Observed > 50) %>% 
-  ggplot(aes(x = reorder_within(Term, -log10(Q.value), cluster), y = -log10(Q.value))) +
-  geom_point(aes(size = Observed)) +
-  coord_flip() +
-  scale_x_reordered() +
-  facet_grid(cluster~., scales = "free_y") +
-  theme_bw() +
-  xlab(xlabel) +
-  guides(size = guide_legend(title = "# genes")) +
-  scale_size_continuous(breaks = c(20,100,200))
-}
-```
-
-```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
-
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.GO.png")
-```
-
-#Murray data 
-```{r}
-# intestine_anterior
-FeaturePlot(emb.GFPpooled, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, , ncol = 2)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.Murray-Anterior.png") 
-
-# intestine_middle_and_posterior
-FeaturePlot(emb.GFPpooled, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, , ncol = 2)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.Murray-Mid.png")
-
-# intestine_far_posterior
-FeaturePlot(emb.GFPpooled, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 2)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.Murray-Posterior.png")
-```
-
-#Pull out cluster specific CLECs 
-```{r fig.height=4, fig.width=7}
-emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top2clecs
-
-DoHeatmap(emb.GFPpooled, features = top2clecs$gene,raster=F)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top2clecs.png")
-```
-
-# Find marker clecs in each cluster
-```{r}
-emb.GFPpooled.markers.clecs <- emb.GFPpooled.markers %>% 
-  group_by(cluster) %>%
-  filter(grepl("clec*",gene), p_val_adj < .01) %>%
-  slice_max(n = 10, order_by = avg_log2FC)
-
-write.csv(emb.GFPpooled.markers.clecs,"./DESeq2_output2/GFP_pooled/emb.GFPpooled.marker.clecs.csv", row.names = TRUE)
-```
-
------ ignore for now -----
-# Pull out cluster specific SPPs 
-```{r fig.height=4, fig.width=7}
-emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("^spp",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10spps
-
-DoHeatmap(emb.GFPpooled, features = top10spps$gene,raster=F)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top10spp.png")
-```
-
-# Pull out cluster specific IRGs 
-```{r fig.height=4, fig.width=7}
-emb.GFPpooled.markers %>% group_by(cluster) %>% filter(grepl("^irg",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10irgs
-
-DoHeatmap(emb.GFPpooled, features = top10irgs$gene,raster=F)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.HeatMap-top10irg.png")
-```
------ ignore for now -----
-
-
-# Assign cell type identity to clusters 
-```
-new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono",
-    "NK", "DC", "Platelet")
-names(new.cluster.ids) <- levels(pbmc)
-pbmc <- RenameIdents(pbmc, new.cluster.ids)
-DimPlot(pbmc, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
-```
-
-
-
-# Remove contamination clusters (based on tissue ontology data)
-contamination clusters = 4 11
-
-```{r}
-emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('4','11'), invert = TRUE), dims = 1:20)
+emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('3','8', '10', '11', '12'), invert = TRUE), dims = 1:8)
 
 DimPlot(emb.GFPpooled.specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
 # now rerun PCA and re-lcuster 
@@ -470,33 +333,33 @@ ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png"
 emb.GFPpooled.specificClusters <- RunPCA(emb.GFPpooled.specificClusters, features = VariableFeatures(object = emb.GFPpooled.specificClusters))
 
 DimPlot(emb.GFPpooled.specificClusters, reduction = "pca")
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.DimPlot.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.DimPlot.png")
 
 ElbowPlot(emb.GFPpooled.specificClusters)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.ElbowPlot.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.ElbowPlot.png")
 ```
 
 ```{r}
 # Choose the number of PCs to use for re-clustering 
-emb.GFPpooled.specificClusters <- FindNeighbors(emb.GFPpooled.specificClusters, dims = 1:20)
+emb.GFPpooled.specificClusters <- FindNeighbors(emb.GFPpooled.specificClusters, dims = 1:8)
 
 # check new clusters with Clustree
 emb.GFPpooled.specificClusters.recluster <- FindClusters(
   object = emb.GFPpooled.specificClusters,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:20,
+  dims.use = 1:8,
   save.SNN = TRUE)
 
 clustree(emb.GFPpooled.specificClusters.recluster, prefix = "RNA_snn_res.")
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Clustree.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Clustree.png")
 
 emb.GFPpooled.specificClusters.recluster <- FindClusters(emb.GFPpooled.specificClusters, resolution = 1.2)
 
-emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:20)
+emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:8)
 
 DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
 # Find new marker genes
@@ -507,10 +370,41 @@ emb.GFPpooled.specificClusters.recluster.markers %>%
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
-write.csv(emb.GFPpooled.specificClusters.recluster.markers,"./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.markers.csv", row.names = TRUE)
+write.csv(emb.GFPpooled.specificClusters.recluster.markers,"./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.markers.csv", row.names = TRUE)
 ```
 
-# Perform new gene ontology
+# Validate clusters 
+```{r}
+emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2_reclust
+
+DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2_reclust$gene,raster=F)
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.HeatMap-top2.png")
+
+
+# intestine marker genes
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F)
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.FeaturePlot-PostCtrls.png")
+
+
+# Contamination marker genes: germline (glh-1, chs-1), muscle (myo-2, myo-3), neuron(hlh-2, rab-3)  
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.FeaturePlot-NegCtrls.png")
+```
+
+
+# Perform gene ontology
+```{r}
+library(reticulate)
+py_config()
+# to modify the python to use in R, nano ~/.Renviron. just uncomment the right path and comment out the other. Will need to restart the Rsession before implimenting. 
+use_condaenv("base")
+
+tea <- import("tissue_enrichment_analysis")
+tissue_df <- tea$fetch_dictionary("tissue")
+phenotype_df <- tea$fetch_dictionary("phenotype")
+go_df <- tea$fetch_dictionary("go")
+```
+
 ```{r}
 emb.GFPpooled.specificClusters.recluster.markers <- emb.GFPpooled.specificClusters.recluster.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
 
@@ -568,16 +462,16 @@ my_ontology_plot <- function(input_df, xlabel){
 ```{r fig.height=15, fig.width=5}
 my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
 
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO.png")
 ```
 
 # Pull out new cluster marker genes 
 ```{r}
-emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
+emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=4, wt=avg_log2FC) -> top4
 
-DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2$gene,raster=F)
+DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top4$gene,raster=F)
 
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top2.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top4.png")
 ```
 
 
@@ -586,8 +480,26 @@ ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-t
 emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2clecs
 
 DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2clecs$gene,raster=F)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top2clecs.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top2clecs.png")
 ```
+
+
+# Pull out cluster specific SPPs 
+```{r fig.height=4, fig.width=7}
+emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(grepl("^spp",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10spps
+
+DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top10spps$gene,raster=F)
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top10spp.png")
+```
+
+# Pull out cluster specific IRGs 
+```{r fig.height=4, fig.width=7}
+emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(grepl("^irg",gene), p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10irgs
+
+DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top10irgs$gene,raster=F)
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top10irg.png")
+```
+
 
 
 # plot genes of interest
@@ -595,27 +507,40 @@ From John Murray dataset
     - intestine_anterior: ZC204.12, cpr-1, ceh-37
     - intestine_middle_and_posterior: irg-7, pal-1, cpr-1, ceh-37
     - intestine_far_posterior: irg-7, faah-1, pbo-4, psa-3
-```{r}
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot-PosCtrls.png")
-```
+
 ```{r}
 # top marker gene for each cluster
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, pt.size = 0.1,
             features = (emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC))$gene)
 ```
+
 ```{r}
 # genes from murray data
 # intestine_anterior
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, ncol = 2)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Anterior.png") 
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Anterior.png") 
 
 # intestine_middle_and_posterior
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, ncol = 2)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Mid.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Mid.png")
 
 # intestine_far_posterior
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 2)
-ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Posterior.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Posterior.png")
+```
+
+
+
+
+
+
+
+# Assign cell type identity to clusters 
+```
+new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono",
+    "NK", "DC", "Platelet")
+names(new.cluster.ids) <- levels(pbmc)
+pbmc <- RenameIdents(pbmc, new.cluster.ids)
+DimPlot(pbmc, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
 ```
 
