@@ -358,7 +358,7 @@ emb.GFPpooled.specificClusters.recluster <- FindClusters(emb.GFPpooled.specificC
 
 emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:8)
 
-DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE)
+DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 8, pt.size = 3, legend(pch = 5))
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
@@ -528,10 +528,6 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Mid
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 2)
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Posterior.png")
 ```
-
-
-
-
 
 
 
