@@ -37,7 +37,9 @@ library(clustree)
 
 # Load the data
 ```{r}
-emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP/outs/count/filtered_feature_bc_matrix.h5")
+#emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP/outs/count/filtered_feature_bc_matrix.h5")
+
+emb.GFPpooled.data <- Read10X_h5("./cellranger/all_pooled/outs/count/filtered_feature_bc_matrix.h5")
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
@@ -121,7 +123,6 @@ emb.GFPpooled[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled, features = 
 Visualize QC metrics as a violin plot
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-
 ggsave("./DESeq2_output2/GFP_pooled/emb.GFPpooled.VlnPlot.png")
 ```
 
