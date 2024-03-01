@@ -358,7 +358,13 @@ emb.GFPpooled.specificClusters.recluster <- FindClusters(emb.GFPpooled.specificC
 
 emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:8)
 
-DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 8, pt.size = 3, legend(pch = 5))
+DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 8, pt.size = 3) + theme(legend.text = element_text(size = 20))
+
+
+DimPlot(seurat_object, reduction = 'umap', group.by = 'ident', label = TRUE, label.size = 4) + NoLegend()
+
+
+
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
@@ -382,7 +388,7 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.HeatMap-top2.png")
 
 
 # intestine marker genes
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F)
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 1)
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.FeaturePlot-PostCtrls.png")
 
 
