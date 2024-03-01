@@ -358,11 +358,10 @@ emb.GFPpooled.specificClusters.recluster <- FindClusters(emb.GFPpooled.specificC
 
 emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:8)
 
-DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 8, pt.size = 3) + theme(legend.text = element_text(size = 20))
+DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 9, pt.size = 4) + theme(legend.text = element_text(size = 20))
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 
-
-DimPlot(seurat_object, reduction = 'umap', group.by = 'ident', label = TRUE, label.size = 4) + NoLegend()
-
+#DimPlot(seurat_object, reduction = 'umap', group.by = 'ident', label = TRUE, label.size = 4) + NoLegend()
 
 
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
