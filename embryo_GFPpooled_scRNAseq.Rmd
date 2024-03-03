@@ -378,17 +378,17 @@ emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filte
 
 
 DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2_reclust$gene,raster=F) + theme(text = element_text(size = 20))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.HeatMap-top2.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top2.png")
 
 
 # intestine marker genes
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 2)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.FeaturePlot-PostCtrls.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot-PostCtrls.png")
 
 
 # Contamination marker genes: germline (glh-1, chs-1), muscle (myo-2, myo-3), neuron(hlh-2, rab-3)  
 FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.FeaturePlot-NegCtrls.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot-NegCtrls.png")
 ```
 
 
