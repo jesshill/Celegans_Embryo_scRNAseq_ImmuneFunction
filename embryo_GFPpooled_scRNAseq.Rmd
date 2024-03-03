@@ -325,7 +325,6 @@ contamination clusters = 3, 8, 10, 11, 12
 emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('3','8', '10', '11', '12'), invert = TRUE), dims = 1:8)
 
 DimPlot(emb.GFPpooled.specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
 # now rerun PCA and re-lcuster 
