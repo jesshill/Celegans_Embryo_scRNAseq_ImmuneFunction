@@ -382,7 +382,7 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.HeatMap-top2.png")
 
 
 # intestine marker genes
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 1)
+FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 2)
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.FeaturePlot-PostCtrls.png")
 
 
