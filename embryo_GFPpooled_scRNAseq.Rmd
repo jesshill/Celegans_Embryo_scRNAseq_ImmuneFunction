@@ -363,6 +363,7 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 
 # Find new marker genes
 ```{r}
+#find markers for every cluster compared to all remaining cells
 emb.GFPpooled.specificClusters.recluster.markers <- FindAllMarkers(emb.GFPpooled.specificClusters.recluster, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
 emb.GFPpooled.specificClusters.recluster.markers %>% 
@@ -371,6 +372,7 @@ emb.GFPpooled.specificClusters.recluster.markers %>%
 
 write.csv(emb.GFPpooled.specificClusters.recluster.markers,"./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.markers.csv", row.names = TRUE)
 ```
+
 
 # Validate clusters 
 ```{r}
