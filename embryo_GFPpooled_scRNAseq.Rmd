@@ -462,13 +462,13 @@ my_ontology_plot <- function(input_df, xlabel){
 ```{r fig.height=15, fig.width=5}
 my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
 
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO_T.png")
 ```
 
 ```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), go_df), "Gene Ontology")
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1.01), go_df), "Gene Ontology") + theme(text = element_text(size = 15))
 
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO_G.png")
 ```
 
 
