@@ -360,11 +360,6 @@ emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificCluste
 
 DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 9, pt.size = 4) + theme(legend.text = element_text(size = 20))
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
-
-#DimPlot(seurat_object, reduction = 'umap', group.by = 'ident', label = TRUE, label.size = 4) + NoLegend()
-
-
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
 ```
 
 # Find new marker genes
@@ -382,7 +377,8 @@ write.csv(emb.GFPpooled.specificClusters.recluster.markers,"./Seurat_output/GFP_
 ```{r}
 emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2_reclust
 
-DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2_reclust$gene,raster=F)
+
+DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2_reclust$gene,raster=F) + theme(text = element_text(size = 20))
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.recluster.HeatMap-top2.png")
 
 
