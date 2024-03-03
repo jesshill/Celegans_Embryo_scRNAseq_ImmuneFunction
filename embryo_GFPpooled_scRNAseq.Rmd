@@ -465,6 +465,13 @@ my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.marker
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO.png")
 ```
 
+```{r fig.height=15, fig.width=5}
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), go_df), "Gene Ontology")
+
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO.png")
+```
+
+
 # Pull out new cluster marker genes 
 ```{r}
 emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=4, wt=avg_log2FC) -> top4
