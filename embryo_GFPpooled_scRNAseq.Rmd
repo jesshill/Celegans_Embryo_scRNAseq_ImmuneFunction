@@ -34,6 +34,15 @@ library(clustree)
 ```
 
 ---
+count matrix
+QC and filtering
+Normalization
+Linear dimensionality reduction (PCA)
+Scale data
+Identify highly variable genes
+Clustering
+Non-linear dimensional reduction (UMAP/t-SNE)
+---
 
 # Load the data
 ```{r}
@@ -92,6 +101,8 @@ head(emb.GFPpooled.data.filt)
 # Set up the Seurat object
 ```{r}
 emb.GFPpooled <- CreateSeuratObject(counts = emb.GFPpooled.data.filt, project = "emb_GFPpooled", min.cells = 3, min.features = 200)
+
+view(emb.GFPpooled@meta.data) #955 rows
 ```
 
 ```{r}
@@ -109,6 +120,7 @@ rownames(emb.GFPpooled)[!(rownames(emb.GFPpooled) %in% genes.df$external_gene_id
 
 ```{r}
 # show QC metrics for the first 5 cells 
+view(emb.GFPpooled@meta.data)
 head(emb.GFPpooled@meta.data, 5)
 ```
 
@@ -152,6 +164,16 @@ FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA"
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeatureScatter.filt.png")
 ```
 
+```{r}
+view(emb.GFPpooled@meta.data)
+hist(emb.GFPpooled$nFeature_RNA)
+hist(emb.GFPpooled$nCount_RNA)
+
+view(emb.GFPpooled@assays$RNA$counts)
+exp_matrix <- as.matrix(emb.GFPpooled@assays$RNA$counts)
+gene_express_per_cell <- rowSums(exp_matrix)
+genes_express_only_once <- sum(gene_express_per_cell==1)
+```
 
 # Normalize the data
 After removing unwanted cells from the dataset, we next normalize the data. 
@@ -255,7 +277,7 @@ Seurat first constructs a KNN graph based on the euclidean distance in PCA space
 
 To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
 ```{r}
-emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:8)
+emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:20)
 
 # deviation form original seurat pipeline
 # generate a vector of different resolutions to see which one performs best 
@@ -263,7 +285,7 @@ emb.GFPpooled.clust <- FindClusters(
   object = emb.GFPpooled,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:8,
+  dims.use = 1:20,
   save.SNN = TRUE)
 
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
@@ -278,14 +300,20 @@ emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1.2)
 Visualize and explore data with UMAP or tSNE.
 The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
 ```{r}
-emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:8)
+emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:20)
 ```
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
-DimPlot(emb.GFPpooled, reduction = "umap", label = "TRUE", label.box = TRUE)
+DimPlot(emb.GFPpooled, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 9, pt.size = 4) + 
+  theme(axis.title.x = element_text(size = 20),
+        axis.ticks.x = element_line(size = 6),
+        axis.title.y = element_text(size = 20),
+        axis.ticks.y = element_line(size = 6),
+        legend.text = element_text(size = 20))
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.UMAP.png")
 ```
+
 
 # Find differentially expressed features (cluster biomarkers)
 Find markers that define clusters via differential expression. By default, Seurat identifies positive and negative markers of a single cluster compared to all other cells. You can do for all clusters, you can test groups of clusters vs. each other, or against all cells. 
@@ -305,7 +333,10 @@ write.csv(emb.GFPpooled.markers,"./Seurat_output/GFP_pooled/emb_GFPpooled_marker
 ```{r}
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
-DoHeatmap(emb.GFPpooled, features = top2$gene,raster=F)
+DoHeatmap(emb.GFPpooled, features = top2$gene,raster=F) + 
+  theme(axis.text.x = element_text(size = 12), 
+        axis.text.y = element_text(size = 12),
+        legend.text = element_text(size = 12))          
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
 
 
