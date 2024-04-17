@@ -340,7 +340,14 @@ DoHeatmap(emb.GFPpooled, features = top2$gene,raster=F) +
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
 
 
-FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'),raster=F)
+FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 3) + 
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        axis.ticks.x = element_line(size = 6),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 12),
+        axis.ticks.y = element_line(size = 6),
+        legend.text = element_text(size = 12))
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-PostCtrls.png")
 
 
