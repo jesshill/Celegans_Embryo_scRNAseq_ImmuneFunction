@@ -363,6 +363,21 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
 ```
 
 
+```{r}
+#how many cells are expressing these markers of other tissues?
+view(emb.GFPpooled@assays$RNA$data)
+
+total_cells_expressing_gene <- sum(emb.GFPpooled@assays$RNA$data["hlh-2", ] > 0)
+print(total_cells_expressing_gene)
+
+total_cells_expressing_gene <- sum(emb.GFPpooled@assays$RNA$data["myo-3", ] > 0)
+print(total_cells_expressing_gene)
+
+total_cells_expressing_gene <- sum(emb.GFPpooled@assays$RNA$data["rab-3", ] > 0)
+print(total_cells_expressing_gene)
+```
+
+
 # Remove contamination clusters (based on expression of elt-2, elt-7, and ges-1)
 contamination clusters = 3, 8, 10, 11, 12
 
