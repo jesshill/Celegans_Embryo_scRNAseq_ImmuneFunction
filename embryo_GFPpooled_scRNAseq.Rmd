@@ -334,8 +334,7 @@ write.csv(emb.GFPpooled.markers,"./Seurat_output/GFP_pooled/emb_GFPpooled_marker
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
 DoHeatmap(emb.GFPpooled, features = top2$gene,raster=F) + 
-  theme(axis.text.x = element_text(size = 14), 
-        axis.text.y = element_text(size = 14),
+  theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))          
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
 
