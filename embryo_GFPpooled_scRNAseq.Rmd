@@ -343,10 +343,8 @@ quartz(width = 12, height = 4)
 FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 3) + 
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 14),
-        axis.ticks.x = element_line(size = 6),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 14),
-        axis.ticks.y = element_line(size = 6),
         legend.text = element_text(size = 14))
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-PostCtrls.png")
 
@@ -354,10 +352,8 @@ quartz(width = 10, height = 8)
 FeaturePlot(emb.GFPpooled, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F, ncol = 2) +
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 14),
-        axis.ticks.x = element_line(size = 6),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 14),
-        axis.ticks.y = element_line(size = 6),
         legend.text = element_text(size = 14))
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
 ```
@@ -378,6 +374,141 @@ print(total_cells_expressing_gene)
 ```
 
 
+# Perform gene ontology
+```{r}
+library(reticulate)
+py_config()
+# to modify the python to use in R, nano ~/.Renviron. just uncomment the right path and comment out the other. Will need to restart the Rsession before implimenting. 
+use_condaenv("base")
+
+tea <- import("tissue_enrichment_analysis")
+tissue_df <- tea$fetch_dictionary("tissue")
+phenotype_df <- tea$fetch_dictionary("phenotype")
+go_df <- tea$fetch_dictionary("go")
+```
+
+```{r}
+emb.GFPpooled.markers <- emb.GFPpooled.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
+
+emb.GFPpooled.markers <- emb.GFPpooled.markers %>% rename(WBGeneID = wbps_gene_id)
+```
+
+```{r}
+clusters <- unique(emb.GFPpooled.markers$cluster)
+
+my_tea_analysis <- function(input_df, tea_dict){
+  tea_df <- data.frame()
+  for (i in clusters){
+  tea_set <- tea$enrichment_analysis(
+    (input_df %>% 
+       filter(cluster == i))$WBGeneID, 
+    tissue_df = tea_dict 
+    # %>% 
+    #   filter(wbid %in% (input_df %>% 
+    #                       filter(cluster %in% clusters))$WBGeneID)
+  )
+  if(nrow(tea_set) == 0){
+    next
+  } else {
+  tea_df <- bind_rows(tea_df, data.frame(tea_set, cluster = i))
+  }
+}
+tea_df
+}
+
+reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
+    new_x <- paste(x, within, sep = sep)
+    stats::reorder(new_x, by, FUN = fun)
+}
+
+scale_x_reordered <- function(..., sep = "___") {
+    reg <- paste0(sep, ".+$")
+    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
+}
+
+my_ontology_plot <- function(input_df, xlabel){
+  input_df %>%
+  filter(Q.value < 0.001,  Observed > 50) %>% 
+  ggplot(aes(x = reorder_within(Term, -log10(Q.value), cluster), y = -log10(Q.value))) +
+  geom_point(aes(size = Observed)) +
+  coord_flip() +
+  scale_x_reordered() +
+  facet_grid(cluster~., scales = "free_y") +
+  theme_bw() +
+  xlab(xlabel) +
+  guides(size = guide_legend(title = "# genes")) +
+  scale_size_continuous(breaks = c(20,100,200))
+}
+```
+
+```{r}
+quartz(width = 8, height = 20)
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 2), tissue_df), "Tissue Ontology")
+
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_T.png")
+```
+
+```{r}
+quartz(width = 15, height = 20)
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), go_df), "Gene Ontology") + theme(text = element_text(size = 20))
+
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_G.png")
+```
+
+
+# plot genes of interest
+From John Murray dataset 
+    - intestine_anterior: ZC204.12, cpr-1, ceh-37
+    - intestine_middle_and_posterior: irg-7, pal-1, cpr-1, ceh-37
+    - intestine_far_posterior: irg-7, faah-1, pbo-4, psa-3
+
+```{r}
+# top marker gene for each cluster
+FeaturePlot(emb.GFPpooled, pt.size = 0.1,
+            features = (emb.GFPpooled.markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC))$gene)
+```
+
+```{r}
+# genes from murray data
+# intestine_anterior
+quartz(width = 5, height = 10)
+FeaturePlot(emb.GFPpooled, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, ncol = 1) +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 14),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Anterior.png") 
+
+# intestine_middle_and_posterior
+quartz(width = 5, height = 10)
+FeaturePlot(emb.GFPpooled, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, ncol = 1) + 
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 14),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Mid.png")
+
+# intestine_far_posterior
+quartz(width = 5, height = 10)
+FeaturePlot(emb.GFPpooled, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 1) + 
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 14),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Posterior.png")
+```
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------
 # Remove contamination clusters (based on expression of elt-2, elt-7, and ges-1)
 contamination clusters = 3, 8, 10, 11, 12
 
