@@ -391,6 +391,19 @@ go_df <- tea$fetch_dictionary("go")
 emb.GFPpooled.markers <- emb.GFPpooled.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
 
 emb.GFPpooled.markers <- emb.GFPpooled.markers %>% rename(WBGeneID = wbps_gene_id)
+
+cluster0_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==0, ]
+cluster1_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==1, ]
+cluster2_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==2, ]
+cluster3_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==3, ]
+cluster4_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==4, ]
+cluster5_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==5, ]
+cluster6_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==6, ]
+cluster7_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==7, ] cluster8_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==8, ] 
+cluster9_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==9, ] 
+cluster10_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==10, ]
+cluster11_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==11, ]
+cluster12_MarkerGenes <- emb.GFPpooled.markers[emb.GFPpooled.markers$cluster==12, ]
 ```
 
 ```{r}
@@ -453,6 +466,56 @@ quartz(width = 15, height = 20)
 my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), go_df), "Gene Ontology") + theme(text = element_text(size = 20))
 
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_G.png")
+```
+
+----
+
+For specific clusters 
+```{r}
+clusters <- unique(cluster0_MarkerGenes)
+
+my_tea_analysis <- function(input_df, tea_dict){
+  tea_df <- data.frame()
+  tea_set <- tea$enrichment_analysis(input_df$WBGeneID, tissue_df = tea_dict) 
+  if(nrow(tea_set) == 0){
+    next
+  } else {
+  tea_df <- bind_rows(tea_df, data.frame(tea_set))
+  }
+tea_df
+}
+
+reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
+    new_x <- paste(x, within, sep = sep)
+    stats::reorder(new_x, by, FUN = fun)
+}
+
+scale_x_reordered <- function(..., sep = "___") {
+    reg <- paste0(sep, ".+$")
+    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
+}
+
+my_ontology_plot <- function(input_df, xlabel){
+  input_df %>%
+  filter(Q.value < 0.001,  Observed > 50) %>% 
+  ggplot(aes(x = Term, -log10(Q.value), y = -log10(Q.value))) +
+  geom_point(aes(size = Observed)) +
+  coord_flip() +
+  scale_x_reordered() +
+  facet_grid(scales = "free_y") +
+  theme_bw() +
+  xlab(xlabel) +
+  guides(size = guide_legend(title = "# genes")) +
+  scale_size_continuous(breaks = c(20,100,200))
+}
+```
+
+
+```{r}
+quartz(width = 15, height = 20)
+my_ontology_plot(my_tea_analysis(cluster0_MarkerGenes %>% filter(p_val_adj < 0.05, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 20))
+
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled_cluster0.GO_G.png")
 ```
 
 
