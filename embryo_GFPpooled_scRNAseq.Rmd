@@ -502,7 +502,19 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Posterior.png")
 ```
 
 
+```{r}
+# marker genes we FISHed for
+quartz(width = 5, height = 10)
+FeaturePlot(emb.GFPpooled, features = c('C14C6.5', 'clec-56', 'pbo-4'), raster=F, ncol = 1) + 
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 14),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.smiFISH-genes.png")
+```
 
+```
 
 
 
