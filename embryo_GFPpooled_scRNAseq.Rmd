@@ -441,82 +441,33 @@ scale_x_reordered <- function(..., sep = "___") {
 
 my_ontology_plot <- function(input_df, xlabel){
   input_df %>%
-  filter(Q.value < 0.001,  Observed > 50) %>% 
+  filter(Q.value < 0.001,  Observed > 10) %>% 
   ggplot(aes(x = reorder_within(Term, -log10(Q.value), cluster), y = -log10(Q.value))) +
   geom_point(aes(size = Observed)) +
   coord_flip() +
   scale_x_reordered() +
-  facet_grid(cluster~., scales = "free_y") +
+  facet_wrap(cluster~., ncol = 3, scales = "free_y") +
   theme_bw() +
   xlab(xlabel) +
   guides(size = guide_legend(title = "# genes")) +
-  scale_size_continuous(breaks = c(20,100,200))
+  scale_size_continuous(breaks = c(10,20,100,200,300))
 }
 ```
 
 ```{r}
 quartz(width = 8, height = 20)
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 2), tissue_df), "Tissue Ontology")
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.01, avg_log2FC > 2), tissue_df), "Tissue Ontology")
 
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_T.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_T.png", limitsize = FALSE)
 ```
 
 ```{r}
-quartz(width = 15, height = 20)
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), go_df), "Gene Ontology") + theme(text = element_text(size = 20))
+quartz(width = 60, height = 40)
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
 
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_G.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_G.png", limitsize = FALSE)
 ```
 
-----
-
-For specific clusters 
-```{r}
-clusters <- unique(cluster0_MarkerGenes)
-
-my_tea_analysis <- function(input_df, tea_dict){
-  tea_df <- data.frame()
-  tea_set <- tea$enrichment_analysis(input_df$WBGeneID, tissue_df = tea_dict) 
-  if(nrow(tea_set) == 0){
-    next
-  } else {
-  tea_df <- bind_rows(tea_df, data.frame(tea_set))
-  }
-tea_df
-}
-
-reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
-    new_x <- paste(x, within, sep = sep)
-    stats::reorder(new_x, by, FUN = fun)
-}
-
-scale_x_reordered <- function(..., sep = "___") {
-    reg <- paste0(sep, ".+$")
-    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
-}
-
-my_ontology_plot <- function(input_df, xlabel){
-  input_df %>%
-  filter(Q.value < 0.001,  Observed > 50) %>% 
-  ggplot(aes(x = Term, -log10(Q.value), y = -log10(Q.value))) +
-  geom_point(aes(size = Observed)) +
-  coord_flip() +
-  scale_x_reordered() +
-  facet_grid(scales = "free_y") +
-  theme_bw() +
-  xlab(xlabel) +
-  guides(size = guide_legend(title = "# genes")) +
-  scale_size_continuous(breaks = c(20,100,200))
-}
-```
-
-
-```{r}
-quartz(width = 15, height = 20)
-my_ontology_plot(my_tea_analysis(cluster0_MarkerGenes %>% filter(p_val_adj < 0.05, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 20))
-
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled_cluster0.GO_G.png")
-```
 
 
 # plot genes of interest
