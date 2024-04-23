@@ -416,9 +416,6 @@ my_tea_analysis <- function(input_df, tea_dict){
     (input_df %>% 
        filter(cluster == i))$WBGeneID, 
     tissue_df = tea_dict 
-    # %>% 
-    #   filter(wbid %in% (input_df %>% 
-    #                       filter(cluster %in% clusters))$WBGeneID)
   )
   if(nrow(tea_set) == 0){
     next
@@ -455,13 +452,17 @@ my_ontology_plot <- function(input_df, xlabel){
 ```
 
 ```{r}
-quartz(width = 8, height = 20)
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.01, avg_log2FC > 2), tissue_df), "Tissue Ontology")
+#filter(Q.value < 0.001,  Observed > 50) %>% 
+
+quartz(width = 10, height = 20)
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
 
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_T.png", limitsize = FALSE)
 ```
 
 ```{r}
+#filter(Q.value < 0.001,  Observed > 10) %>% 
+
 quartz(width = 60, height = 40)
 my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
 
