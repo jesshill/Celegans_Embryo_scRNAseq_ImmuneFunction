@@ -653,13 +653,10 @@ FeaturePlot(emb.GFPpooled, features = c('C14C6.5', 'clec-56', 'pbo-4'), raster=F
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.smiFISH-genes.png")
 ```
 
-```
 
 
 
-
-
---------------------------------------------------------------------
+-------------------------------NOT USING RIGHT NOW-----------------------
 # Remove contamination clusters (based on expression of elt-2, elt-7, and ges-1)
 contamination clusters = 3, 8, 10, 11, 12
 
