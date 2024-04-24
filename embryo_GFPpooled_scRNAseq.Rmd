@@ -515,6 +515,11 @@ dim(go_df)
 go_df <- go_df %>% rename(WBGeneID = wbid)
 go_df_background <- go_df %>% filter(WBGeneID %in% emb.ALLpooled.markers$WBGeneID)
 go_df_background <- go_df_background %>% rename(wbid = WBGeneID)
+
+
+tissue_df <- tissue_df %>% rename(WBGeneID = wbid)
+tissue_df_background <- tissue_df %>% filter(WBGeneID %in% emb.ALLpooled.markers$WBGeneID)
+tissue_df_background <- tissue_df_background %>% rename(wbid = WBGeneID)
 ```
 
 ```{r}
@@ -592,6 +597,15 @@ quartz(width = 60, height = 40)
 my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), go_df_background), "Gene Ontology") + theme(text = element_text(size = 30))
 
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_G_background.png", limitsize = FALSE)
+```
+
+```{r}
+#filter(Q.value < 0.001,  Observed > 10)
+
+quartz(width = 60, height = 100)
+my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), tissue_df_background), "Gene Ontology") + theme(text = element_text(size = 30))
+
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_T_background.png", limitsize = FALSE)
 ```
 
 
