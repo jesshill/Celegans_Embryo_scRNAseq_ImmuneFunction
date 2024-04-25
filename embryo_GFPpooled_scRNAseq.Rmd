@@ -452,16 +452,27 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
 
 
 # Erin wants to see the smiFISH targets in the heat map as well 
-
-
-quartz(width = 12, height = 4)
-FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 3) + 
+quartz(width = 10, height = 3)
+FeaturePlot(emb.GFPpooled, features = c("C14C6.5","clec-56", "pbo-4"),raster=F, ncol = 3) + 
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 14),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-PostCtrls.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-FISH.png")
+
+
+
+quartz(width = 10, height = 4)
+FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7",'ges-1',"end-1","acp-2","C10C5.4"),raster=F, ncol = 3) + 
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 14),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-PosCtrls.png")
+
+
 
 quartz(width = 10, height = 8)
 FeaturePlot(emb.GFPpooled, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F, ncol = 2) +
@@ -474,13 +485,14 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
 
 
 #early intestinal cell markers
-FeaturePlot(emb.GFPpooled, features = c("end-3","end-1", "acp-2"),raster=F, ncol = 2) +
+quartz(width = 10, height = 8)
+FeaturePlot(emb.GFPpooled, features = c("end-1", "acp-2",  "C10C5.4"),raster=F, ncol = 1) +
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 14),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-#found in the data: med-2 
+#found in the data: med-2, end-3, fbxb-96 
 #not-found in the data: med-1, T05E12.10, C33E10.3
 
 
