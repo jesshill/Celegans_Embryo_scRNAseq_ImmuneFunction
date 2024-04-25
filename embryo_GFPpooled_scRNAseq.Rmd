@@ -387,6 +387,9 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Clustree.png")
 clustree(emb.ALLpooled.clust, prefix = "RNA_snn_res.")
 ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.Clustree.png")
 
+# can also see how the different resolutions look like this
+DimPlot(emb.GFPpooled.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
+
 # now choose the appropriate resolution for the given dimensions using the Clustree data
 emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1.2)
 emb.ALLpooled <- FindClusters(emb.ALLpooled, resolution = 1.2)
