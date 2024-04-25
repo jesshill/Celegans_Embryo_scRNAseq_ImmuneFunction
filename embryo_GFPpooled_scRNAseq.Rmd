@@ -485,14 +485,14 @@ FeaturePlot(emb.GFPpooled, features = c("end-3","end-1", "acp-2"),raster=F, ncol
 
 
 #smiFISH targets
-quartz(width = 10, height = 8)
+quartz(width = 5, height = 8)
 FeaturePlot(emb.GFPpooled, features = c("C14C6.5","clec-56", "pbo-4"),raster=F, ncol = 1) +
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 14),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
+ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-FISH.png")
 
 
 emb.ALLpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
