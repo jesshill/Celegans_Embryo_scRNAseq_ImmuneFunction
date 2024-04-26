@@ -170,7 +170,6 @@ FeatureScatter is typically used to visualize feature-feature relationships, but
 plot1 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
-
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeatureScatter.png")
 
 
@@ -178,7 +177,6 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeatureScatter.png")
 plot1 <- FeatureScatter(emb.ALLpooled, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.ALLpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
-
 ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.FeatureScatter.png")
 ```
 
@@ -187,14 +185,11 @@ Filter based on features.
 cells being filtered due to mito percent: 
 ```{r}
 sum(emb.GFPpooled$percent.mt > 50)/ length(emb.GFPpooled$percent.mt)
-
 emb.GFPpooled <- subset(emb.GFPpooled, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 
 
 
-
 sum(emb.ALLpooled$percent.mt > 50)/ length(emb.ALLpooled$percent.mt)
-
 emb.ALLpooled <- subset(emb.ALLpooled, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
 
@@ -313,6 +308,7 @@ ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap1.png")
 DimHeatmap(emb.GFPpooled, dims = 1:6, cells = 500, balanced = TRUE)
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap1-6.png")
 ```
+
 
 # Determine dataset dimensionality
 To overcome the extensive technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a ‘metafeature’ that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. However, how many components should we choose to include? 
@@ -433,7 +429,7 @@ emb.GFPpooled.markers <- FindAllMarkers(emb.GFPpooled, only.pos = F, min.pct = 0
 
 emb.GFPpooled.markers %>% 
   group_by(cluster) %>% filter(p_val_adj < .01) %>%
-  slice_max(n = 2, order_by = avg_log2FC)
+  slice_max(n = 2, order_by = avg_log2FC) 
 
 write.csv(emb.GFPpooled.markers,"./Seurat_output/GFP_pooled/emb_GFPpooled_markers.csv", row.names = TRUE)
 
@@ -445,23 +441,15 @@ emb.ALLpooled.markers <- FindAllMarkers(emb.ALLpooled, only.pos = F, min.pct = 0
 ```{r}
 emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
-DoHeatmap(emb.GFPpooled, features = c(top2$gene, "clec-56", ""), raster=F) + 
+# Erin wants to see the smiFISH targets in the heat map as well
+quartz(width = 20, height = 10)
+DoHeatmap(emb.GFPpooled, features = c(top2$gene, "clec-56", "pbo-4", "C14C6.5"), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))          
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
 
 
-# Erin wants to see the smiFISH targets in the heat map as well 
-quartz(width = 10, height = 3)
-FeaturePlot(emb.GFPpooled, features = c("C14C6.5","clec-56", "pbo-4"),raster=F, ncol = 3) + 
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-FISH.png")
-
-
+#-------------------- 
 
 quartz(width = 10, height = 4)
 FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7",'ges-1',"end-1","acp-2","C10C5.4"),raster=F, ncol = 3) + 
@@ -484,18 +472,6 @@ FeaturePlot(emb.GFPpooled, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
 
 
-#early intestinal cell markers
-quartz(width = 10, height = 8)
-FeaturePlot(emb.GFPpooled, features = c("end-1", "acp-2",  "C10C5.4"),raster=F, ncol = 1) +
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-#found in the data: med-2, end-3, fbxb-96 
-#not-found in the data: med-1, T05E12.10, C33E10.3
-
-
 #smiFISH targets
 quartz(width = 5, height = 8)
 FeaturePlot(emb.GFPpooled, features = c("C14C6.5","clec-56", "pbo-4"),raster=F, ncol = 1) +
@@ -505,6 +481,9 @@ FeaturePlot(emb.GFPpooled, features = c("C14C6.5","clec-56", "pbo-4"),raster=F, 
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-FISH.png")
+
+
+
 
 
 emb.ALLpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
