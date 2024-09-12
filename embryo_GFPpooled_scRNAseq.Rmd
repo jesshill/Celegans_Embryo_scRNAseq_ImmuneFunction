@@ -499,7 +499,6 @@ ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.FeaturePlot-PostCtrls.png")
 ```
 
 
-
 ```{r}
 #how many cells are expressing these markers of other tissues?
 view(emb.GFPpooled@assays$RNA$data)
