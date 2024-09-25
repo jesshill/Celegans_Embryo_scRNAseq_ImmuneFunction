@@ -1,1 +1,0 @@
-cellranger aggr --id=all_GFP --csv=aggregation_GFP.csv
