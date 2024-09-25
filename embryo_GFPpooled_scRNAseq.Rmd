@@ -13,21 +13,32 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Install packages
 ```{r}
-#install.packages('Seurat')
-#packageVersion('Seurat') # 5.0.1
-#install.packages('Matrix')
+install.packages('Seurat')
+packageVersion('Seurat') # 5.0.1
+install.packages('Matrix')
+install.packages("hdf5r")
+install.packages("clustree")
+install.packages("tidyverse")
+install.packages("patchwork")
+install.packages("remotes")
+install.packages("R.utils")
 
-#install.packages("hdf5r")
-#BiocManager::install("biomaRt")
-#install.packages("clustree")
-#install.packages("tidyverse")
-#install.packages("patchwork")
+remotes::install_github('satijalab/seurat-wrappers')
+
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "3.19")
+
+BiocManager::install("biomaRt")
 ```
 
 # Load packages
 ```{r echo=FALSE}
 library(biomaRt)
 library(Seurat)
+library(SeuratWrappers)
+library(ggplot2)
 library(tidyverse)
 library(patchwork)
 library(clustree)
