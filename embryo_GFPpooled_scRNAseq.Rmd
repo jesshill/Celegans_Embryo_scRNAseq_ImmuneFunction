@@ -57,10 +57,13 @@ Non-linear dimensional reduction (UMAP/t-SNE)
 
 # Load the data
 ```{r}
-emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP_v1/filtered_feature_bc_matrix.h5")
+emb.GFPrep1and2.data <- Read10X_h5("./cellranger/GFP_rep1and2/filtered_feature_bc_matrix.h5")
+
+emb.GFPrep3and4.data <- Read10X_h5("./cellranger/GFP_rep3and4/filtered_feature_bc_matrix.h5")
 
 #emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP_v1/outs/count/filtered_feature_bc_matrix.h5")
 ```
+
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
 ```{r}
@@ -68,16 +71,33 @@ mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite
 
 genes.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "gene_name"),
-      value = list("caelegprjna13758", rownames(emb.GFPpooled.data)),
+      value = list("caelegprjna13758", rownames(emb.GFPrep1and2.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
 
 mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes.df$chromosome_name = NULL
 
-c(nrow(genes.df), nrow(emb.GFPpooled.data))
+c(nrow(genes.df), nrow(emb.GFPrep1and2.data))
 
 # there are genes missing
-nrow(emb.GFPpooled.data)-nrow(genes.df)
+nrow(emb.GFPrep1and2.data)-nrow(genes.df)
+
+
+
+mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+genes1.df <- getBM(mart = mart, 
+      filters = c("species_id_1010", "gene_name"),
+      value = list("caelegprjna13758", rownames(emb.GFPrep3and4.data)),
+      attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
+
+mitoList = genes1.df[genes1.df$chromosome_name == 'MtDNA', 'external_gene_id']
+genes1.df$chromosome_name = NULL
+
+c(nrow(genes1.df), nrow(emb.GFPrep3and4.data))
+
+# there are genes missing
+nrow(emb.GFPrep3and4.data)-nrow(genes1.df)
 ```
 
 
@@ -85,14 +105,14 @@ nrow(emb.GFPpooled.data)-nrow(genes.df)
 There are `r nrow(emb.GFPpooled.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 
 ```{r}
-emb.GFPpooled.data.filt <- emb.GFPpooled.data[rownames(emb.GFPpooled.data) %in% genes.df$external_gene_id,]
+emb.GFPrep1and2.data.filt <- emb.GFPrep1and2.data[rownames(emb.GFPrep1and2.data) %in% genes.df$external_gene_id,]
 
 # The two data structures do not have the same order of WBGeneIDs
-identical(rownames(emb.GFPpooled.data.filt), genes.df$external_gene_id)
+identical(rownames(emb.GFPrep1and2.data.filt), genes.df$external_gene_id)
 
 # Use match to make sure they are in the same order
-identical(rownames(emb.GFPpooled.data.filt),
-          genes.df[match(rownames(emb.GFPpooled.data.filt), genes.df$external_gene_id),]$external_gene_id)
+identical(rownames(emb.GFPrep1and2.data.filt),
+          genes.df[match(rownames(emb.GFPrep1and2.data.filt), genes.df$external_gene_id),]$external_gene_id)
 
 # now replace the WBGeneIDs with gene names
 #rownames(emb.GFPpooled.data.filt) <- genes.df[
@@ -101,23 +121,56 @@ identical(rownames(emb.GFPpooled.data.filt),
 #  ,]$external_gene_id
 
 # are there NAs?
-sum(!is.na(rownames(emb.GFPpooled.data.filt)))
+sum(!is.na(rownames(emb.GFPrep1and2.data.filt)))
 
-head(emb.GFPpooled.data.filt)
+head(emb.GFPrep1and2.data.filt)
+
+
+
+emb.GFPrep3and4.data.filt <- emb.GFPrep3and4.data[rownames(emb.GFPrep3and4.data) %in% genes1.df$external_gene_id,]
+
+# The two data structures do not have the same order of WBGeneIDs
+identical(rownames(emb.GFPrep3and4.data.filt), genes1.df$external_gene_id)
+
+# Use match to make sure they are in the same order
+identical(rownames(emb.GFPrep3and4.data.filt),
+          genes1.df[match(rownames(emb.GFPrep3and4.data.filt), genes1.df$external_gene_id),]$external_gene_id)
+
+# now replace the WBGeneIDs with gene names
+#rownames(emb.GFPpooled.data.filt) <- genes.df[
+#  match(rownames(emb.GFPpooled.data.filt),
+#        genes.df$wbps_gene_id)
+#  ,]$external_gene_id
+
+# are there NAs?
+sum(!is.na(rownames(emb.GFPrep3and4.data.filt)))
+
+head(emb.GFPrep3and4.data.filt)
 ```
 
 
 # Set up the Seurat object
+# Initialize the Seurat object with the raw (non-normalized data).
 ```{r}
-emb.GFPpooled <- CreateSeuratObject(counts = emb.GFPpooled.data.filt, project = "emb_GFPpooled", min.cells = 3, min.features = 200)
+emb.GFPrep1and2 <- CreateSeuratObject(counts = emb.GFPrep1and2.data.filt, project = "emb.GFPrep1and2", min.cells = 3, min.features = 200)
 
-view(emb.GFPpooled@meta.data) #955 rows
+view(emb.GFPrep1and2@meta.data) #955 rows
+
+
+emb.GFPrep3and4 <- CreateSeuratObject(counts = emb.GFPrep3and4.data.filt, project = "emb.GFPrep3and4", min.cells = 3, min.features = 200)
+
+view(emb.GFPrep3and4@metas.data) #1560 rows
 ```
 
 ```{r}
 length(unique(genes.df$wbps_gene_id))
-length(unique(rownames(emb.GFPpooled)))
-rownames(emb.GFPpooled)[!(rownames(emb.GFPpooled) %in% genes.df$external_gene_id)]
+length(unique(rownames(emb.GFPrep1and2)))
+rownames(emb.GFPrep1and2)[!(rownames(emb.GFPrep1and2) %in% genes.df$external_gene_id)]
+
+
+length(unique(genes1.df$wbps_gene_id))
+length(unique(rownames(emb.GFPrep3and4)))
+rownames(emb.GFPrep3and4)[!(rownames(emb.GFPrep3and4) %in% genes1.df$external_gene_id)]
 ```
 
 
@@ -129,20 +182,31 @@ rownames(emb.GFPpooled)[!(rownames(emb.GFPpooled) %in% genes.df$external_gene_id
 
 ```{r}
 # show QC metrics for the first 5 cells 
-view(emb.GFPpooled@meta.data)
-head(emb.GFPpooled@meta.data, 5)
+view(emb.GFPrep1and2@meta.data)
+head(emb.GFPrep1and2@meta.data, 5)
+
+view(emb.GFPrep3and4@meta.data)
+head(emb.GFPrep3and4@meta.data, 5)
 ```
 
 Mitochondrial genome percentage 
 ```{r}
-mitoIndices = which(rownames(emb.GFPpooled) %in% mitoList)
-emb.GFPpooled[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled, features = mitoIndices)
+mitoIndices = which(rownames(emb.GFPrep1and2) %in% mitoList)
+emb.GFPrep1and2[["percent.mt"]] <- PercentageFeatureSet(emb.GFPrep1and2, features = mitoIndices)
+
+
+mitoIndices = which(rownames(emb.GFPrep3and4) %in% mitoList)
+emb.GFPrep3and4[["percent.mt"]] <- PercentageFeatureSet(emb.GFPrep3and4, features = mitoIndices)
 ```
 
 Visualize QC metrics as a violin plot
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.VlnPlot.png")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.VlnPlot.png")
+
+
+VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.VlnPlot.png")
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -150,14 +214,7 @@ FeatureScatter is typically used to visualize feature-feature relationships, but
 plot1 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeatureScatter.png")
-
-
-
-plot1 <- FeatureScatter(emb.ALLpooled, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
-plot2 <- FeatureScatter(emb.ALLpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-plot1 + plot2
-ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.FeatureScatter.png")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.FeatureScatter.png")
 ```
 
 
@@ -166,29 +223,16 @@ cells being filtered due to mito percent:
 ```{r}
 sum(emb.GFPpooled$percent.mt > 50)/ length(emb.GFPpooled$percent.mt)
 emb.GFPpooled <- subset(emb.GFPpooled, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
-
-
-
-sum(emb.ALLpooled$percent.mt > 50)/ length(emb.ALLpooled$percent.mt)
-emb.ALLpooled <- subset(emb.ALLpooled, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
 
 
 Visualize after filtering
 ```{r}
 VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.VlnPlot.filt.png")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.VlnPlot.filt.png")
 
 FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeatureScatter.filt.png")
-
-
-
-VlnPlot(emb.ALLpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.VlnPlot.filt.png")
-
-FeatureScatter(emb.ALLpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.FeatureScatter.filt.png")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.FeatureScatter.filt.png")
 ```
 
 ```{r}
@@ -210,8 +254,6 @@ Normalized values are stored in emb.GFPpooled[["RNA]]@data
 
 ```{r}
 emb.GFPpooled <- NormalizeData(emb.GFPpooled, normalization.method = "LogNormalize", scale.factor = 10000)
-
-emb.ALLpooled <- NormalizeData(emb.ALLpooled, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
 
 
@@ -220,21 +262,13 @@ Identify highly variable features to focus on in downstream analysis
 ```{r}
 emb.GFPpooled <- FindVariableFeatures(emb.GFPpooled, selection.method = "vst", nfeatures = 2000)
 
-emb.ALLpooled <- FindVariableFeatures(emb.ALLpooled, selection.method = "vst", nfeatures = 2000)
-
 # Identify the 10 most highly variable genes
 top10 <- head(VariableFeatures(emb.GFPpooled), 10)
-top10_A <- head(VariableFeatures(emb.ALLpooled), 10)
 
 # plot variable features with and without labels
 plot1 <- VariableFeaturePlot(emb.GFPpooled)
 LabelPoints(plot = plot1, points = top10, repel = TRUE)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.VarFeatures.png")
-
-
-plot1 <- VariableFeaturePlot(emb.ALLpooled)
-LabelPoints(plot = plot1, points = top10_A, repel = TRUE)
-ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.VarFeatures.png")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.VarFeatures.png")
 ```
 
 
