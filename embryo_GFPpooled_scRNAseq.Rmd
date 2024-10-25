@@ -13,24 +13,30 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Install packages
 ```{r}
-install.packages('Seurat')
-packageVersion('Seurat') # 5.0.1
-install.packages('Matrix')
-install.packages("hdf5r")
-install.packages("clustree")
-install.packages("tidyverse")
-install.packages("patchwork")
-install.packages("remotes")
-install.packages("R.utils")
+#install.packages('Seurat')
+#packageVersion('Seurat') # 5.0.1
+#install.packages('Matrix')
+#install.packages("hdf5r")
+#install.packages("clustree")
+#install.packages("tidyverse")
+#install.packages("patchwork")
+#install.packages("remotes")
+#install.packages("R.utils")
 
-remotes::install_github('satijalab/seurat-wrappers')
+#remotes::install_github('satijalab/seurat-wrappers')
 
 
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install(version = "3.19")
+#if (!require("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#BiocManager::install(version = "3.19")
 
-BiocManager::install("biomaRt")
+#BiocManager::install("biomaRt")
+
+#BiocManager::install('multtest')
+#install.packages('metap')
+
+#install.packages('devtools')
+#devtools::install_github('immunogenomics/presto')
 ```
 
 # Load packages
@@ -42,6 +48,8 @@ library(ggplot2)
 library(tidyverse)
 library(patchwork)
 library(clustree)
+library(metap)
+library(presto)
 ```
 
 ---
@@ -57,11 +65,13 @@ Non-linear dimensional reduction (UMAP/t-SNE)
 
 # Load the data
 ```{r}
-emb.GFPrep1and2.data <- Read10X_h5("./cellranger/GFP_rep1and2/filtered_feature_bc_matrix.h5")
+#emb.GFPrep1and2.data <- Read10X_h5("./cellranger/GFP_rep1and2/filtered_feature_bc_matrix.h5")
 
-emb.GFPrep3and4.data <- Read10X_h5("./cellranger/GFP_rep3and4/filtered_feature_bc_matrix.h5")
+#emb.GFPrep3and4.data <- Read10X_h5("./cellranger/GFP_rep3and4/filtered_feature_bc_matrix.h5")
 
-#emb.GFPpooled.data <- Read10X_h5("./cellranger/all_GFP_v1/outs/count/filtered_feature_bc_matrix.h5")
+emb.GFPpooled_v1.data <- Read10X_h5("./cellranger/all_GFP_v1/filtered_feature_bc_matrix.h5")
+
+emb.GFPpooled_v2.data <- Read10X_h5("./cellranger/all_GFP_v2/filtered_feature_bc_matrix.h5")
 ```
 
 
@@ -71,106 +81,131 @@ mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite
 
 genes.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "gene_name"),
-      value = list("caelegprjna13758", rownames(emb.GFPrep1and2.data)),
+      value = list("caelegprjna13758", rownames(emb.GFPpooled_v1.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
 
 mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes.df$chromosome_name = NULL
 
-c(nrow(genes.df), nrow(emb.GFPrep1and2.data))
+c(nrow(genes.df), nrow(emb.GFPpooled_v1.data))
 
 # there are genes missing
-nrow(emb.GFPrep1and2.data)-nrow(genes.df)
-
-
-
+nrow(emb.GFPpooled_v1.data)-nrow(genes.df)
+```
+```{r}
 mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
 genes1.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "gene_name"),
-      value = list("caelegprjna13758", rownames(emb.GFPrep3and4.data)),
+      value = list("caelegprjna13758", rownames(emb.GFPpooled_v2.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
 
 mitoList = genes1.df[genes1.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes1.df$chromosome_name = NULL
 
-c(nrow(genes1.df), nrow(emb.GFPrep3and4.data))
+c(nrow(genes1.df), nrow(emb.GFPpooled_v2.data))
 
 # there are genes missing
-nrow(emb.GFPrep3and4.data)-nrow(genes1.df)
+nrow(emb.GFPpooled_v2.data)-nrow(genes1.df)
 ```
 
 
 
 There are `r nrow(emb.GFPpooled.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
+```{r}
+emb.GFPpooled_v1.data.filt <- emb.GFPpooled_v1.data[rownames(emb.GFPpooled_v1.data) %in% genes.df$external_gene_id,]
+
+# The two data structures do not have the same order of WBGeneIDs
+identical(rownames(emb.GFPpooled_v1.data.filt), genes.df$external_gene_id)
+
+# Use match to make sure they are in the same order
+identical(rownames(emb.GFPpooled_v1.data.filt),
+          genes.df[match(rownames(emb.GFPpooled_v1.data.filt), genes.df$external_gene_id),]$external_gene_id)
+
+# now replace the WBGeneIDs with gene names
+#rownames(emb.GFPpooled.data.filt) <- genes.df[
+#  match(rownames(emb.GFPpooled.data.filt),
+#        genes.df$wbps_gene_id)
+#  ,]$external_gene_id
+
+# are there NAs?
+sum(!is.na(rownames(emb.GFPpooled_v1.data.filt)))
+
+head(emb.GFPpooled_v1.data.filt)
+```
+```{r}
+emb.GFPpooled_v2.data.filt <- emb.GFPpooled_v2.data[rownames(emb.GFPpooled_v2.data) %in% genes1.df$external_gene_id,]
+
+# The two data structures do not have the same order of WBGeneIDs
+identical(rownames(emb.GFPpooled_v2.data.filt), genes1.df$external_gene_id)
+
+# Use match to make sure they are in the same order
+identical(rownames(emb.GFPpooled_v2.data.filt),
+          genes1.df[match(rownames(emb.GFPpooled_v2.data.filt), genes1.df$external_gene_id),]$external_gene_id)
+
+# now replace the WBGeneIDs with gene names
+#rownames(emb.GFPpooled.data.filt) <- genes.df[
+#  match(rownames(emb.GFPpooled.data.filt),
+#        genes.df$wbps_gene_id)
+#  ,]$external_gene_id
+
+# are there NAs?
+sum(!is.na(rownames(emb.GFPpooled_v2.data.filt)))
+
+head(emb.GFPpooled_v2.data.filt)
+```
+
 
 ```{r}
-emb.GFPrep1and2.data.filt <- emb.GFPrep1and2.data[rownames(emb.GFPrep1and2.data) %in% genes.df$external_gene_id,]
-
-# The two data structures do not have the same order of WBGeneIDs
-identical(rownames(emb.GFPrep1and2.data.filt), genes.df$external_gene_id)
-
-# Use match to make sure they are in the same order
-identical(rownames(emb.GFPrep1and2.data.filt),
-          genes.df[match(rownames(emb.GFPrep1and2.data.filt), genes.df$external_gene_id),]$external_gene_id)
-
-# now replace the WBGeneIDs with gene names
-#rownames(emb.GFPpooled.data.filt) <- genes.df[
-#  match(rownames(emb.GFPpooled.data.filt),
-#        genes.df$wbps_gene_id)
-#  ,]$external_gene_id
-
-# are there NAs?
-sum(!is.na(rownames(emb.GFPrep1and2.data.filt)))
-
-head(emb.GFPrep1and2.data.filt)
-
-
-
-emb.GFPrep3and4.data.filt <- emb.GFPrep3and4.data[rownames(emb.GFPrep3and4.data) %in% genes1.df$external_gene_id,]
-
-# The two data structures do not have the same order of WBGeneIDs
-identical(rownames(emb.GFPrep3and4.data.filt), genes1.df$external_gene_id)
-
-# Use match to make sure they are in the same order
-identical(rownames(emb.GFPrep3and4.data.filt),
-          genes1.df[match(rownames(emb.GFPrep3and4.data.filt), genes1.df$external_gene_id),]$external_gene_id)
-
-# now replace the WBGeneIDs with gene names
-#rownames(emb.GFPpooled.data.filt) <- genes.df[
-#  match(rownames(emb.GFPpooled.data.filt),
-#        genes.df$wbps_gene_id)
-#  ,]$external_gene_id
-
-# are there NAs?
-sum(!is.na(rownames(emb.GFPrep3and4.data.filt)))
-
-head(emb.GFPrep3and4.data.filt)
+# extract the cell codes (barcode info with the trailing integer which signifies the order of the samples in the aggregation step)
+cellcodes <- as.data.frame(emb.GFPpooled_v1.data.filt@Dimnames[[2]])
+colnames(cellcodes) <- "barcodes"
+rownames(cellcodes) <- cellcodes$barcodes
+cellcodes$rep_group <- ifelse(grepl("-1$", cellcodes$barcodes), "Rep_1", ifelse(grepl("-2$", cellcodes$barcodes), "Rep_2", ifelse(grepl("-3$", cellcodes$barcodes), "Rep_3", "Rep_4")))
+view(cellcodes)
 ```
+```{r}
+cellcodes_1 <- as.data.frame(emb.GFPpooled_v2.data.filt@Dimnames[[2]])
+colnames(cellcodes_1) <- "barcodes"
+rownames(cellcodes_1) <- cellcodes_1$barcodes 
+cellcodes_1$rep_group <- ifelse(grepl("-1$", cellcodes_1$barcodes), "Rep_1", ifelse(grepl("-2$", cellcodes_1$barcodes), "Rep_2", ifelse(grepl("-3$", cellcodes_1$barcodes), "Rep_3", "Rep_4")))
+view(cellcodes_1)
+```
+
 
 
 # Set up the Seurat object
 # Initialize the Seurat object with the raw (non-normalized data).
 ```{r}
-emb.GFPrep1and2 <- CreateSeuratObject(counts = emb.GFPrep1and2.data.filt, project = "emb.GFPrep1and2", min.cells = 3, min.features = 200)
+emb.GFPpooled_v1 <- CreateSeuratObject(counts = emb.GFPpooled_v1.data.filt, project = "emb.GFPpooled_v1", min.cells = 3, min.features = 200, meta.data = cellcodes)
 
-view(emb.GFPrep1and2@meta.data) #955 rows
-
-
-emb.GFPrep3and4 <- CreateSeuratObject(counts = emb.GFPrep3and4.data.filt, project = "emb.GFPrep3and4", min.cells = 3, min.features = 200)
-
-view(emb.GFPrep3and4@metas.data) #1560 rows
+view(emb.GFPpooled_v1@meta.data)
 ```
+```{r}
+emb.GFPpooled_v2 <- CreateSeuratObject(counts = emb.GFPpooled_v2.data.filt, project = "emb.GFPpooled_v2", min.cells = 3, min.features = 200, meta.data = cellcodes_1)
+
+view(emb.GFPpooled_v2@meta.data)
+```
+
+
+```{r}
+emb.GFPpooled_v1[["RNA"]] <- split(emb.GFPpooled_v1[["RNA"]], f = emb.GFPpooled_v1$rep_group)
+emb.GFPpooled_v1
+
+emb.GFPpooled_v2[["RNA"]] <- split(emb.GFPpooled_v2[["RNA"]], f = emb.GFPpooled_v2$rep_group)
+emb.GFPpooled_v2
+```
+
 
 ```{r}
 length(unique(genes.df$wbps_gene_id))
-length(unique(rownames(emb.GFPrep1and2)))
-rownames(emb.GFPrep1and2)[!(rownames(emb.GFPrep1and2) %in% genes.df$external_gene_id)]
+length(unique(rownames(emb.GFPpooled_v1)))
+rownames(emb.GFPpooled_v1)[!(rownames(emb.GFPpooled_v1) %in% genes.df$external_gene_id)]
 
 
 length(unique(genes1.df$wbps_gene_id))
-length(unique(rownames(emb.GFPrep3and4)))
-rownames(emb.GFPrep3and4)[!(rownames(emb.GFPrep3and4) %in% genes1.df$external_gene_id)]
+length(unique(rownames(emb.GFPpooled_v2)))
+rownames(emb.GFPpooled_v2)[!(rownames(emb.GFPpooled_v2) %in% genes1.df$external_gene_id)]
 ```
 
 
@@ -182,68 +217,96 @@ rownames(emb.GFPrep3and4)[!(rownames(emb.GFPrep3and4) %in% genes1.df$external_ge
 
 ```{r}
 # show QC metrics for the first 5 cells 
-view(emb.GFPrep1and2@meta.data)
-head(emb.GFPrep1and2@meta.data, 5)
+view(emb.GFPpooled_v1@meta.data)
+head(emb.GFPpooled_v1@meta.data, 5)
 
-view(emb.GFPrep3and4@meta.data)
-head(emb.GFPrep3and4@meta.data, 5)
+view(emb.GFPpooled_v2@meta.data)
+head(emb.GFPpooled_v2@meta.data, 5)
 ```
 
 Mitochondrial genome percentage 
 ```{r}
-mitoIndices = which(rownames(emb.GFPrep1and2) %in% mitoList)
-emb.GFPrep1and2[["percent.mt"]] <- PercentageFeatureSet(emb.GFPrep1and2, features = mitoIndices)
+mitoIndices = which(rownames(emb.GFPpooled_v1) %in% mitoList)
+emb.GFPpooled_v1[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled_v1, features = mitoIndices)
 
 
-mitoIndices = which(rownames(emb.GFPrep3and4) %in% mitoList)
-emb.GFPrep3and4[["percent.mt"]] <- PercentageFeatureSet(emb.GFPrep3and4, features = mitoIndices)
+mitoIndices_1 = which(rownames(emb.GFPpooled_v2) %in% mitoList)
+emb.GFPpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled_v2, features = mitoIndices_1)
 ```
 
 Visualize QC metrics as a violin plot
 ```{r}
-VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.VlnPlot.png")
+VlnPlot(emb.GFPpooled_v1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3) 
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.VlnPlot.png")
 
 
-VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.VlnPlot.png")
+VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.png")
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 ```{r}
-plot1 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
-plot2 <- FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 <- FeatureScatter(emb.GFPpooled_v1, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb.GFPpooled_v1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.FeatureScatter.png")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.FeatureScatter.png")
+
+
+plot1 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 + plot2
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.png")
 ```
 
 
 Filter based on features.
 cells being filtered due to mito percent: 
 ```{r}
-sum(emb.GFPpooled$percent.mt > 50)/ length(emb.GFPpooled$percent.mt)
-emb.GFPpooled <- subset(emb.GFPpooled, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
+sum(emb.GFPpooled_v1$percent.mt > 50)/ length(emb.GFPpooled_v1$percent.mt)
+emb.GFPpooled_v1 <- subset(emb.GFPpooled_v1, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
+
+
+sum(emb.GFPpooled_v2$percent.mt > 50)/ length(emb.GFPpooled_v2$percent.mt)
+emb.GFPpooled_v2 <- subset(emb.GFPpooled_v2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
 
 
 Visualize after filtering
 ```{r}
-VlnPlot(emb.GFPpooled, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.VlnPlot.filt.png")
+VlnPlot(emb.GFPpooled_v1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.VlnPlot.filt.png")
 
-FeatureScatter(emb.GFPpooled, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.FeatureScatter.filt.png")
+FeatureScatter(emb.GFPpooled_v1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.FeatureScatter.filt.png")
+
+
+
+VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.filt.png")
+
+FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.filt.png")
 ```
 
 ```{r}
-view(emb.GFPpooled@meta.data)
-hist(emb.GFPpooled$nFeature_RNA)
-hist(emb.GFPpooled$nCount_RNA)
+view(emb.GFPpooled_v1@meta.data)
+hist(emb.GFPpooled_v1$nFeature_RNA)
+hist(emb.GFPpooled_v1$nCount_RNA)
 
-view(emb.GFPpooled@assays$RNA$counts)
-exp_matrix <- as.matrix(emb.GFPpooled@assays$RNA$counts)
+view(emb.GFPpooled_v1@assays$RNA$counts)
+exp_matrix <- as.matrix(emb.GFPpooled_v1@assays$RNA$counts)
 gene_express_per_cell <- rowSums(exp_matrix)
 genes_express_only_once <- sum(gene_express_per_cell==1)
+
+
+view(emb.GFPpooled_v2@meta.data)
+hist(emb.GFPpooled_v2$nFeature_RNA)
+hist(emb.GFPpooled_v2$nCount_RNA)
+
+view(emb.GFPpooled_v2@assays$RNA$counts)
+exp_matrix1 <- as.matrix(emb.GFPpooled_v2@assays$RNA$counts)
+gene_express_per_cell1 <- rowSums(exp_matrix1)
+genes_express_only_once1 <- sum(gene_express_per_cell1==1)
 ```
 
 # Normalize the data
@@ -253,22 +316,31 @@ By default, we employ a global-scaling normalization method "LogNormalize" that 
 Normalized values are stored in emb.GFPpooled[["RNA]]@data
 
 ```{r}
-emb.GFPpooled <- NormalizeData(emb.GFPpooled, normalization.method = "LogNormalize", scale.factor = 10000)
+emb.GFPpooled_v1 <- NormalizeData(emb.GFPpooled_v1, normalization.method = "LogNormalize", scale.factor = 10000)
+
+emb.GFPpooled_v2 <- NormalizeData(emb.GFPpooled_v2, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
 
 
 # Feature selection
 Identify highly variable features to focus on in downstream analysis
 ```{r}
-emb.GFPpooled <- FindVariableFeatures(emb.GFPpooled, selection.method = "vst", nfeatures = 2000)
+emb.GFPpooled_v1 <- FindVariableFeatures(emb.GFPpooled_v1, selection.method = "vst", nfeatures = 2000)
+
+emb.GFPpooled_v2 <- FindVariableFeatures(emb.GFPpooled_v2, selection.method = "vst", nfeatures = 2000)
 
 # Identify the 10 most highly variable genes
-top10 <- head(VariableFeatures(emb.GFPpooled), 10)
+top10 <- head(VariableFeatures(emb.GFPpooled_v1), 10)
+top10_1 <- head(VariableFeatures(emb.GFPpooled_v2), 10)
 
 # plot variable features with and without labels
-plot1 <- VariableFeaturePlot(emb.GFPpooled)
+plot1 <- VariableFeaturePlot(emb.GFPpooled_v1)
 LabelPoints(plot = plot1, points = top10, repel = TRUE)
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled.VarFeatures.png")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.VarFeatures.png")
+
+plot1 <- VariableFeaturePlot(emb.GFPpooled_v2)
+LabelPoints(plot = plot1, points = top10_1, repel = TRUE)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VarFeatures.png")
 ```
 
 
@@ -278,12 +350,12 @@ Shifts the expression of each gene, so that the mean expression across cells is 
 Scales the expression of each gene, so that the variance across cells is 1. 
 This gives equal weight in downstream analysis, so that highly expressed genes dont dominate. 
 ```{r}
-all.genes <- rownames(emb.GFPpooled)
-emb.GFPpooled <- ScaleData(emb.GFPpooled, features = all.genes)
+all.genes <- rownames(emb.GFPpooled_v1)
+emb.GFPpooled_v1 <- ScaleData(emb.GFPpooled_v1, features = all.genes)
 
 
-all.genes_A <- rownames(emb.ALLpooled)
-emb.ALLpooled <- ScaleData(emb.ALLpooled, features = all.genes_A)
+all.genes_1 <- rownames(emb.GFPpooled_v2)
+emb.GFPpooled_v2 <- ScaleData(emb.GFPpooled_v2, features = all.genes_1)
 ```
 
 
@@ -291,36 +363,51 @@ emb.ALLpooled <- ScaleData(emb.ALLpooled, features = all.genes_A)
 perform PCA on the scaled data. 
 By default, only the previously determined vairable features are used as input. 
 ```{r}
-emb.GFPpooled <- RunPCA(emb.GFPpooled, features = VariableFeatures(object = emb.GFPpooled))
+emb.GFPpooled_v1 <- RunPCA(emb.GFPpooled_v1, features = VariableFeatures(object = emb.GFPpooled_v1))
 
 
-emb.ALLpooled <- RunPCA(emb.ALLpooled, features = VariableFeatures(object = emb.ALLpooled))
+emb.GFPpooled_v2 <- RunPCA(emb.GFPpooled_v2, features = VariableFeatures(object = emb.GFPpooled_v2))
 ```
 
 Examine and visualize PCA results a few different ways
 ```{r}
-print(emb.GFPpooled[["pca"]], dims = 1:5, nfeatures = 5)
+print(emb.GFPpooled_v1[["pca"]], dims = 1:5, nfeatures = 5)
+
+print(emb.GFPpooled_v2[["pca"]], dims = 1:5, nfeatures = 5)
 ```
 
 ```{r}
 # top genes associated with reduction components
-VizDimLoadings(emb.GFPpooled, dims = 1:2, reduction = "pca")
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.DimLoadings.png")
+VizDimLoadings(emb.GFPpooled_v1, dims = 1:2, reduction = "pca")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.DimLoadings.png")
+
+
+VizDimLoadings(emb.GFPpooled_v2, dims = 1:2, reduction = "pca")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimLoadings.png")
 ```
 
 ```{r}
-DimPlot(emb.GFPpooled, reduction = "pca")
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.DimPlot.png")
+DimPlot(emb.GFPpooled_v1, reduction = "pca")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.DimPlot.png")
+
+DimPlot(emb.GFPpooled_v2, reduction = "pca")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.png")
 ```
 
 ```{r}
-DimHeatmap(emb.GFPpooled, dims = 1, cells = 500, balanced = TRUE)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap1.png")
+DimHeatmap(emb.GFPpooled_v1, dims = 1, cells = 500, balanced = TRUE)
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.HeatMap1.png")
+
+DimHeatmap(emb.GFPpooled_v2, dims = 1, cells = 500, balanced = TRUE)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1.png")
 ```
 
 ```{r}
-DimHeatmap(emb.GFPpooled, dims = 1:6, cells = 500, balanced = TRUE)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap1-6.png")
+DimHeatmap(emb.GFPpooled_v1, dims = 1:6, cells = 500, balanced = TRUE)
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.HeatMap1-6.png")
+
+DimHeatmap(emb.GFPpooled_v2, dims = 1:6, cells = 500, balanced = TRUE)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1-6.png")
 ```
 
 
@@ -329,34 +416,33 @@ To overcome the extensive technical noise in any single feature for scRNA-seq da
 
 Seurat implements a resampling test inspired by the JackStraw procedure. We randomly permute a subset of the data (1% by default) and rerun PCA, constructing a ‘null distribution’ of feature scores, and repeat this procedure. We identify ‘significant’ PCs as those who have a strong enrichment of low p-value features
 ```{r}
-emb.GFPpooled <- JackStraw(emb.GFPpooled, num.replicate = 100)
-emb.GFPpooled <- ScoreJackStraw(emb.GFPpooled, dims = 1:20)
+emb.GFPpooled_v1 <- JackStraw(emb.GFPpooled_v1, num.replicate = 100)
+emb.GFPpooled_v1 <- ScoreJackStraw(emb.GFPpooled_v1, dims = 1:20)
 
 
-
-emb.ALLpooled <- JackStraw(emb.ALLpooled, num.replicate = 100)
-emb.ALLpooled <- ScoreJackStraw(emb.ALLpooled, dims = 1:20)
+emb.GFPpooled_v2 <- JackStraw(emb.GFPpooled_v2, num.replicate = 100)
+emb.GFPpooled_v2 <- ScoreJackStraw(emb.GFPpooled_v2, dims = 1:20)
 ```
 
 The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
 ```{r}
-JackStrawPlot(emb.GFPpooled, dims = 1:20)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.JackStrawPlot.png")
+JackStrawPlot(emb.GFPpooled_v1, dims = 1:20)
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.JackStrawPlot.png")
 
 
-JackStrawPlot(emb.ALLpooled, dims = 1:20)
-ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.JackStrawPlot.png")
+JackStrawPlot(emb.GFPpooled_v2, dims = 1:20)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.JackStrawPlot.png")
 ```
 
 
 An alternative heuristic method generates an ‘Elbow plot’: a ranking of principle components based on the percentage of variance explained by each one.
 ```{r}
-ElbowPlot(emb.GFPpooled)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ElbowPlot.png")
+ElbowPlot(emb.GFPpooled_v1)
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.ElbowPlot.png")
 
 
-ElbowPlot(emb.ALLpooled)
-ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.ElbowPlot.png")
+ElbowPlot(emb.GFPpooled_v2)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ElbowPlot.png")
 ```
 
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
@@ -369,100 +455,183 @@ Seurat first constructs a KNN graph based on the euclidean distance in PCA space
 
 To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
 ```{r}
-emb.GFPpooled <- FindNeighbors(emb.GFPpooled, dims = 1:20)
-emb.ALLpooled <- FindNeighbors(emb.ALLpooled, dims = 1:20)
+emb.GFPpooled_v1 <- FindNeighbors(emb.GFPpooled_v1, dims = 1:20)
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:20)
 
 # deviation form original seurat pipeline
 # generate a vector of different resolutions to see which one performs best 
-emb.GFPpooled.clust <- FindClusters(
-  object = emb.GFPpooled,
+emb.GFPpooled_v1.clust <- FindClusters(
+  object = emb.GFPpooled_v1,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
   dims.use = 1:20,
   save.SNN = TRUE)
 
 
-emb.ALLpooled.clust <- FindClusters(
-  object = emb.ALLpooled,
+emb.GFPpooled_v2.clust <- FindClusters(
+  object = emb.GFPpooled_v2,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
   dims.use = 1:20,
   save.SNN = TRUE)
 
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
-clustree(emb.GFPpooled.clust, prefix = "RNA_snn_res.")
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Clustree.png")
+clustree(emb.GFPpooled_v1.clust, prefix = "RNA_snn_res.")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.Clustree.png")
 
 
-clustree(emb.ALLpooled.clust, prefix = "RNA_snn_res.")
-ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.Clustree.png")
+clustree(emb.GFPpooled_v2.clust, prefix = "RNA_snn_res.")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.Clustree.png")
 
 # can also see how the different resolutions look like this
-DimPlot(emb.GFPpooled.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
+DimPlot(emb.GFPpooled_v1.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
 
 # now choose the appropriate resolution for the given dimensions using the Clustree data
-emb.GFPpooled <- FindClusters(emb.GFPpooled, resolution = 1.2)
-emb.ALLpooled <- FindClusters(emb.ALLpooled, resolution = 1.2)
+emb.GFPpooled_v1 <- FindClusters(emb.GFPpooled_v1, resolution = 1.2, cluster.name = "unintegrated_clusters")
+
+emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
 ```
 
 # Run non-linear dimensional reduction (UMAP or tSNE)
 Visualize and explore data with UMAP or tSNE.
 The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
 ```{r}
-emb.GFPpooled <- RunUMAP(emb.GFPpooled, dims = 1:20)
-emb.ALLpooled <- RunUMAP(emb.ALLpooled, dims = 1:20)
+emb.GFPpooled_v1 <- RunUMAP(emb.GFPpooled_v1, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
+emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
 ```
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
-DimPlot(emb.GFPpooled, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 9, pt.size = 4) + 
+DimPlot(emb.GFPpooled_v1, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 3, pt.size = 3) + 
   theme(axis.title.x = element_text(size = 20),
         axis.ticks.x = element_line(size = 6),
         axis.title.y = element_text(size = 20),
         axis.ticks.y = element_line(size = 6),
         legend.text = element_text(size = 20))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.UMAP.png")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.UMAP.unint.png")
 
 
-DimPlot(emb.ALLpooled, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 3, pt.size = 1) + 
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 3, pt.size = 3) + 
   theme(axis.title.x = element_text(size = 20),
         axis.ticks.x = element_line(size = 6),
         axis.title.y = element_text(size = 20),
         axis.ticks.y = element_line(size = 6),
         legend.text = element_text(size = 20))
-ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.UMAP.png")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.png")
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.png")
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.rep.png")
 ```
 
+
+
+# Perform integration 
+Aims to return a single dimensional reduction that captures the shared sources of variance across multiple layers, so that cells in a similar biological state will cluster. The method returns a dimensional reduction (i.e. integrated.cca) which can be used for visualization and unsupervised clustering analysis. 
+
+Anchor-based CCA integration
+```{r}
+emb.GFPpooled_v1 <- IntegrateLayers(object = emb.GFPpooled_v1, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca",
+    verbose = FALSE)
+
+# re-join layers after integration
+emb.GFPpooled_v1[["RNA"]] <- JoinLayers(emb.GFPpooled_v1[["RNA"]])
+
+emb.GFPpooled_v1 <- FindNeighbors(emb.GFPpooled_v1, reduction = "integrated.cca", dims = 1:20)
+emb.GFPpooled_v1 <- FindClusters(emb.GFPpooled_v1, resolution = 1.2, cluster.name = "cca_clusters")
+
+emb.GFPpooled_v1 <- RunUMAP(emb.GFPpooled_v1, dims = 1:20, reduction = "integrated.cca", reduction.name = "umap.cca")
+
+DimPlot(emb.GFPpooled_v1, reduction = "umap.cca", group.by = c("rep_group", "seurat_clusters"))
+
+DimPlot(emb.GFPpooled_v1, reduction = "umap.cca", split.by = "rep_group")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.UMAP.int.rep.png")
+```
+```{r}
+emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca",
+    verbose = FALSE)
+
+# re-join layers after integration
+emb.GFPpooled_v2[["RNA"]] <- JoinLayers(emb.GFPpooled_v2[["RNA"]])
+
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:20)
+emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "cca_clusters")
+
+emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "integrated.cca", reduction.name = "umap.cca")
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", group.by = c("rep_group", "seurat_clusters"))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.png")
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", split.by = "rep_group")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.rep.png")
+```
+
+# Identify conserved cell type markers across conditions
+```{r}
+#Idents(emb.GFPpooled_v1) <- "seurat_clusters"
+#head(Idents(emb.GFPpooled_v1))
+
+#conserved_markers <- FindConservedMarkers(emb.GFPpooled_v1, ident.1=6, grouping.var = "rep_group")
+
+#view(conserved_markers)
+```
+```{r}
+#Idents(emb.GFPpooled_v2) <- "seurat_annotations"
+```
+
+
+---
 
 # Find differentially expressed features (cluster biomarkers)
 Find markers that define clusters via differential expression. By default, Seurat identifies positive and negative markers of a single cluster compared to all other cells. You can do for all clusters, you can test groups of clusters vs. each other, or against all cells. 
 
 The min.pct argument requires a feature to be detected at a minimum percentage in either of the two groups of cells, and the thresh.test argument requires a feature to be differentially expressed (on average) by some amount between the two groups. max.cells.per.ident can also be set and will downsample each identity class to have no more cells than whatever this is set to. 
 ```{r}
-emb.GFPpooled.markers <- FindAllMarkers(emb.GFPpooled, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+emb.GFPpooled_v2.markers <- FindAllMarkers(emb.GFPpooled_v2, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
-emb.GFPpooled.markers %>% 
+emb.GFPpooled_v2.markers %>% 
   group_by(cluster) %>% filter(p_val_adj < .01) %>%
   slice_max(n = 2, order_by = avg_log2FC) 
 
-write.csv(emb.GFPpooled.markers,"./Seurat_output/GFP_pooled/emb_GFPpooled_markers.csv", row.names = TRUE)
-
-
-
-emb.ALLpooled.markers <- FindAllMarkers(emb.ALLpooled, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+write.csv(emb.GFPpooled_v2.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2_markers.csv", row.names = TRUE)
 ```
 
 ```{r}
-emb.GFPpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
+emb.GFPpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
 # Erin wants to see the smiFISH targets in the heat map as well
 quartz(width = 20, height = 10)
-DoHeatmap(emb.GFPpooled, features = c(top2$gene, "clec-56", "pbo-4", "C14C6.5"), raster=F) + 
+DoHeatmap(emb.GFPpooled_v2, features = c(top2$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))          
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.HeatMap-top2.png")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap-top2.png")
+
+# RNAi 
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), ncol = 3)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.rnai.png")
+
+#intestine
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt-7", "end-1", "acp-2", "ges-1"), ncol = 2)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.intestine.png")
+
+# germline
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("glh-1", "chs-1"))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.germ.png")
+
+# neuron
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("hlh-2", "rab-3"))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.neuron.png")
+
+# muscle
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("myo-2", "myo-3"))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.muscle.png")
 
 
+# early intestine
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("end-1", "acp-2", "ugt-14"))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.earlyint.png")
 #-------------------- 
 
 quartz(width = 10, height = 4)
