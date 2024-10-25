@@ -12,6 +12,8 @@ set -e
 
 module purge
 
+export PATH="/pl/active/onishimura_lab/PROJECTS/JessicaH/scRNAseq_mixed_stage_embryos_2024/cellranger-8.0.1:$PATH"
+
 source /curc/sw/anaconda3/latest 
 
 

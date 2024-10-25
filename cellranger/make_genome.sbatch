@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 #SBATCH --nodes=1
-#SBATCH --ntasks=12
-#SBATCH --time=01:00:00
+#SBATCH --ntasks=24
+#SBATCH --time=02:00:00
 #SBATCH --partition=amilan
-#SBATCH --job-name=filter_gtf
+#SBATCH --job-name=make_genome
 #SBATCH --output=%x.%j.log
 
- 
+
 set -e
 
 module purge
@@ -20,13 +20,13 @@ conda activate scRNAseq
 
 # script
 
-cmd="cellranger mkgtf \
-Caenorhabditis_elegans.WBcel235.112.gtf \
-Caenorhabditis_elegans.WBcel235.112.filtered.gtf \
---attribute=gene_biotype:protein_coding"
+cmd="cellranger mkref \
+--genome=Caenorhabditis_elegans_genome \
+--fasta=Caenorhabditis_elegans.WBcel235.dna.toplevel.fa \
+--genes=Caenorhabditis_elegans.WBcel235.112.filtered.gtf 
+"
 
 echo $cmd
 eval $cmd
-
 
 
