@@ -65,10 +65,6 @@ Non-linear dimensional reduction (UMAP/t-SNE)
 
 # Load the data
 ```{r}
-#emb.GFPrep1and2.data <- Read10X_h5("./cellranger/GFP_rep1and2/filtered_feature_bc_matrix.h5")
-
-#emb.GFPrep3and4.data <- Read10X_h5("./cellranger/GFP_rep3and4/filtered_feature_bc_matrix.h5")
-
 emb.GFPpooled_v1.data <- Read10X_h5("./cellranger/all_GFP_v1/filtered_feature_bc_matrix.h5")
 
 emb.GFPpooled_v2.data <- Read10X_h5("./cellranger/all_GFP_v2/filtered_feature_bc_matrix.h5")
