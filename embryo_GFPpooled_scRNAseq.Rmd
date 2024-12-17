@@ -232,7 +232,7 @@ emb.GFPpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled_v2, featu
 
 Visualize QC metrics as a violin plot
 ```{r}
-VlnPlot(emb.GFPpooled_v1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3) 
+VlnPlot(emb.GFPpooled_v1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.VlnPlot.png")
 
 
@@ -498,7 +498,7 @@ emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "pca", re
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
-DimPlot(emb.GFPpooled_v1, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 3, pt.size = 3) + 
+DimPlot(emb.GFPpooled_v1, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 3, pt.size = 1) + 
   theme(axis.title.x = element_text(size = 20),
         axis.ticks.x = element_line(size = 6),
         axis.title.y = element_text(size = 20),
@@ -507,7 +507,7 @@ DimPlot(emb.GFPpooled_v1, reduction = "umap.unintegrated", group.by = c("rep_gro
 ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.UMAP.unint.png")
 
 
-DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 3, pt.size = 3) + 
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 3, pt.size = 1) + 
   theme(axis.title.x = element_text(size = 20),
         axis.ticks.x = element_line(size = 6),
         axis.title.y = element_text(size = 20),
