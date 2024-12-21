@@ -525,7 +525,8 @@ ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.rep.png")
 
 
 # Perform integration 
-Aims to return a single dimensional reduction that captures the shared sources of variance across multiple layers, so that cells in a similar biological state will cluster. The method returns a dimensional reduction (i.e. integrated.cca) which can be used for visualization and unsupervised clustering analysis. 
+Aims to return a single dimensional reduction that captures the shared sources of variance across multiple layers, so that cells in a similar biological state will cluster. The method returns a dimensional reduction (i.e. integrated.cca, harmony) which can be used for visualization and unsupervised clustering analysis. 
+
 
 Anchor-based CCA integration
 ```{r}
@@ -543,7 +544,7 @@ emb.GFPpooled_v1 <- RunUMAP(emb.GFPpooled_v1, dims = 1:20, reduction = "integrat
 DimPlot(emb.GFPpooled_v1, reduction = "umap.cca", group.by = c("rep_group", "seurat_clusters"))
 
 DimPlot(emb.GFPpooled_v1, reduction = "umap.cca", split.by = "rep_group")
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.UMAP.int.rep.png")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.UMAP.int.cca.rep.png")
 ```
 ```{r}
 emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca",
@@ -558,11 +559,54 @@ emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.nam
 emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "integrated.cca", reduction.name = "umap.cca")
 
 DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", group.by = c("rep_group", "seurat_clusters"))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.png")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.cca.png")
 
 DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", split.by = "rep_group")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.rep.png")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.cca.rep.png")
 ```
+
+
+Harmony
+```{r}
+#library(harmony)
+```
+```{r}
+emb.GFPpooled_v1 <- IntegrateLayers(object = emb.GFPpooled_v1, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
+    verbose = FALSE)
+
+# re-join layers after integration
+emb.GFPpooled_v1[["RNA"]] <- JoinLayers(emb.GFPpooled_v1[["RNA"]])
+
+emb.GFPpooled_v1 <- FindNeighbors(emb.GFPpooled_v1, reduction = "harmony", dims = 1:20)
+emb.GFPpooled_v1 <- FindClusters(emb.GFPpooled_v1, resolution = 1.2, cluster.name = "harmony_clusters")
+
+emb.GFPpooled_v1 <- RunUMAP(emb.GFPpooled_v1, dims = 1:20, reduction = "harmony", reduction.name = "umap.harmony")
+
+DimPlot(emb.GFPpooled_v1, reduction = "umap.harmony", group.by = c("rep_group", "seurat_clusters"))
+
+DimPlot(emb.GFPpooled_v1, reduction = "umap.harmony", split.by = "rep_group")
+ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.UMAP.int.harmony.rep.png")
+```
+```{r}
+emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
+    verbose = FALSE)
+
+# re-join layers after integration
+emb.GFPpooled_v2[["RNA"]] <- JoinLayers(emb.GFPpooled_v2[["RNA"]])
+
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "harmony", dims = 1:20)
+emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
+
+emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "harmony", reduction.name = "umap.harmony")
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "seurat_clusters"), pt.size = 1)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.png")
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.rep.png")
+```
+
+
 
 # Identify conserved cell type markers across conditions
 ```{r}
@@ -597,98 +641,99 @@ write.csv(emb.GFPpooled_v2.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2_
 ```{r}
 emb.GFPpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
+emb.GFPpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=1, wt=avg_log2FC) -> top1
+
 # Erin wants to see the smiFISH targets in the heat map as well
 quartz(width = 20, height = 10)
-DoHeatmap(emb.GFPpooled_v2, features = c(top2$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
+DoHeatmap(emb.GFPpooled_v2, features = c(top1$gene), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))          
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap-top2.png")
+        legend.text = element_text(size = 14))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap-top1.png")
+
+quartz(width = 20, height = 10)
+DoHeatmap(emb.GFPpooled_v2, features = c(top1$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
+  theme(axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap-top1.smifish.png")
+
+quartz(width = 20, height = 10)
+DoHeatmap(emb.GFPpooled_v2, features = c("clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
+  theme(axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap-smiFISH.png")
+
+
 
 # RNAi 
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), ncol = 3)
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), ncol = 3)
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.rnai.png")
 
 #intestine
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt-7", "end-1", "acp-2", "ges-1"), ncol = 2)
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "end-1", "acp-2", "ges-1"), ncol = 2)
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.intestine.png")
 
 # germline
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("glh-1", "chs-1"))
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("glh-1", "chs-1"))
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.germ.png")
 
 # neuron
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("hlh-2", "rab-3"))
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("hlh-2", "rab-3"))
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.neuron.png")
 
 # muscle
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("myo-2", "myo-3"))
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("myo-2", "myo-3"))
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.muscle.png")
 
 
 # early intestine
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("end-1", "acp-2", "ugt-14"))
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("end-1", "acp-2", "ugt-14"))
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.earlyint.png")
 #-------------------- 
 
 quartz(width = 10, height = 4)
-FeaturePlot(emb.GFPpooled, features = c("elt-2","elt-7",'ges-1',"end-1","acp-2","C10C5.4"),raster=F, ncol = 3) + 
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("elt-2","elt-7",'ges-1',"end-1","acp-2","C10C5.4"),raster=F, ncol = 3) + 
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 14),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-PosCtrls.png")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot-PosCtrls.png")
 
 
 
 quartz(width = 10, height = 8)
-FeaturePlot(emb.GFPpooled, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F, ncol = 2) +
+FeaturePlot(emb.GFPpooled_v2, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F, ncol = 2) +
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 14),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-NegCtrls.png")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot-NegCtrls.png")
 
 
 #smiFISH targets
 quartz(width = 5, height = 8)
-FeaturePlot(emb.GFPpooled, features = c("C14C6.5","clec-56", "pbo-4"),raster=F, ncol = 1) +
+FeaturePlot(emb.GFPpooled_v2, features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"),raster=F, ncol = 3) +
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 14),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.FeaturePlot-FISH.png")
-
-
-
-
-
-emb.ALLpooled.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
-
-quartz(width = 12, height = 4)
-FeaturePlot(emb.ALLpooled, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 3) + 
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.ALLpooled.FeaturePlot-PostCtrls.png")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot-FISH.png")
 ```
 
 
 ```{r}
 #how many cells are expressing these markers of other tissues?
-view(emb.GFPpooled@assays$RNA$data)
+view(emb.GFPpooled_v2@assays$RNA$data)
 
-total_cells_expressing_gene <- sum(emb.GFPpooled@assays$RNA$data["hlh-2", ] > 0)
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2@assays$RNA$data["hlh-2", ] > 0)
 print(total_cells_expressing_gene)
 
-total_cells_expressing_gene <- sum(emb.GFPpooled@assays$RNA$data["myo-3", ] > 0)
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2@assays$RNA$data["myo-3", ] > 0)
 print(total_cells_expressing_gene)
 
-total_cells_expressing_gene <- sum(emb.GFPpooled@assays$RNA$data["rab-3", ] > 0)
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2@assays$RNA$data["rab-3", ] > 0)
 print(total_cells_expressing_gene)
 ```
 
@@ -706,26 +751,26 @@ phenotype_df <- tea$fetch_dictionary("phenotype")
 go_df <- tea$fetch_dictionary("go")
 
 #set up go_df to represent only our background genes 
-view(go_df) #12,964 rows
-dim(go_df)
+#view(go_df) 
+#dim(go_df)
 
-go_df <- go_df %>% rename(WBGeneID = wbid)
-go_df_background <- go_df %>% filter(WBGeneID %in% emb.ALLpooled.markers$WBGeneID)
-go_df_background <- go_df_background %>% rename(wbid = WBGeneID)
+#go_df <- go_df %>% rename(WBGeneID = wbid)
+#go_df_background <- go_df %>% filter(WBGeneID %in% emb.ALLpooled.markers$WBGeneID)
+#go_df_background <- go_df_background %>% rename(wbid = WBGeneID)
 
 
-tissue_df <- tissue_df %>% rename(WBGeneID = wbid)
-tissue_df_background <- tissue_df %>% filter(WBGeneID %in% emb.ALLpooled.markers$WBGeneID)
-tissue_df_background <- tissue_df_background %>% rename(wbid = WBGeneID)
+#tissue_df <- tissue_df %>% rename(WBGeneID = wbid)
+#tissue_df_background <- tissue_df %>% filter(WBGeneID %in% emb.ALLpooled.markers$WBGeneID)
+#tissue_df_background <- tissue_df_background %>% rename(wbid = WBGeneID)
 ```
 
 ```{r}
-emb.GFPpooled.markers <- emb.GFPpooled.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
-emb.GFPpooled.markers <- emb.GFPpooled.markers %>% rename(WBGeneID = wbps_gene_id)
+emb.GFPpooled_v2.markers <- emb.GFPpooled_v2.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
+emb.GFPpooled_v2.markers <- emb.GFPpooled_v2.markers %>% rename(WBGeneID = wbps_gene_id)
 ```
 
 ```{r}
-clusters <- unique(emb.GFPpooled.markers$cluster)
+clusters <- unique(emb.GFPpooled_v2.markers$cluster)
 
 my_tea_analysis <- function(input_df, tea_dict){
   tea_df <- data.frame()
@@ -773,174 +818,170 @@ my_ontology_plot <- function(input_df, xlabel){
 #filter(Q.value < 0.001,  Observed > 50)
 
 quartz(width = 10, height = 20)
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
+my_ontology_plot(my_tea_analysis(emb.GFPpooled_v2.markers %>% filter(p_val_adj < 0.01, avg_log2FC > 2), tissue_df), "Tissue Ontology")
 
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_T.png", limitsize = FALSE)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.GO_T.png", limitsize = FALSE)
 ```
 
 ```{r}
 #filter(Q.value < 0.001,  Observed > 10)
 
 quartz(width = 60, height = 40)
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
-
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_G.png", limitsize = FALSE)
+my_ontology_plot(my_tea_analysis(emb.GFPpooled_v2.markers %>% filter(p_val_adj < 0.01, avg_log2FC > 2), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.GO_G.png", limitsize = FALSE)
 ```
 
 ```{r}
-#filter(Q.value < 0.001,  Observed > 10)
-
-quartz(width = 60, height = 40)
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), go_df_background), "Gene Ontology") + theme(text = element_text(size = 30))
-
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_G_background.png", limitsize = FALSE)
+# #filter(Q.value < 0.001,  Observed > 10)
+# 
+# quartz(width = 60, height = 40)
+# my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), go_df_background), "Gene Ontology") + theme(text = element_text(size = 30))
+# 
+# ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_G_background.png", limitsize = FALSE)
 ```
-
 ```{r}
-#filter(Q.value < 0.001,  Observed > 10)
-
-quartz(width = 60, height = 100)
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), tissue_df_background), "Gene Ontology") + theme(text = element_text(size = 30))
-
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_T_background.png", limitsize = FALSE)
+# #filter(Q.value < 0.001,  Observed > 10)
+# 
+# quartz(width = 60, height = 100)
+# my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), tissue_df_background), "Gene Ontology") + theme(text = element_text(size = 30))
+# 
+# ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_T_background.png", limitsize = FALSE)
 ```
-
 
 # plot genes of interest
 From John Murray dataset 
     - intestine_anterior: ZC204.12, cpr-1, ceh-37
     - intestine_middle_and_posterior: irg-7, pal-1, cpr-1, ceh-37
     - intestine_far_posterior: irg-7, faah-1, pbo-4, psa-3
-
 ```{r}
-# top marker gene for each cluster
-FeaturePlot(emb.GFPpooled, pt.size = 0.1,
-            features = (emb.GFPpooled.markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC))$gene)
+# # top marker gene for each cluster
+# FeaturePlot(emb.GFPpooled, pt.size = 0.1,
+#             features = (emb.GFPpooled.markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC))$gene)
 ```
 
 ```{r}
-# genes from murray data
-# intestine_anterior
-quartz(width = 5, height = 10)
-FeaturePlot(emb.GFPpooled, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, ncol = 1) +
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Anterior.png") 
-
-# intestine_middle_and_posterior
-quartz(width = 5, height = 10)
-FeaturePlot(emb.GFPpooled, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, ncol = 1) + 
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Mid.png")
-
-# intestine_far_posterior
-quartz(width = 5, height = 10)
-FeaturePlot(emb.GFPpooled, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 1) + 
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Posterior.png")
+# # genes from murray data
+# # intestine_anterior
+# quartz(width = 5, height = 10)
+# FeaturePlot(emb.GFPpooled, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, ncol = 1) +
+#   theme(axis.title.x = element_text(size = 12),
+#         axis.text.x = element_text(size = 14),
+#         axis.title.y = element_text(size = 12),
+#         axis.text.y = element_text(size = 14),
+#         legend.text = element_text(size = 14))
+# ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Anterior.png") 
+# 
+# # intestine_middle_and_posterior
+# quartz(width = 5, height = 10)
+# FeaturePlot(emb.GFPpooled, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, ncol = 1) + 
+#   theme(axis.title.x = element_text(size = 12),
+#         axis.text.x = element_text(size = 14),
+#         axis.title.y = element_text(size = 12),
+#         axis.text.y = element_text(size = 14),
+#         legend.text = element_text(size = 14))
+# ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Mid.png")
+# 
+# # intestine_far_posterior
+# quartz(width = 5, height = 10)
+# FeaturePlot(emb.GFPpooled, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 1) + 
+#   theme(axis.title.x = element_text(size = 12),
+#         axis.text.x = element_text(size = 14),
+#         axis.title.y = element_text(size = 12),
+#         axis.text.y = element_text(size = 14),
+#         legend.text = element_text(size = 14))
+# ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.Murray-Posterior.png")
 ```
-
 
 ```{r}
-# marker genes we FISHed for
-quartz(width = 5, height = 10)
-FeaturePlot(emb.GFPpooled, features = c('C14C6.5', 'clec-56', 'pbo-4'), raster=F, ncol = 1) + 
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.smiFISH-genes.png")
+# # marker genes we FISHed for
+# quartz(width = 5, height = 10)
+# FeaturePlot(emb.GFPpooled, features = c('C14C6.5', 'clec-56', 'pbo-4'), raster=F, ncol = 1) + 
+#   theme(axis.title.x = element_text(size = 12),
+#         axis.text.x = element_text(size = 14),
+#         axis.title.y = element_text(size = 12),
+#         axis.text.y = element_text(size = 14),
+#         legend.text = element_text(size = 14))
+# ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.smiFISH-genes.png")
 ```
-
-
-
 
 -------------------------------NOT USING RIGHT NOW-----------------------
-# Remove contamination clusters (based on expression of elt-2, elt-7, and ges-1)
-contamination clusters = 3, 8, 10, 11, 12
-
+# Remove contamination clusters
+contamination clusters = 6, 12, 20
 ```{r}
-emb.GFPpooled.specificClusters <- RunUMAP(subset(emb.GFPpooled, idents = c('3','8', '10', '11', '12'), invert = TRUE), dims = 1:8)
-
-DimPlot(emb.GFPpooled.specificClusters, reduction = "umap", label = "TRUE", label.box = TRUE)
+emb.GFPpooled_v2.specificClusters <- RunUMAP(subset(emb.GFPpooled_v2, idents = c('6','12', '20'), invert = TRUE), dims = 1:20)
 ```
-
 # now rerun PCA and re-lcuster 
 ```{r}
-emb.GFPpooled.specificClusters <- RunPCA(emb.GFPpooled.specificClusters, features = VariableFeatures(object = emb.GFPpooled.specificClusters))
+emb.GFPpooled_v2.specificClusters <- RunPCA(emb.GFPpooled_v2.specificClusters, features = VariableFeatures(object = emb.GFPpooled_v2.specificClusters))
 
-DimPlot(emb.GFPpooled.specificClusters, reduction = "pca")
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.DimPlot.png")
+DimPlot(emb.GFPpooled_v2.specificClusters, reduction = "pca")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.DimPlot.png")
 
-ElbowPlot(emb.GFPpooled.specificClusters)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.ElbowPlot.png")
+ElbowPlot(emb.GFPpooled_v2.specificClusters)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.ElbowPlot.png")
 ```
-
 ```{r}
 # Choose the number of PCs to use for re-clustering 
-emb.GFPpooled.specificClusters <- FindNeighbors(emb.GFPpooled.specificClusters, dims = 1:8)
+emb.GFPpooled_v2.specificClusters <- FindNeighbors(emb.GFPpooled_v2.specificClusters, dims = 1:7)
 
 # check new clusters with Clustree
-emb.GFPpooled.specificClusters.recluster <- FindClusters(
-  object = emb.GFPpooled.specificClusters,
+emb.GFPpooled_v2.specificClusters.recluster <- FindClusters(
+  object = emb.GFPpooled_v2.specificClusters,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:8,
+  dims.use = 1:7,
   save.SNN = TRUE)
 
-clustree(emb.GFPpooled.specificClusters.recluster, prefix = "RNA_snn_res.")
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Clustree.png")
+clustree(emb.GFPpooled_v2.specificClusters.recluster, prefix = "RNA_snn_res.")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.Clustree.png")
 
-emb.GFPpooled.specificClusters.recluster <- FindClusters(emb.GFPpooled.specificClusters, resolution = 1.2)
+emb.GFPpooled_v2.specificClusters.recluster <- FindClusters(emb.GFPpooled_v2.specificClusters, resolution = 1.2)
 
-emb.GFPpooled.specificClusters.recluster <- RunUMAP(emb.GFPpooled.specificClusters.recluster, dims = 1:8)
+emb.GFPpooled_v2.specificClusters.recluster <- RunUMAP(emb.GFPpooled_v2.specificClusters.recluster, dims = 1:7)
 
-DimPlot(emb.GFPpooled.specificClusters.recluster, reduction = "umap", label = "TRUE", label.box = TRUE, label.size = 9, pt.size = 4) + theme(legend.text = element_text(size = 20))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.UMAP.png")
+DimPlot(emb.GFPpooled_v2.specificClusters.recluster, reduction = "umap", group.by = c("rep_group", "seurat_clusters"), pt.size = 1) + theme(legend.text = element_text(size = 15))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.UMAP.png") 
+
+DimPlot(emb.GFPpooled_v2.specificClusters.recluster, reduction = "umap", split.by = c("rep_group"), pt.size = 1) + theme(legend.text = element_text(size = 15))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.UMAP.rep.png") 
 ```
 
 # Find new marker genes
 ```{r}
 #find markers for every cluster compared to all remaining cells
-emb.GFPpooled.specificClusters.recluster.markers <- FindAllMarkers(emb.GFPpooled.specificClusters.recluster, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+emb.GFPpooled_v2.specificClusters.recluster.markers <- FindAllMarkers(emb.GFPpooled_v2.specificClusters.recluster, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
-emb.GFPpooled.specificClusters.recluster.markers %>% 
+emb.GFPpooled_v2.specificClusters.recluster.markers %>% 
   group_by(cluster) %>%
   slice_max(n = 2, order_by = avg_log2FC)
 
-write.csv(emb.GFPpooled.specificClusters.recluster.markers,"./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.markers.csv", row.names = TRUE)
+write.csv(emb.GFPpooled_v2.specificClusters.recluster.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.markers.csv", row.names = TRUE)
 ```
 
 
 # Validate clusters 
 ```{r}
-emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2_reclust
+emb.GFPpooled_v2.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=1, wt=avg_log2FC) -> top1_reclust
 
+DoHeatmap(emb.GFPpooled_v2.specificClusters.recluster, features = top1_reclust$gene,raster=F) + theme(text = element_text(size = 20))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.HeatMap-top1.png") 
 
-DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top2_reclust$gene,raster=F) + theme(text = element_text(size = 20))
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top2.png")
+DoHeatmap(emb.GFPpooled_v2.specificClusters.recluster, features = c(top1_reclust$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + theme(text = element_text(size = 20))
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.HeatMap-top1.fish.png") 
 
 
 # intestine marker genes
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 2)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot-PostCtrls.png")
-
+FeaturePlot(emb.GFPpooled_v2.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 2)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.FeaturePlot-PostCtrls.png")
 
 # Contamination marker genes: germline (glh-1, chs-1), muscle (myo-2, myo-3), neuron(hlh-2, rab-3)  
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.FeaturePlot-NegCtrls.png")
+FeaturePlot(emb.GFPpooled_v2.specificClusters.recluster, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F, ncol = 2)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.FeaturePlot-NegCtrls.png")
+
+
+# FISH
+FeaturePlot(emb.GFPpooled_v2.specificClusters.recluster, features = c("clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F, ncol = 3)
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.FeaturePlot-FISH.png")
 ```
 
 
