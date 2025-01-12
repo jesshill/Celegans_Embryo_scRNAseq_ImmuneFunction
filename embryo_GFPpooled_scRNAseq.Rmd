@@ -245,12 +245,12 @@ ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.png")
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 ```{r}
-plot1 <- FeatureScatter(emb.GFPpooled_v1, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
-plot2 <- FeatureScatter(emb.GFPpooled_v1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 <- FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
+plot2 <- FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.FeatureScatter.png")
-
-
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.png")
+```
+```{r}
 plot1 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
@@ -261,10 +261,10 @@ ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.png")
 Filter based on features.
 cells being filtered due to mito percent: 
 ```{r}
-sum(emb.GFPpooled_v1$percent.mt > 50)/ length(emb.GFPpooled_v1$percent.mt)
-emb.GFPpooled_v1 <- subset(emb.GFPpooled_v1, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
-
-
+sum(emb.ALLpooled_v2$percent.mt > 50)/ length(emb.ALLpooled_v2$percent.mt)
+emb.ALLpooled_v2 <- subset(emb.ALLpooled_v2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
+```
+```{r}
 sum(emb.GFPpooled_v2$percent.mt > 50)/ length(emb.GFPpooled_v2$percent.mt)
 emb.GFPpooled_v2 <- subset(emb.GFPpooled_v2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
@@ -272,11 +272,11 @@ emb.GFPpooled_v2 <- subset(emb.GFPpooled_v2, subset = nFeature_RNA > 200 & nFeat
 
 Visualize after filtering
 ```{r}
-VlnPlot(emb.GFPpooled_v1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.VlnPlot.filt.png")
+VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.filt.png")
 
-FeatureScatter(emb.GFPpooled_v1, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.FeatureScatter.filt.png")
+FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.filt.png")
 
 
 
