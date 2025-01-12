@@ -65,9 +65,11 @@ Non-linear dimensional reduction (UMAP/t-SNE)
 
 # Load the data
 ```{r}
-emb.GFPpooled_v1.data <- Read10X_h5("./cellranger/all_GFP_v1/filtered_feature_bc_matrix.h5")
+#emb.GFPpooled_v1.data <- Read10X_h5("./cellranger/all_GFP_v1/filtered_feature_bc_matrix.h5")
 
 emb.GFPpooled_v2.data <- Read10X_h5("./cellranger/all_GFP_v2/filtered_feature_bc_matrix.h5")
+
+emb.ALLpooled_v2.data <- Read10X_h5("./cellranger/all_pooled_v2/filtered_feature_bc_matrix.h5")
 ```
 
 
@@ -77,16 +79,16 @@ mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite
 
 genes.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "gene_name"),
-      value = list("caelegprjna13758", rownames(emb.GFPpooled_v1.data)),
+      value = list("caelegprjna13758", rownames(emb.ALLpooled_v2.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
 
 mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes.df$chromosome_name = NULL
 
-c(nrow(genes.df), nrow(emb.GFPpooled_v1.data))
+c(nrow(genes.df), nrow(emb.ALLpooled_v2.data))
 
 # there are genes missing
-nrow(emb.GFPpooled_v1.data)-nrow(genes.df)
+nrow(emb.ALLpooled_v2.data)-nrow(genes.df)
 ```
 ```{r}
 mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
@@ -109,14 +111,14 @@ nrow(emb.GFPpooled_v2.data)-nrow(genes1.df)
 
 There are `r nrow(emb.GFPpooled.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
 ```{r}
-emb.GFPpooled_v1.data.filt <- emb.GFPpooled_v1.data[rownames(emb.GFPpooled_v1.data) %in% genes.df$external_gene_id,]
+emb.ALLpooled_v2.data.filt <- emb.ALLpooled_v2.data[rownames(emb.ALLpooled_v2.data) %in% genes.df$external_gene_id,]
 
 # The two data structures do not have the same order of WBGeneIDs
-identical(rownames(emb.GFPpooled_v1.data.filt), genes.df$external_gene_id)
+identical(rownames(emb.ALLpooled_v2.data.filt), genes.df$external_gene_id)
 
 # Use match to make sure they are in the same order
-identical(rownames(emb.GFPpooled_v1.data.filt),
-          genes.df[match(rownames(emb.GFPpooled_v1.data.filt), genes.df$external_gene_id),]$external_gene_id)
+identical(rownames(emb.ALLpooled_v2.data.filt),
+          genes.df[match(rownames(emb.ALLpooled_v2.data.filt), genes.df$external_gene_id),]$external_gene_id)
 
 # now replace the WBGeneIDs with gene names
 #rownames(emb.GFPpooled.data.filt) <- genes.df[
@@ -125,9 +127,9 @@ identical(rownames(emb.GFPpooled_v1.data.filt),
 #  ,]$external_gene_id
 
 # are there NAs?
-sum(!is.na(rownames(emb.GFPpooled_v1.data.filt)))
+sum(!is.na(rownames(emb.ALLpooled_v2.data.filt)))
 
-head(emb.GFPpooled_v1.data.filt)
+head(emb.ALLpooled_v2.data.filt)
 ```
 ```{r}
 emb.GFPpooled_v2.data.filt <- emb.GFPpooled_v2.data[rownames(emb.GFPpooled_v2.data) %in% genes1.df$external_gene_id,]
@@ -154,7 +156,7 @@ head(emb.GFPpooled_v2.data.filt)
 
 ```{r}
 # extract the cell codes (barcode info with the trailing integer which signifies the order of the samples in the aggregation step)
-cellcodes <- as.data.frame(emb.GFPpooled_v1.data.filt@Dimnames[[2]])
+cellcodes <- as.data.frame(emb.ALLpooled_v2.data.filt@Dimnames[[2]])
 colnames(cellcodes) <- "barcodes"
 rownames(cellcodes) <- cellcodes$barcodes
 cellcodes$rep_group <- ifelse(grepl("-1$", cellcodes$barcodes), "Rep_1", ifelse(grepl("-2$", cellcodes$barcodes), "Rep_2", ifelse(grepl("-3$", cellcodes$barcodes), "Rep_3", "Rep_4")))
@@ -173,9 +175,9 @@ view(cellcodes_1)
 # Set up the Seurat object
 # Initialize the Seurat object with the raw (non-normalized data).
 ```{r}
-emb.GFPpooled_v1 <- CreateSeuratObject(counts = emb.GFPpooled_v1.data.filt, project = "emb.GFPpooled_v1", min.cells = 3, min.features = 200, meta.data = cellcodes)
+emb.ALLpooled_v2 <- CreateSeuratObject(counts = emb.ALLpooled_v2.data.filt, project = "emb.ALLpooled_v2", min.cells = 3, min.features = 200, meta.data = cellcodes)
 
-view(emb.GFPpooled_v1@meta.data)
+view(emb.ALLpooled_v2@meta.data)
 ```
 ```{r}
 emb.GFPpooled_v2 <- CreateSeuratObject(counts = emb.GFPpooled_v2.data.filt, project = "emb.GFPpooled_v2", min.cells = 3, min.features = 200, meta.data = cellcodes_1)
@@ -185,9 +187,10 @@ view(emb.GFPpooled_v2@meta.data)
 
 
 ```{r}
-emb.GFPpooled_v1[["RNA"]] <- split(emb.GFPpooled_v1[["RNA"]], f = emb.GFPpooled_v1$rep_group)
-emb.GFPpooled_v1
-
+emb.ALLpooled_v2[["RNA"]] <- split(emb.ALLpooled_v2[["RNA"]], f = emb.ALLpooled_v2$rep_group)
+emb.ALLpooled_v2
+```
+```{r}
 emb.GFPpooled_v2[["RNA"]] <- split(emb.GFPpooled_v2[["RNA"]], f = emb.GFPpooled_v2$rep_group)
 emb.GFPpooled_v2
 ```
@@ -195,10 +198,10 @@ emb.GFPpooled_v2
 
 ```{r}
 length(unique(genes.df$wbps_gene_id))
-length(unique(rownames(emb.GFPpooled_v1)))
-rownames(emb.GFPpooled_v1)[!(rownames(emb.GFPpooled_v1) %in% genes.df$external_gene_id)]
-
-
+length(unique(rownames(emb.ALLpooled_v2)))
+rownames(emb.ALLpooled_v2)[!(rownames(emb.ALLpooled_v2) %in% genes.df$external_gene_id)]
+```
+```{r}
 length(unique(genes1.df$wbps_gene_id))
 length(unique(rownames(emb.GFPpooled_v2)))
 rownames(emb.GFPpooled_v2)[!(rownames(emb.GFPpooled_v2) %in% genes1.df$external_gene_id)]
@@ -213,8 +216,8 @@ rownames(emb.GFPpooled_v2)[!(rownames(emb.GFPpooled_v2) %in% genes1.df$external_
 
 ```{r}
 # show QC metrics for the first 5 cells 
-view(emb.GFPpooled_v1@meta.data)
-head(emb.GFPpooled_v1@meta.data, 5)
+view(emb.ALLpooled_v2@meta.data)
+head(emb.ALLpooled_v2@meta.data, 5)
 
 view(emb.GFPpooled_v2@meta.data)
 head(emb.GFPpooled_v2@meta.data, 5)
@@ -222,18 +225,18 @@ head(emb.GFPpooled_v2@meta.data, 5)
 
 Mitochondrial genome percentage 
 ```{r}
-mitoIndices = which(rownames(emb.GFPpooled_v1) %in% mitoList)
-emb.GFPpooled_v1[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled_v1, features = mitoIndices)
-
-
+mitoIndices = which(rownames(emb.ALLpooled_v2) %in% mitoList)
+emb.ALLpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.ALLpooled_v2, features = mitoIndices)
+```
+```{r}
 mitoIndices_1 = which(rownames(emb.GFPpooled_v2) %in% mitoList)
 emb.GFPpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled_v2, features = mitoIndices_1)
 ```
 
 Visualize QC metrics as a violin plot
 ```{r}
-VlnPlot(emb.GFPpooled_v1, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.VlnPlot.png")
+VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.png")
 
 
 VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
