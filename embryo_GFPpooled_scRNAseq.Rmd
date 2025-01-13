@@ -277,9 +277,8 @@ ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.filt.png")
 
 FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.filt.png")
-
-
-
+```
+```{r}
 VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.filt.png")
 
@@ -288,16 +287,16 @@ ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.filt.png")
 ```
 
 ```{r}
-view(emb.GFPpooled_v1@meta.data)
-hist(emb.GFPpooled_v1$nFeature_RNA)
-hist(emb.GFPpooled_v1$nCount_RNA)
+view(emb.ALLpooled_v2@meta.data)
+hist(emb.ALLpooled_v2$nFeature_RNA)
+hist(emb.ALLpooled_v2$nCount_RNA)
 
-view(emb.GFPpooled_v1@assays$RNA$counts)
-exp_matrix <- as.matrix(emb.GFPpooled_v1@assays$RNA$counts)
+view(emb.ALLpooled_v2@assays$RNA$counts)
+exp_matrix <- as.matrix(emb.ALLpooled_v2@assays$RNA$counts)
 gene_express_per_cell <- rowSums(exp_matrix)
 genes_express_only_once <- sum(gene_express_per_cell==1)
-
-
+```
+```{r}
 view(emb.GFPpooled_v2@meta.data)
 hist(emb.GFPpooled_v2$nFeature_RNA)
 hist(emb.GFPpooled_v2$nCount_RNA)
@@ -315,8 +314,9 @@ By default, we employ a global-scaling normalization method "LogNormalize" that 
 Normalized values are stored in emb.GFPpooled[["RNA]]@data
 
 ```{r}
-emb.GFPpooled_v1 <- NormalizeData(emb.GFPpooled_v1, normalization.method = "LogNormalize", scale.factor = 10000)
-
+emb.ALLpooled_v2 <- NormalizeData(emb.ALLpooled_v2, normalization.method = "LogNormalize", scale.factor = 10000)
+```
+```{r}
 emb.GFPpooled_v2 <- NormalizeData(emb.GFPpooled_v2, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
 
@@ -324,21 +324,21 @@ emb.GFPpooled_v2 <- NormalizeData(emb.GFPpooled_v2, normalization.method = "LogN
 # Feature selection
 Identify highly variable features to focus on in downstream analysis
 ```{r}
-emb.GFPpooled_v1 <- FindVariableFeatures(emb.GFPpooled_v1, selection.method = "vst", nfeatures = 2000)
+emb.ALLpooled_v2 <- FindVariableFeatures(emb.ALLpooled_v2, selection.method = "vst", nfeatures = 2000)
 
 emb.GFPpooled_v2 <- FindVariableFeatures(emb.GFPpooled_v2, selection.method = "vst", nfeatures = 2000)
 
 # Identify the 10 most highly variable genes
-top10 <- head(VariableFeatures(emb.GFPpooled_v1), 10)
-top10_1 <- head(VariableFeatures(emb.GFPpooled_v2), 10)
+top10_all <- head(VariableFeatures(emb.ALLpooled_v2), 10)
+top10_GFP <- head(VariableFeatures(emb.GFPpooled_v2), 10)
 
 # plot variable features with and without labels
-plot1 <- VariableFeaturePlot(emb.GFPpooled_v1)
-LabelPoints(plot = plot1, points = top10, repel = TRUE)
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.VarFeatures.png")
+plot1 <- VariableFeaturePlot(emb.ALLpooled_v2)
+LabelPoints(plot = plot1, points = top10_all, repel = TRUE)
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VarFeatures.png")
 
 plot1 <- VariableFeaturePlot(emb.GFPpooled_v2)
-LabelPoints(plot = plot1, points = top10_1, repel = TRUE)
+LabelPoints(plot = plot1, points = top10_GFP, repel = TRUE)
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VarFeatures.png")
 ```
 
@@ -349,8 +349,8 @@ Shifts the expression of each gene, so that the mean expression across cells is 
 Scales the expression of each gene, so that the variance across cells is 1. 
 This gives equal weight in downstream analysis, so that highly expressed genes dont dominate. 
 ```{r}
-all.genes <- rownames(emb.GFPpooled_v1)
-emb.GFPpooled_v1 <- ScaleData(emb.GFPpooled_v1, features = all.genes)
+all.genes <- rownames(emb.ALLpooled_v2)
+emb.ALLpooled_v2 <- ScaleData(emb.ALLpooled_v2, features = all.genes)
 
 
 all.genes_1 <- rownames(emb.GFPpooled_v2)
@@ -362,7 +362,7 @@ emb.GFPpooled_v2 <- ScaleData(emb.GFPpooled_v2, features = all.genes_1)
 perform PCA on the scaled data. 
 By default, only the previously determined vairable features are used as input. 
 ```{r}
-emb.GFPpooled_v1 <- RunPCA(emb.GFPpooled_v1, features = VariableFeatures(object = emb.GFPpooled_v1))
+emb.ALLpooled_v2 <- RunPCA(emb.ALLpooled_v2, features = VariableFeatures(object = emb.ALLpooled_v2))
 
 
 emb.GFPpooled_v2 <- RunPCA(emb.GFPpooled_v2, features = VariableFeatures(object = emb.GFPpooled_v2))
@@ -370,15 +370,15 @@ emb.GFPpooled_v2 <- RunPCA(emb.GFPpooled_v2, features = VariableFeatures(object 
 
 Examine and visualize PCA results a few different ways
 ```{r}
-print(emb.GFPpooled_v1[["pca"]], dims = 1:5, nfeatures = 5)
+print(emb.ALLpooled_v2[["pca"]], dims = 1:5, nfeatures = 5)
 
 print(emb.GFPpooled_v2[["pca"]], dims = 1:5, nfeatures = 5)
 ```
 
 ```{r}
 # top genes associated with reduction components
-VizDimLoadings(emb.GFPpooled_v1, dims = 1:2, reduction = "pca")
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.DimLoadings.png")
+VizDimLoadings(emb.ALLpooled_v2, dims = 1:2, reduction = "pca")
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimLoadings.png")
 
 
 VizDimLoadings(emb.GFPpooled_v2, dims = 1:2, reduction = "pca")
