@@ -386,24 +386,24 @@ ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimLoadings.png")
 ```
 
 ```{r}
-DimPlot(emb.GFPpooled_v1, reduction = "pca")
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.DimPlot.png")
+DimPlot(emb.ALLpooled_v2, reduction = "pca")
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimPlot.png")
 
 DimPlot(emb.GFPpooled_v2, reduction = "pca")
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.png")
 ```
 
 ```{r}
-DimHeatmap(emb.GFPpooled_v1, dims = 1, cells = 500, balanced = TRUE)
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.HeatMap1.png")
+DimHeatmap(emb.ALLpooled_v2, dims = 1, cells = 500, balanced = TRUE)
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1.png")
 
 DimHeatmap(emb.GFPpooled_v2, dims = 1, cells = 500, balanced = TRUE)
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1.png")
 ```
 
 ```{r}
-DimHeatmap(emb.GFPpooled_v1, dims = 1:6, cells = 500, balanced = TRUE)
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.HeatMap1-6.png")
+DimHeatmap(emb.ALLpooled_v2, dims = 1:6, cells = 500, balanced = TRUE)
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1-6.png")
 
 DimHeatmap(emb.GFPpooled_v2, dims = 1:6, cells = 500, balanced = TRUE)
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1-6.png")
