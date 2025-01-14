@@ -415,8 +415,8 @@ To overcome the extensive technical noise in any single feature for scRNA-seq da
 
 Seurat implements a resampling test inspired by the JackStraw procedure. We randomly permute a subset of the data (1% by default) and rerun PCA, constructing a ‘null distribution’ of feature scores, and repeat this procedure. We identify ‘significant’ PCs as those who have a strong enrichment of low p-value features
 ```{r}
-emb.GFPpooled_v1 <- JackStraw(emb.GFPpooled_v1, num.replicate = 100)
-emb.GFPpooled_v1 <- ScoreJackStraw(emb.GFPpooled_v1, dims = 1:20)
+emb.ALLpooled_v2 <- JackStraw(emb.ALLpooled_v2, num.replicate = 100)
+emb.ALLpooled_v2 <- ScoreJackStraw(emb.ALLpooled_v2, dims = 1:20)
 
 
 emb.GFPpooled_v2 <- JackStraw(emb.GFPpooled_v2, num.replicate = 100)
@@ -425,8 +425,8 @@ emb.GFPpooled_v2 <- ScoreJackStraw(emb.GFPpooled_v2, dims = 1:20)
 
 The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
 ```{r}
-JackStrawPlot(emb.GFPpooled_v1, dims = 1:20)
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.JackStrawPlot.png")
+JackStrawPlot(emb.ALLpooled_v2, dims = 1:20)
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.JackStrawPlot.png")
 
 
 JackStrawPlot(emb.GFPpooled_v2, dims = 1:20)
