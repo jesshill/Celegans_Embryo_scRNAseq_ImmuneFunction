@@ -41,15 +41,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Load packages
 ```{r echo=FALSE}
-library(biomaRt)
-library(Seurat)
-library(SeuratWrappers)
-library(ggplot2)
-library(tidyverse)
-library(patchwork)
-library(clustree)
-library(metap)
-library(presto)
+# library(biomaRt)
+# library(Seurat)
+# library(SeuratWrappers)
+# library(ggplot2)
+# library(tidyverse)
+# library(patchwork)
+# library(clustree)
+# library(metap)
+# library(presto)
 ```
 
 ---
@@ -236,11 +236,11 @@ emb.GFPpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled_v2, featu
 Visualize QC metrics as a violin plot
 ```{r}
 VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.png")
 
 
 VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.png")
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -248,13 +248,13 @@ FeatureScatter is typically used to visualize feature-feature relationships, but
 plot1 <- FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.png")
 ```
 ```{r}
 plot1 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.png")
 ```
 
 
@@ -273,17 +273,17 @@ emb.GFPpooled_v2 <- subset(emb.GFPpooled_v2, subset = nFeature_RNA > 200 & nFeat
 Visualize after filtering
 ```{r}
 VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.filt.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.filt.png")
 
 FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.filt.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.filt.png")
 ```
 ```{r}
 VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.filt.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.filt.png")
 
 FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.filt.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.filt.png")
 ```
 
 ```{r}
@@ -335,11 +335,11 @@ top10_GFP <- head(VariableFeatures(emb.GFPpooled_v2), 10)
 # plot variable features with and without labels
 plot1 <- VariableFeaturePlot(emb.ALLpooled_v2)
 LabelPoints(plot = plot1, points = top10_all, repel = TRUE)
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VarFeatures.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VarFeatures.png")
 
 plot1 <- VariableFeaturePlot(emb.GFPpooled_v2)
 LabelPoints(plot = plot1, points = top10_GFP, repel = TRUE)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VarFeatures.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VarFeatures.png")
 ```
 
 
@@ -378,35 +378,35 @@ print(emb.GFPpooled_v2[["pca"]], dims = 1:5, nfeatures = 5)
 ```{r}
 # top genes associated with reduction components
 VizDimLoadings(emb.ALLpooled_v2, dims = 1:2, reduction = "pca")
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimLoadings.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimLoadings.png")
 
 
 VizDimLoadings(emb.GFPpooled_v2, dims = 1:2, reduction = "pca")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimLoadings.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimLoadings.png")
 ```
 
 ```{r}
 DimPlot(emb.ALLpooled_v2, reduction = "pca")
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimPlot.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimPlot.png")
 
 DimPlot(emb.GFPpooled_v2, reduction = "pca")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.png")
 ```
 
 ```{r}
 DimHeatmap(emb.ALLpooled_v2, dims = 1, cells = 500, balanced = TRUE)
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1.png")
 
 DimHeatmap(emb.GFPpooled_v2, dims = 1, cells = 500, balanced = TRUE)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1.png")
 ```
 
 ```{r}
 DimHeatmap(emb.ALLpooled_v2, dims = 1:6, cells = 500, balanced = TRUE)
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1-6.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1-6.png")
 
 DimHeatmap(emb.GFPpooled_v2, dims = 1:6, cells = 500, balanced = TRUE)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1-6.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1-6.png")
 ```
 
 
@@ -426,22 +426,22 @@ emb.GFPpooled_v2 <- ScoreJackStraw(emb.GFPpooled_v2, dims = 1:20)
 The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
 ```{r}
 JackStrawPlot(emb.ALLpooled_v2, dims = 1:20)
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.JackStrawPlot.png")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.JackStrawPlot.png")
 
 
 JackStrawPlot(emb.GFPpooled_v2, dims = 1:20)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.JackStrawPlot.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.JackStrawPlot.png")
 ```
 
 
 An alternative heuristic method generates an ‘Elbow plot’: a ranking of principle components based on the percentage of variance explained by each one.
 ```{r}
-ElbowPlot(emb.GFPpooled_v1)
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.ElbowPlot.png")
+ElbowPlot(emb.ALLpooled_v2)
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.ElbowPlot.png")
 
 
 ElbowPlot(emb.GFPpooled_v2)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ElbowPlot.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ElbowPlot.png")
 ```
 
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
@@ -454,17 +454,51 @@ Seurat first constructs a KNN graph based on the euclidean distance in PCA space
 
 To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
 ```{r}
-emb.GFPpooled_v1 <- FindNeighbors(emb.GFPpooled_v1, dims = 1:20)
+# emb.ALLpooled_v2_20 <- FindNeighbors(emb.ALLpooled_v2, dims = 1:20)
+# emb.ALLpooled_v2_10 <- FindNeighbors(emb.ALLpooled_v2, dims = 1:10)
+emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, dims = 1:20)
+
+# emb.GFPpooled_v2_20 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:20)
+# emb.GFPpooled_v2_10 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:10)
 emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:20)
 
 # deviation form original seurat pipeline
 # generate a vector of different resolutions to see which one performs best 
-emb.GFPpooled_v1.clust <- FindClusters(
-  object = emb.GFPpooled_v1,
+
+# emb.ALLpooled_v2.clust10 <- FindClusters(
+#   object = emb.ALLpooled_v2_10,
+#   reduction.type = "pca",
+#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+#   dims.use = 1:10,
+#   save.SNN = TRUE)
+# 
+# emb.ALLpooled_v2.clust20 <- FindClusters(
+#   object = emb.ALLpooled_v2_20,
+#   reduction.type = "pca",
+#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+#   dims.use = 1:20,
+#   save.SNN = TRUE)
+
+emb.ALLpooled_v2.clust <- FindClusters(
+  object = emb.ALLpooled_v2,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
   dims.use = 1:20,
   save.SNN = TRUE)
+
+# emb.GFPpooled_v2.clust10 <- FindClusters(
+#   object = emb.GFPpooled_v2_10,
+#   reduction.type = "pca",
+#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+#   dims.use = 1:10,
+#   save.SNN = TRUE)
+# 
+# emb.GFPpooled_v2.clust20 <- FindClusters(
+#   object = emb.GFPpooled_v2_20,
+#   reduction.type = "pca",
+#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+#   dims.use = 1:20,
+#   save.SNN = TRUE)
 
 
 emb.GFPpooled_v2.clust <- FindClusters(
@@ -474,28 +508,43 @@ emb.GFPpooled_v2.clust <- FindClusters(
   dims.use = 1:20,
   save.SNN = TRUE)
 
-## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
-clustree(emb.GFPpooled_v1.clust, prefix = "RNA_snn_res.")
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.Clustree.png")
 
+# clustree(emb.ALLpooled_v2.clust10, prefix = "RNA_snn_res.")
+# clustree(emb.ALLpooled_v2.clust20, prefix = "RNA_snn_res.")
+clustree(emb.ALLpooled_v2.clust, prefix = "RNA_snn_res.")
+
+#clustree(emb.GFPpooled_v2.clust10, prefix = "RNA_snn_res.")
+#clustree(emb.GFPpooled_v2.clust20, prefix = "RNA_snn_res.")
+clustree(emb.GFPpooled_v2.clust, prefix = "RNA_snn_res.")
+
+
+## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
+clustree(emb.ALLpooled_v2.clust, prefix = "RNA_snn_res.")
+#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.Clustree.png")
 
 clustree(emb.GFPpooled_v2.clust, prefix = "RNA_snn_res.")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.Clustree.png")
+#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.Clustree.png")
+
+
 
 # can also see how the different resolutions look like this
-DimPlot(emb.GFPpooled_v1.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
-
+DimPlot(emb.ALLpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
+DimPlot(emb.GFPpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
+```
+```{r}
 # now choose the appropriate resolution for the given dimensions using the Clustree data
-emb.GFPpooled_v1 <- FindClusters(emb.GFPpooled_v1, resolution = 1.2, cluster.name = "unintegrated_clusters")
+emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
 
 emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
 ```
+
+
 
 # Run non-linear dimensional reduction (UMAP or tSNE)
 Visualize and explore data with UMAP or tSNE.
 The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
 ```{r}
-emb.GFPpooled_v1 <- RunUMAP(emb.GFPpooled_v1, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
+emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
 emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
 ```
 
