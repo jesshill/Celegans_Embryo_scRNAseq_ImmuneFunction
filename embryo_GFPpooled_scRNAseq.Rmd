@@ -550,28 +550,38 @@ emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "pca", re
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
-DimPlot(emb.GFPpooled_v1, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 3, pt.size = 1) + 
+DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1) + 
   theme(axis.title.x = element_text(size = 20),
         axis.ticks.x = element_line(size = 6),
         axis.title.y = element_text(size = 20),
         axis.ticks.y = element_line(size = 6),
         legend.text = element_text(size = 20))
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.UMAP.unint.png")
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint.png")
 
 
-DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 3, pt.size = 1) + 
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1) + 
   theme(axis.title.x = element_text(size = 20),
         axis.ticks.x = element_line(size = 6),
         axis.title.y = element_text(size = 20),
         axis.ticks.y = element_line(size = 6),
         legend.text = element_text(size = 20))
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.png")
+
+
 
 DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.png")
+ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint2.png")
 
 DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group")
 ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.rep.png")
+
+
+
+DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"))
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint2.png")
+
+DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group")
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint.rep.png")
 ```
 
 
@@ -623,21 +633,23 @@ Harmony
 #library(harmony)
 ```
 ```{r}
-emb.GFPpooled_v1 <- IntegrateLayers(object = emb.GFPpooled_v1, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
+emb.ALLpooled_v2 <- IntegrateLayers(object = emb.ALLpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
     verbose = FALSE)
 
 # re-join layers after integration
-emb.GFPpooled_v1[["RNA"]] <- JoinLayers(emb.GFPpooled_v1[["RNA"]])
+emb.ALLpooled_v2[["RNA"]] <- JoinLayers(emb.ALLpooled_v2[["RNA"]])
 
-emb.GFPpooled_v1 <- FindNeighbors(emb.GFPpooled_v1, reduction = "harmony", dims = 1:20)
-emb.GFPpooled_v1 <- FindClusters(emb.GFPpooled_v1, resolution = 1.2, cluster.name = "harmony_clusters")
+emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, reduction = "harmony", dims = 1:20)
+emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
 
-emb.GFPpooled_v1 <- RunUMAP(emb.GFPpooled_v1, dims = 1:20, reduction = "harmony", reduction.name = "umap.harmony")
+emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, dims = 1:20, reduction = "harmony", reduction.name = "umap.harmony")
 
-DimPlot(emb.GFPpooled_v1, reduction = "umap.harmony", group.by = c("rep_group", "seurat_clusters"))
 
-DimPlot(emb.GFPpooled_v1, reduction = "umap.harmony", split.by = "rep_group")
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.UMAP.int.harmony.rep.png")
+DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "seurat_clusters"))
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.png")
+
+DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
+ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.rep.png")
 ```
 ```{r}
 emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
