@@ -703,6 +703,18 @@ write.csv(emb.GFPpooled_v2.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2_
 ```
 
 ```{r}
+emb.ALLpooled_v2.markers <- FindAllMarkers(emb.ALLpooled_v2, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+
+emb.ALLpooled_v2.markers %>% 
+  group_by(cluster) %>% filter(p_val_adj < .01) %>%
+  slice_max(n = 2, order_by = avg_log2FC) 
+
+write.csv(emb.ALLpooled_v2.markers,"./Seurat_output/all_pooled_v2/emb.ALLpooled_v2_markers.csv", row.names = TRUE)
+```
+
+
+
+```{r}
 emb.GFPpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
 emb.GFPpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=1, wt=avg_log2FC) -> top1
