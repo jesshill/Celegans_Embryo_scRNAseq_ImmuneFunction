@@ -825,7 +825,8 @@ dev.off()
 
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.UMAP-lab.pdf", height = 6, width = 6)
-DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", pt.size = 1, label = TRUE, label.size = 4) + theme(legend.text = element_text(size = 10))
+DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", pt.size = 1, label = TRUE, label.size = 6) + theme(legend.text = element_text(size = 10))
+#DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", label = TRUE, pt.size = 1, label.size = 4) + theme(legend.text = element_text(size = 10))
 dev.off()
 
 
