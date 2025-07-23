@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Install packages
 ```{r}
 #install.packages('Seurat')
-#packageVersion('Seurat') # 5.0.1
+#packageVersion('Seurat') # 5.3.0
 #install.packages('Matrix')
 #install.packages("hdf5r")
 #install.packages("clustree")
@@ -23,12 +23,11 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages("remotes")
 #install.packages("R.utils")
 
-#remotes::install_github('satijalab/seurat-wrappers')
 
-
-#if (!require("BiocManager", quietly = TRUE))
-#    install.packages("BiocManager")
-#BiocManager::install(version = "3.19")
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# BiocManager::install(version = "3.21")
+#BiocManager::install(version = "3.19") #cant use with this version of R anymore
 
 #BiocManager::install("biomaRt")
 
@@ -36,20 +35,17 @@ knitr::opts_chunk$set(echo = TRUE)
 #install.packages('metap')
 
 #install.packages('devtools')
-#devtools::install_github('immunogenomics/presto')
 ```
 
 # Load packages
 ```{r echo=FALSE}
-# library(biomaRt)
-# library(Seurat)
-# library(SeuratWrappers)
-# library(ggplot2)
-# library(tidyverse)
-# library(patchwork)
-# library(clustree)
-# library(metap)
-# library(presto)
+#library(biomaRt)
+#library(Seurat)
+#library(ggplot2)
+#library(tidyverse)
+#library(patchwork)
+#library(clustree)
+#library(metap)
 ```
 
 ---
@@ -65,12 +61,11 @@ Non-linear dimensional reduction (UMAP/t-SNE)
 
 # Load the data
 ```{r}
-#emb.GFPpooled_v1.data <- Read10X_h5("./cellranger/all_GFP_v1/filtered_feature_bc_matrix.h5")
-
 emb.GFPpooled_v2.data <- Read10X_h5("./cellranger/all_GFP_v2/filtered_feature_bc_matrix.h5")
 
 emb.ALLpooled_v2.data <- Read10X_h5("./cellranger/all_pooled_v2/filtered_feature_bc_matrix.h5")
 ```
+
 
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
@@ -98,7 +93,7 @@ genes1.df <- getBM(mart = mart,
       value = list("caelegprjna13758", rownames(emb.GFPpooled_v2.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
 
-mitoList = genes1.df[genes1.df$chromosome_name == 'MtDNA', 'external_gene_id']
+mitoList1 = genes1.df[genes1.df$chromosome_name == 'MtDNA', 'external_gene_id']
 genes1.df$chromosome_name = NULL
 
 c(nrow(genes1.df), nrow(emb.GFPpooled_v2.data))
@@ -109,7 +104,7 @@ nrow(emb.GFPpooled_v2.data)-nrow(genes1.df)
 
 
 
-There are `r nrow(emb.GFPpooled.data)-nrow(genes.df)` genes that are now dead, remove them from the input matrix.
+Remove missing genes (`nrow(emb.GFPpooled.data)-nrow(genes.df)`) from the input matrix 
 ```{r}
 emb.ALLpooled_v2.data.filt <- emb.ALLpooled_v2.data[rownames(emb.ALLpooled_v2.data) %in% genes.df$external_gene_id,]
 
@@ -119,12 +114,6 @@ identical(rownames(emb.ALLpooled_v2.data.filt), genes.df$external_gene_id)
 # Use match to make sure they are in the same order
 identical(rownames(emb.ALLpooled_v2.data.filt),
           genes.df[match(rownames(emb.ALLpooled_v2.data.filt), genes.df$external_gene_id),]$external_gene_id)
-
-# now replace the WBGeneIDs with gene names
-#rownames(emb.GFPpooled.data.filt) <- genes.df[
-#  match(rownames(emb.GFPpooled.data.filt),
-#        genes.df$wbps_gene_id)
-#  ,]$external_gene_id
 
 # are there NAs?
 sum(!is.na(rownames(emb.ALLpooled_v2.data.filt)))
@@ -141,12 +130,6 @@ identical(rownames(emb.GFPpooled_v2.data.filt), genes1.df$external_gene_id)
 identical(rownames(emb.GFPpooled_v2.data.filt),
           genes1.df[match(rownames(emb.GFPpooled_v2.data.filt), genes1.df$external_gene_id),]$external_gene_id)
 
-# now replace the WBGeneIDs with gene names
-#rownames(emb.GFPpooled.data.filt) <- genes.df[
-#  match(rownames(emb.GFPpooled.data.filt),
-#        genes.df$wbps_gene_id)
-#  ,]$external_gene_id
-
 # are there NAs?
 sum(!is.na(rownames(emb.GFPpooled_v2.data.filt)))
 
@@ -154,22 +137,65 @@ head(emb.GFPpooled_v2.data.filt)
 ```
 
 
+
 ```{r}
 # extract the cell codes (barcode info with the trailing integer which signifies the order of the samples in the aggregation step)
 cellcodes <- as.data.frame(emb.ALLpooled_v2.data.filt@Dimnames[[2]])
 colnames(cellcodes) <- "barcodes"
 rownames(cellcodes) <- cellcodes$barcodes
-cellcodes$rep_group <- ifelse(grepl("-1$", cellcodes$barcodes), "Rep_1", ifelse(grepl("-2$", cellcodes$barcodes), "Rep_2", ifelse(grepl("-3$", cellcodes$barcodes), "Rep_3", "Rep_4")))
+
+cellcodes$rep_group <- dplyr::case_when(
+  grepl("-(1|5)$", cellcodes$barcodes) ~ "Rep_1",
+  grepl("-(2|6)$", cellcodes$barcodes) ~ "Rep_2",
+  grepl("-(3|7)$", cellcodes$barcodes) ~ "Rep_3",
+  grepl("-(4|8)$", cellcodes$barcodes) ~ "Rep_4",
+  TRUE ~ "Unknown"
+)
+
+view(cellcodes)
+
+
+cellcodes$condition <- dplyr::case_when(
+  grepl("-(1|2|3|4)$", cellcodes$barcodes) ~ "GFP",
+  grepl("-(5|6|7|8)$", cellcodes$barcodes) ~ "Unsorted",
+  TRUE ~ "Unknown"
+)
+
 view(cellcodes)
 ```
 ```{r}
 cellcodes_1 <- as.data.frame(emb.GFPpooled_v2.data.filt@Dimnames[[2]])
 colnames(cellcodes_1) <- "barcodes"
 rownames(cellcodes_1) <- cellcodes_1$barcodes 
-cellcodes_1$rep_group <- ifelse(grepl("-1$", cellcodes_1$barcodes), "Rep_1", ifelse(grepl("-2$", cellcodes_1$barcodes), "Rep_2", ifelse(grepl("-3$", cellcodes_1$barcodes), "Rep_3", "Rep_4")))
+
+cellcodes_1$rep_group <- dplyr::case_when(
+  grepl("-1$", cellcodes_1$barcodes) ~ "Rep_1",
+  grepl("-2$", cellcodes_1$barcodes) ~ "Rep_2",
+  grepl("-3$", cellcodes_1$barcodes) ~ "Rep_3",
+  grepl("-4$", cellcodes_1$barcodes) ~ "Rep_4",
+  TRUE ~ "Unknown"
+)
+
+view(cellcodes_1)
+
+
+cellcodes_1$condition <- dplyr::case_when(
+  grepl("-(1|2|3|4)$", cellcodes_1$barcodes) ~ "GFP",
+  TRUE ~ "Unknown"
+)
+
 view(cellcodes_1)
 ```
 
+
+
+
+```{r}
+# Check data for mismatch. Make sure that rownames(cellcodes) and colnames(counts) match.
+
+all(colnames(emb.ALLpooled_v2.data.filt) == rownames(cellcodes))
+all(colnames(emb.GFPpooled_v2.data.filt) == rownames(cellcodes_1))
+```
 
 
 # Set up the Seurat object
@@ -186,6 +212,8 @@ view(emb.GFPpooled_v2@meta.data)
 ```
 
 
+
+Create a list of Seurat objects, one for each rep_group. Can now loop over these for normalization, variable feature detection, etc.
 ```{r}
 emb.ALLpooled_v2[["RNA"]] <- split(emb.ALLpooled_v2[["RNA"]], f = emb.ALLpooled_v2$rep_group)
 emb.ALLpooled_v2
@@ -196,16 +224,21 @@ emb.GFPpooled_v2
 ```
 
 
-```{r}
+
+
+```
+# this code chunk wont work becuase i havent renamed the rownames of the count matrix (seurat object)!!
+
 length(unique(genes.df$wbps_gene_id))
 length(unique(rownames(emb.ALLpooled_v2)))
 rownames(emb.ALLpooled_v2)[!(rownames(emb.ALLpooled_v2) %in% genes.df$external_gene_id)]
-```
-```{r}
+
+
 length(unique(genes1.df$wbps_gene_id))
 length(unique(rownames(emb.GFPpooled_v2)))
 rownames(emb.GFPpooled_v2)[!(rownames(emb.GFPpooled_v2) %in% genes1.df$external_gene_id)]
 ```
+
 
 
 # Quality control metrics
@@ -218,43 +251,51 @@ rownames(emb.GFPpooled_v2)[!(rownames(emb.GFPpooled_v2) %in% genes1.df$external_
 # show QC metrics for the first 5 cells 
 view(emb.ALLpooled_v2@meta.data)
 head(emb.ALLpooled_v2@meta.data, 5)
-
+```
+```{r}
 view(emb.GFPpooled_v2@meta.data)
 head(emb.GFPpooled_v2@meta.data, 5)
 ```
 
+
 Mitochondrial genome percentage 
 ```{r}
-mitoIndices = which(rownames(emb.ALLpooled_v2) %in% mitoList)
+mitoIndices <- rownames(emb.ALLpooled_v2)[rownames(emb.ALLpooled_v2) %in% mitoList]
 emb.ALLpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.ALLpooled_v2, features = mitoIndices)
 ```
 ```{r}
-mitoIndices_1 = which(rownames(emb.GFPpooled_v2) %in% mitoList)
+mitoIndices_1 <- rownames(emb.GFPpooled_v2)[rownames(emb.GFPpooled_v2) %in% mitoList1]
 emb.GFPpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled_v2, features = mitoIndices_1)
 ```
 
+
+
 Visualize QC metrics as a violin plot
 ```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.pdf", height = 6, width = 9)
 VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.png")
-
-
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.pdf", height = 6, width = 9)
 VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.png")
+dev.off()
 ```
 
 FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 ```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.pdf", height = 6, width = 9)
 plot1 <- FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.png")
+dev.off()
 ```
 ```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.pdf", height = 6, width = 9)
 plot1 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.png")
+dev.off()
 ```
 
 
@@ -272,18 +313,22 @@ emb.GFPpooled_v2 <- subset(emb.GFPpooled_v2, subset = nFeature_RNA > 200 & nFeat
 
 Visualize after filtering
 ```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.filt.pdf", height = 6, width = 9)
 VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.filt.png")
+dev.off()
 
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.filt.pdf", height = 6, width = 9)
 FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.filt.png")
+dev.off()
 ```
 ```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.filt.pdf", height = 6, width = 9)
 VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.filt.png")
+dev.off()
 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.filt.pdf", height = 6, width = 9)
 FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.filt.png")
+dev.off()
 ```
 
 ```{r}
@@ -314,6 +359,8 @@ By default, we employ a global-scaling normalization method "LogNormalize" that 
 Normalized values are stored in emb.GFPpooled[["RNA]]@data
 
 ```{r}
+library(sctransform)
+
 emb.ALLpooled_v2 <- NormalizeData(emb.ALLpooled_v2, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
 ```{r}
@@ -326,20 +373,24 @@ Identify highly variable features to focus on in downstream analysis
 ```{r}
 emb.ALLpooled_v2 <- FindVariableFeatures(emb.ALLpooled_v2, selection.method = "vst", nfeatures = 2000)
 
-emb.GFPpooled_v2 <- FindVariableFeatures(emb.GFPpooled_v2, selection.method = "vst", nfeatures = 2000)
-
 # Identify the 10 most highly variable genes
 top10_all <- head(VariableFeatures(emb.ALLpooled_v2), 10)
-top10_GFP <- head(VariableFeatures(emb.GFPpooled_v2), 10)
 
 # plot variable features with and without labels
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VarFeatures.pdf", height = 6, width = 9)
 plot1 <- VariableFeaturePlot(emb.ALLpooled_v2)
 LabelPoints(plot = plot1, points = top10_all, repel = TRUE)
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VarFeatures.png")
+dev.off()
+```
+```{r}
+emb.GFPpooled_v2 <- FindVariableFeatures(emb.GFPpooled_v2, selection.method = "vst", nfeatures = 2000)
 
+top10_GFP <- head(VariableFeatures(emb.GFPpooled_v2), 10)
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VarFeatures.pdf", height = 6, width = 9)
 plot1 <- VariableFeaturePlot(emb.GFPpooled_v2)
 LabelPoints(plot = plot1, points = top10_GFP, repel = TRUE)
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VarFeatures.png")
+dev.off()
 ```
 
 
@@ -351,8 +402,8 @@ This gives equal weight in downstream analysis, so that highly expressed genes d
 ```{r}
 all.genes <- rownames(emb.ALLpooled_v2)
 emb.ALLpooled_v2 <- ScaleData(emb.ALLpooled_v2, features = all.genes)
-
-
+```
+```{r}
 all.genes_1 <- rownames(emb.GFPpooled_v2)
 emb.GFPpooled_v2 <- ScaleData(emb.GFPpooled_v2, features = all.genes_1)
 ```
@@ -360,53 +411,65 @@ emb.GFPpooled_v2 <- ScaleData(emb.GFPpooled_v2, features = all.genes_1)
 
 # Linear dimensional reduction 
 perform PCA on the scaled data. 
-By default, only the previously determined vairable features are used as input. 
+By default, only the previously determined variable features are used as input. 
 ```{r}
 emb.ALLpooled_v2 <- RunPCA(emb.ALLpooled_v2, features = VariableFeatures(object = emb.ALLpooled_v2))
-
-
+```
+```{r}
 emb.GFPpooled_v2 <- RunPCA(emb.GFPpooled_v2, features = VariableFeatures(object = emb.GFPpooled_v2))
 ```
 
 Examine and visualize PCA results a few different ways
 ```{r}
 print(emb.ALLpooled_v2[["pca"]], dims = 1:5, nfeatures = 5)
-
+```
+```{r}
 print(emb.GFPpooled_v2[["pca"]], dims = 1:5, nfeatures = 5)
 ```
 
 ```{r}
 # top genes associated with reduction components
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimLoadings.pdf", height = 6, width = 9)
 VizDimLoadings(emb.ALLpooled_v2, dims = 1:2, reduction = "pca")
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimLoadings.png")
-
-
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimLoadings.pdf", height = 6, width = 9)
 VizDimLoadings(emb.GFPpooled_v2, dims = 1:2, reduction = "pca")
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimLoadings.png")
+dev.off()
 ```
 
 ```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimPlot.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "pca")
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimPlot.png")
-
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2, reduction = "pca")
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.png")
+dev.off()
 ```
 
 ```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1.pdf", height = 6, width = 9)
 DimHeatmap(emb.ALLpooled_v2, dims = 1, cells = 500, balanced = TRUE)
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1.png")
-
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1.pdf", height = 6, width = 9)
 DimHeatmap(emb.GFPpooled_v2, dims = 1, cells = 500, balanced = TRUE)
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1.png")
+dev.off()
 ```
 
 ```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1-6.pdf", height = 6, width = 9)
 DimHeatmap(emb.ALLpooled_v2, dims = 1:6, cells = 500, balanced = TRUE)
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1-6.png")
-
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1-6.pdf", height = 6, width = 9)
 DimHeatmap(emb.GFPpooled_v2, dims = 1:6, cells = 500, balanced = TRUE)
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1-6.png")
+dev.off()
 ```
 
 
@@ -417,31 +480,35 @@ Seurat implements a resampling test inspired by the JackStraw procedure. We rand
 ```{r}
 emb.ALLpooled_v2 <- JackStraw(emb.ALLpooled_v2, num.replicate = 100)
 emb.ALLpooled_v2 <- ScoreJackStraw(emb.ALLpooled_v2, dims = 1:20)
-
-
+```
+```{r}
 emb.GFPpooled_v2 <- JackStraw(emb.GFPpooled_v2, num.replicate = 100)
 emb.GFPpooled_v2 <- ScoreJackStraw(emb.GFPpooled_v2, dims = 1:20)
 ```
 
 The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
 ```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.JackStrawPlot.pdf", height = 6, width = 9)
 JackStrawPlot(emb.ALLpooled_v2, dims = 1:20)
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.JackStrawPlot.png")
-
-
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.JackStrawPlot.pdf", height = 6, width = 9)
 JackStrawPlot(emb.GFPpooled_v2, dims = 1:20)
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.JackStrawPlot.png")
+dev.off()
 ```
 
 
 An alternative heuristic method generates an ‘Elbow plot’: a ranking of principle components based on the percentage of variance explained by each one.
 ```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.ElbowPlot.pdf", height = 6, width = 9)
 ElbowPlot(emb.ALLpooled_v2)
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.ElbowPlot.png")
-
-
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ElbowPlot.pdf", height = 6, width = 9)
 ElbowPlot(emb.GFPpooled_v2)
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ElbowPlot.png")
+dev.off()
 ```
 
 The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
@@ -454,31 +521,10 @@ Seurat first constructs a KNN graph based on the euclidean distance in PCA space
 
 To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
 ```{r}
-# emb.ALLpooled_v2_20 <- FindNeighbors(emb.ALLpooled_v2, dims = 1:20)
-# emb.ALLpooled_v2_10 <- FindNeighbors(emb.ALLpooled_v2, dims = 1:10)
 emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, dims = 1:20)
-
-# emb.GFPpooled_v2_20 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:20)
-# emb.GFPpooled_v2_10 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:10)
-emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:20)
 
 # deviation form original seurat pipeline
 # generate a vector of different resolutions to see which one performs best 
-
-# emb.ALLpooled_v2.clust10 <- FindClusters(
-#   object = emb.ALLpooled_v2_10,
-#   reduction.type = "pca",
-#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-#   dims.use = 1:10,
-#   save.SNN = TRUE)
-# 
-# emb.ALLpooled_v2.clust20 <- FindClusters(
-#   object = emb.ALLpooled_v2_20,
-#   reduction.type = "pca",
-#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-#   dims.use = 1:20,
-#   save.SNN = TRUE)
-
 emb.ALLpooled_v2.clust <- FindClusters(
   object = emb.ALLpooled_v2,
   reduction.type = "pca",
@@ -486,19 +532,20 @@ emb.ALLpooled_v2.clust <- FindClusters(
   dims.use = 1:20,
   save.SNN = TRUE)
 
-# emb.GFPpooled_v2.clust10 <- FindClusters(
-#   object = emb.GFPpooled_v2_10,
-#   reduction.type = "pca",
-#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-#   dims.use = 1:10,
-#   save.SNN = TRUE)
-# 
-# emb.GFPpooled_v2.clust20 <- FindClusters(
-#   object = emb.GFPpooled_v2_20,
-#   reduction.type = "pca",
-#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-#   dims.use = 1:20,
-#   save.SNN = TRUE)
+clustree(emb.ALLpooled_v2.clust, prefix = "RNA_snn_res.")
+
+
+## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.Clustree.pdf", height = 6, width = 9)
+clustree(emb.ALLpooled_v2.clust, prefix = "RNA_snn_res.")
+dev.off()
+
+
+# can also see how the different resolutions look like this
+DimPlot(emb.ALLpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
+```
+```{r}
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:20)
 
 
 emb.GFPpooled_v2.clust <- FindClusters(
@@ -509,32 +556,24 @@ emb.GFPpooled_v2.clust <- FindClusters(
   save.SNN = TRUE)
 
 
-# clustree(emb.ALLpooled_v2.clust10, prefix = "RNA_snn_res.")
-# clustree(emb.ALLpooled_v2.clust20, prefix = "RNA_snn_res.")
-clustree(emb.ALLpooled_v2.clust, prefix = "RNA_snn_res.")
-
-#clustree(emb.GFPpooled_v2.clust10, prefix = "RNA_snn_res.")
-#clustree(emb.GFPpooled_v2.clust20, prefix = "RNA_snn_res.")
 clustree(emb.GFPpooled_v2.clust, prefix = "RNA_snn_res.")
 
 
-## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
-clustree(emb.ALLpooled_v2.clust, prefix = "RNA_snn_res.")
-#ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.Clustree.png")
-
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.Clustree.pdf", height = 6, width = 9)
 clustree(emb.GFPpooled_v2.clust, prefix = "RNA_snn_res.")
-#ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.Clustree.png")
-
+dev.off()
 
 
 # can also see how the different resolutions look like this
-DimPlot(emb.ALLpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
 DimPlot(emb.GFPpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
 ```
+
+
 ```{r}
 # now choose the appropriate resolution for the given dimensions using the Clustree data
 emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
-
+```
+```{r}
 emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
 ```
 
@@ -545,43 +584,51 @@ Visualize and explore data with UMAP or tSNE.
 The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
 ```{r}
 emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
+```
+```{r}
 emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
 ```
 
 ```{r}
 # Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
-DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1) + 
-  theme(axis.title.x = element_text(size = 20),
-        axis.ticks.x = element_line(size = 6),
-        axis.title.y = element_text(size = 20),
-        axis.ticks.y = element_line(size = 6),
-        legend.text = element_text(size = 20))
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint.png")
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint.pdf", height = 6, width = 9)
+DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1) 
+# + theme(axis.title.x = element_text(size = 20),
+#         axis.ticks.x = element_line(size = 6),
+#         axis.title.y = element_text(size = 20),
+#         axis.ticks.y = element_line(size = 6),
+#         legend.text = element_text(size = 20))
+dev.off()
 
 
-DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1) + 
-  theme(axis.title.x = element_text(size = 20),
-        axis.ticks.x = element_line(size = 6),
-        axis.title.y = element_text(size = 20),
-        axis.ticks.y = element_line(size = 6),
-        legend.text = element_text(size = 20))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.png")
-
-
-
-DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint2.png")
-
-DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.rep.png")
-
-
-
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint2.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"))
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint2.png")
+dev.off()
 
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint.rep.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group")
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint.rep.png")
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.pdf", height = 6, width = 9)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1) 
+# + theme(axis.title.x = element_text(size = 20),
+#         axis.ticks.x = element_line(size = 6),
+#         axis.title.y = element_text(size = 20),
+#         axis.ticks.y = element_line(size = 6),
+#         legend.text = element_text(size = 20))
+dev.off()
+
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint2.pdf", height = 6, width = 9)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"))
+dev.off()
+
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.rep.pdf", height = 6, width = 9)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group")
+dev.off()
 ```
 
 
@@ -590,47 +637,11 @@ ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint.rep.png")
 Aims to return a single dimensional reduction that captures the shared sources of variance across multiple layers, so that cells in a similar biological state will cluster. The method returns a dimensional reduction (i.e. integrated.cca, harmony) which can be used for visualization and unsupervised clustering analysis. 
 
 
-Anchor-based CCA integration
-```{r}
-emb.GFPpooled_v1 <- IntegrateLayers(object = emb.GFPpooled_v1, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca",
-    verbose = FALSE)
-
-# re-join layers after integration
-emb.GFPpooled_v1[["RNA"]] <- JoinLayers(emb.GFPpooled_v1[["RNA"]])
-
-emb.GFPpooled_v1 <- FindNeighbors(emb.GFPpooled_v1, reduction = "integrated.cca", dims = 1:20)
-emb.GFPpooled_v1 <- FindClusters(emb.GFPpooled_v1, resolution = 1.2, cluster.name = "cca_clusters")
-
-emb.GFPpooled_v1 <- RunUMAP(emb.GFPpooled_v1, dims = 1:20, reduction = "integrated.cca", reduction.name = "umap.cca")
-
-DimPlot(emb.GFPpooled_v1, reduction = "umap.cca", group.by = c("rep_group", "seurat_clusters"))
-
-DimPlot(emb.GFPpooled_v1, reduction = "umap.cca", split.by = "rep_group")
-ggsave("./Seurat_output/all_GFP_v1/emb.GFPpooled_v1.UMAP.int.cca.rep.png")
-```
-```{r}
-emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca",
-    verbose = FALSE)
-
-# re-join layers after integration
-emb.GFPpooled_v2[["RNA"]] <- JoinLayers(emb.GFPpooled_v2[["RNA"]])
-
-emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:20)
-emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "cca_clusters")
-
-emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "integrated.cca", reduction.name = "umap.cca")
-
-DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", group.by = c("rep_group", "seurat_clusters"))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.cca.png")
-
-DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", split.by = "rep_group")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.cca.rep.png")
-```
-
-
 Harmony
 ```{r}
+#install.packages("harmony")
 #library(harmony)
+set.seed(42)
 ```
 ```{r}
 emb.ALLpooled_v2 <- IntegrateLayers(object = emb.ALLpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
@@ -641,15 +652,22 @@ emb.ALLpooled_v2[["RNA"]] <- JoinLayers(emb.ALLpooled_v2[["RNA"]])
 
 emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, reduction = "harmony", dims = 1:20)
 emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
-
 emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, dims = 1:20, reduction = "harmony", reduction.name = "umap.harmony")
 
 
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "seurat_clusters"))
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.png")
+dev.off()
 
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.rep.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
-ggsave("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.rep.png")
+dev.off()
+
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony2.pdf", height = 6, width = 6)
+DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", label = TRUE, pt.size = 1, label.size = 4) + theme(legend.text = element_text(size = 10))
+dev.off()
 ```
 ```{r}
 emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
@@ -663,30 +681,46 @@ emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.nam
 
 emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "harmony", reduction.name = "umap.harmony")
 
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "seurat_clusters"), pt.size = 1)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.png")
 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.pdf", height = 6, width = 9)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "seurat_clusters"))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.rep.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.rep.png")
+dev.off()
 ```
 
-
-
-# Identify conserved cell type markers across conditions
 ```{r}
-#Idents(emb.GFPpooled_v1) <- "seurat_clusters"
-#head(Idents(emb.GFPpooled_v1))
+# so variability in the umap projections is coming from the integration (harmony) not from the PCA or umap, those have a set.seed default = 42
+# so need to set a global seed
 
-#conserved_markers <- FindConservedMarkers(emb.GFPpooled_v1, ident.1=6, grouping.var = "rep_group")
 
-#view(conserved_markers)
+emb.GFPpooled_v2@reductions$pca
+emb.GFPpooled_v2@reductions$umap.unintegrated
+emb.GFPpooled_v2@reductions$harmony
+emb.GFPpooled_v2@reductions$umap.harmony
+
+
+DimPlot(emb.GFPpooled_v2, reduction = "pca", split.by = "rep_group")
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group")
+DimPlot(emb.GFPpooled_v2, reduction = "harmony", split.by = "rep_group")
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
 ```
+
+
+output total gene list for cells in clusters (not just variable features)
 ```{r}
-#Idents(emb.GFPpooled_v2) <- "seurat_annotations"
+# `nFeature_RNA` is the number of genes detected in each cell. 
+# `nCount_RNA` is the total number of molecules detected within a cell (AKA total UMIs per cell)
+
+head(emb.GFPpooled_v2@meta.data)
+head(emb.GFPpooled_v2@assays$RNA$data)
+
+write.csv(emb.GFPpooled_v2@meta.data,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2_meta.data.csv", row.names = TRUE)
+
+write.csv(emb.GFPpooled_v2@assays$RNA$data,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.csv", row.names = TRUE)
 ```
-
-
----
 
 # Find differentially expressed features (cluster biomarkers)
 Find markers that define clusters via differential expression. By default, Seurat identifies positive and negative markers of a single cluster compared to all other cells. You can do for all clusters, you can test groups of clusters vs. each other, or against all cells. 
@@ -701,7 +735,6 @@ emb.GFPpooled_v2.markers %>%
 
 write.csv(emb.GFPpooled_v2.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2_markers.csv", row.names = TRUE)
 ```
-
 ```{r}
 emb.ALLpooled_v2.markers <- FindAllMarkers(emb.ALLpooled_v2, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
@@ -713,105 +746,573 @@ write.csv(emb.ALLpooled_v2.markers,"./Seurat_output/all_pooled_v2/emb.ALLpooled_
 ```
 
 
+checking which clusters are intestinal based on the expression of known intestine marker genes
+```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.INTmarkergenes.pdf", height = 6, width = 9)
+FeaturePlot(emb.ALLpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+
+FeaturePlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+
+
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.alltissuemarkergenes.pdf", height = 12, width = 9)
+FeaturePlot(emb.ALLpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+
+#VlnPlot(object = emb.ALLpooled_v2, features = c("ugt-14", "c10c5.4", "acp-2", "end-1"))
+#VlnPlot(object = emb.ALLpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
+
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.INTmarkergenes.pdf", height = 6, width = 9)
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+
+#VlnPlot(object = emb.GFPpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = "seurat_clusters", label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1)
+```
+
+
+
+# Remove contamination clusters
+clusters we want to keep = 1, 2, 5, 11, 14, 15, 16
+based on above checking of intestine marker genes
+contamination clusters = 0, 3, 4, 6, 7, 8, 9, 10, 12, 13, 17, 18, 19, 20
+```{r}
+emb.GFPpooled_v2.filteredClusters <- subset(emb.GFPpooled_v2, idents = c('0', '3', '4', '6', '7', '8', '9', '10', '12', '13', '17', '18', '19'), invert = TRUE)
+emb.GFPpooled_v2.filteredClusters <- RunPCA(emb.GFPpooled_v2.filteredClusters)
+ElbowPlot(emb.GFPpooled_v2.filteredClusters)
+emb.GFPpooled_v2.filteredClusters <- FindNeighbors(emb.GFPpooled_v2.filteredClusters, dims = 1:10)
+emb.GFPpooled_v2.filteredClusters <- FindClusters(emb.GFPpooled_v2.filteredClusters, resolution = 1.2)
+emb.GFPpooled_v2.filteredClusters <- RunUMAP(emb.GFPpooled_v2.filteredClusters, dims = 1:10)
+DimPlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap", label = TRUE)
+
+#check clusters for expression of intestine marker genes
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
+
+
+
+
+emb.GFPpooled_v2.finalfiltClusters <- subset(emb.GFPpooled_v2.filteredClusters, idents = c('11'), invert = TRUE)
+emb.GFPpooled_v2.finalfiltClusters <- RunPCA(emb.GFPpooled_v2.finalfiltClusters)
+ElbowPlot(emb.GFPpooled_v2.finalfiltClusters)
+emb.GFPpooled_v2.finalfiltClusters <- FindNeighbors(emb.GFPpooled_v2.finalfiltClusters, dims = 1:10)
+emb.GFPpooled_v2.finalfiltClusters <- FindClusters(emb.GFPpooled_v2.finalfiltClusters, resolution = 1.2)
+emb.GFPpooled_v2.finalfiltClusters <- RunUMAP(emb.GFPpooled_v2.finalfiltClusters, dims = 1:10)
+DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", label = TRUE)
+
+#check clusters for expression of intestine marker genes
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+
+VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
+```
 
 ```{r}
-emb.GFPpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.UMAP.pdf", height = 6, width = 6)
+DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", pt.size = 1) 
+# + theme(axis.title.x = element_text(size = 20),
+#         axis.ticks.x = element_line(size = 6),
+#         axis.title.y = element_text(size = 20),
+#         axis.ticks.y = element_line(size = 6),
+#         legend.text = element_text(size = 20))
+dev.off()
 
-emb.GFPpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=1, wt=avg_log2FC) -> top1
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.UMAP-lab.pdf", height = 6, width = 6)
+DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", pt.size = 1, label = TRUE, label.size = 4) + theme(legend.text = element_text(size = 10))
+dev.off()
+
+
+
+
+#check clusters for expression of intestine marker genes
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.FeaturePlot.INTmarkergenes.pdf", height = 6, width = 9)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+```
+
+
+
+```{r}
+emb.GFPpooled_v2.finalfiltClusters.markers <- FindAllMarkers(emb.GFPpooled_v2.finalfiltClusters, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+
+emb.GFPpooled_v2.finalfiltClusters.markers %>% 
+  group_by(cluster) %>% filter(p_val_adj < .01) %>%
+  slice_max(n = 2, order_by = avg_log2FC) 
+
+write.csv(emb.GFPpooled_v2.finalfiltClusters.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2_finalfiltClusters_markers.csv", row.names = TRUE)
+```
+
+```{r}
+#The UMAP embeddings are stored in the Seurat object under the reductions slot. Extract the number of cells by checking the number of rows in the UMAP embedding matrix. Counting the number of rows in this matrix, directly corresponds to the number of cells that have UMAP embeddings.
+
+num_int_cells <- nrow(Embeddings(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap"))
+print(paste("Number of intestinal cells in UMAP:", num_int_cells))
+
+num_all_cells <- nrow(Embeddings(emb.ALLpooled_v2, reduction = "umap.harmony"))
+print(paste("Number of all cells in UMAP:", num_all_cells))
+```
+
+
+# make some pretty heatmaps 
+```{r}
+emb.GFPpooled_v2.finalfiltClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
+
+emb.GFPpooled_v2.finalfiltClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=1, wt=avg_log2FC) -> top1
+
+emb.GFPpooled_v2.finalfiltClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) -> all
+
+emb.GFPpooled_v2.finalfiltClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=15, wt=avg_log2FC) -> almost_all
+
 
 # Erin wants to see the smiFISH targets in the heat map as well
-quartz(width = 20, height = 10)
-DoHeatmap(emb.GFPpooled_v2, features = c(top1$gene), raster=F) + 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.markers.HeatMap-top2.pdf", height = 6, width = 15)
+DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c(top2$gene), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap-top1.png")
+dev.off()
 
-quartz(width = 20, height = 10)
-DoHeatmap(emb.GFPpooled_v2, features = c(top1$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.HeatMap-top1.pdf", height = 6, width = 15)
+DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c(top1$gene), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap-top1.smifish.png")
+dev.off()
 
-quartz(width = 20, height = 10)
-DoHeatmap(emb.GFPpooled_v2, features = c("clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.HeatMap-top1.smifish.pdf", height = 6, width = 15)
+DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c(top1$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) +
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap-smiFISH.png")
+dev.off()
+
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.HeatMap-smiFISH.pdf", height = 6, width = 15)
+DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c("clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
+  theme(axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+dev.off()
 
 
 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.HeatMap-all.pdf", height = 12, width = 30)
+DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c(all$gene), raster=F) + 
+  theme(axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.HeatMap-almost_all_15.pdf", height = 12, width = 30)
+DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c(almost_all$gene), raster=F) + theme(axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+dev.off()
+```
+
+
+```{r}
 # RNAi 
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), ncol = 3)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.rnai.png")
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.rnai.pdf", height = 6, width = 15)  
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), ncol = 3, coord.fixed = TRUE)
+dev.off()
 
-#intestine
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "end-1", "acp-2", "ges-1"), ncol = 2)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.intestine.png")
+
+
+
+# intestine
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.intestine.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1"), ncol = 3, coord.fixed = TRUE)
+dev.off() 
 
 # germline
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("glh-1", "chs-1"))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.germ.png")
-
-# neuron
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("hlh-2", "rab-3"))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.neuron.png")
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.germ.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("glh-1", "nos-1", "pgl-1"), ncol = 3, coord.fixed = TRUE)
+dev.off()
 
 # muscle
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("myo-2", "myo-3"))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.muscle.png")
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.muscle.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("myo-3", "pat-10", "mls-1"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+# neuron
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.neuron.pdf", height = 6, width = 15)
+FeaturePlot(eemb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("rab-3", "odr-2", "mec-7"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+# pharynx
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.pharynx.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("myo-2", "tnc-2", "phat-2"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+# hypodermis
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.hypodermis.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+
+
 
 
 # early intestine
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("end-1", "acp-2", "ugt-14"))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.featureplot.earlyint.png")
-#-------------------- 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.earlyint.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("end-1", "acp-2", "ugt-14", "C10C5.4"), ncol = 2 , coord.fixed = TRUE)
+dev.off()
 
-quartz(width = 10, height = 4)
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("elt-2","elt-7",'ges-1',"end-1","acp-2","C10C5.4"),raster=F, ncol = 3) + 
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot-PosCtrls.png")
+# mid intestine
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.midint.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("T19D7.6", "T21E8.4", "C10A4.3", "klo-1"), ncol = 2 , coord.fixed = TRUE)
+dev.off()
+# (not the best) "T20D4.19", "F47B8.4"
 
+# late intestine
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.lateint.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("C14C6.5", "clec-56", "cpr-1", "lec-9"), ncol = 2 , coord.fixed = TRUE)
+dev.off()
 
-
-quartz(width = 10, height = 8)
-FeaturePlot(emb.GFPpooled_v2, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F, ncol = 2) +
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot-NegCtrls.png")
 
 
 #smiFISH targets
-quartz(width = 5, height = 8)
-FeaturePlot(emb.GFPpooled_v2, features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"),raster=F, ncol = 3) +
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.FeaturePlot-FISH.pdf", height = 10, width = 20)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), raster=F, ncol = 3, coord.fixed = TRUE) +
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 14),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot-FISH.png")
+dev.off()
+
+
+
+VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = c("C14C6.5", "cpr-1", "Y32F6A.5"), raster=F, ncol = 2)
+VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = "pbo-4", raster=F)
+```
+
+
+
+# how many cells are expressing these markers of other tissues?
+```{r}
+view(emb.GFPpooled_v2.finalfiltClusters@assays$RNA$data)
+
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2.finalfiltClusters@assays$RNA$data["hlh-2", ] > 0) #12
+print(total_cells_expressing_gene)
+
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2.finalfiltClusters@assays$RNA$data["myo-3", ] > 0) #11
+print(total_cells_expressing_gene)
+
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2.finalfiltClusters@assays$RNA$data["rab-3", ] > 0) #133
+print(total_cells_expressing_gene)
+```
+
+
+# how many intestinal cells were in our all cells pooled sample?
+```{r}
+view(emb.ALLpooled_v2@assays$RNA$data)
+
+unique_cells <- colSums(emb.ALLpooled_v2@assays$RNA$data[c("elt-2", "elt-7", "ges-1"), ] > 0) > 0
+sum(unique_cells) # 1388
+
+unique_cells <- sum(emb.ALLpooled_v2@assays$RNA$data["elt-2", ] > 0) #749
+unique_cells <- sum(emb.ALLpooled_v2@assays$RNA$data["elt-7", ] > 0) #698
+unique_cells <- sum(emb.ALLpooled_v2@assays$RNA$data["ges-1", ] > 0) #515
+sum(unique_cells) 
+
+b <- (749+698+515)
+print(b)
+
+total_cells <- ncol(emb.ALLpooled_v2@assays$RNA$data)
+print(total_cells) #18748
+
+a <- (1388/18748)*100
+print(a) #7.5%
+
+c <- (1962/18748)*100
+print(c) #10%
+```
+
+
+---- alternate GO analysis
+```{r}
+Cluster0.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==0 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster1.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==1 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster2.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==2 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster3.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==3 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster4.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==4 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster5.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==5 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster6.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==6 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster7.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==7 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster8.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==8 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster9.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==9 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster10.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==10 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster11.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==11 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster12.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==12 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+Cluster13.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==13 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
+```
+```{r}
+BiocManager::install("Rsamtools")
+
+install.packages("Signac")
+install.packages("cowplot")
+
+BiocManager::install("org.Ce.eg.db")
+BiocManager::install("biovizBase")
+#BiocManager::install(c('BSgenome.Hsapiens.UCSC.hg38', 'EnsDb.Hsapiens.v86'))
+BiocManager::install("clusterProfiler")
+BiocManager::install("enrichplot")
+BiocManager::install("ggtree")
+
+# load libraries
+library(Signac)
+library(cowplot)
+library(clusterProfiler)
+library(org.Ce.eg.db)
+library(enrichplot)
+library(ggtree)
 ```
 
 
 ```{r}
-#how many cells are expressing these markers of other tissues?
-view(emb.GFPpooled_v2@assays$RNA$data)
+Cluster0.gene_ids <- bitr(Cluster0.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.37% of input gene IDs are fail to map...
+Cluster1.gene_ids <- bitr(Cluster1.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.6% of input gene IDs are fail to map...
+Cluster2.gene_ids <- bitr(Cluster2.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.17% of input gene IDs are fail to map...
+Cluster3.gene_ids <- bitr(Cluster3.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #4.73% of input gene IDs are fail to map...
+Cluster4.gene_ids <- bitr(Cluster4.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.36% of input gene IDs are fail to map...
+Cluster5.gene_ids <- bitr(Cluster5.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.98% of input gene IDs are fail to map...
+Cluster6.gene_ids <- bitr(Cluster6.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.64% of input gene IDs are fail to map...
+Cluster7.gene_ids <- bitr(Cluster7.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.83% of input gene IDs are fail to map...
+Cluster8.gene_ids <- bitr(Cluster8.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #4.89% of input gene IDs are fail to map...
+Cluster9.gene_ids <- bitr(Cluster9.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.43% of input gene IDs are fail to map...
+Cluster10.gene_ids <- bitr(Cluster10.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.3% of input gene IDs are fail to map...
+Cluster11.gene_ids <- bitr(Cluster11.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.14% of input gene IDs are fail to map...
+Cluster12.gene_ids <- bitr(Cluster12.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.56% of input gene IDs are fail to map...
 
-total_cells_expressing_gene <- sum(emb.GFPpooled_v2@assays$RNA$data["hlh-2", ] > 0)
-print(total_cells_expressing_gene)
-
-total_cells_expressing_gene <- sum(emb.GFPpooled_v2@assays$RNA$data["myo-3", ] > 0)
-print(total_cells_expressing_gene)
-
-total_cells_expressing_gene <- sum(emb.GFPpooled_v2@assays$RNA$data["rab-3", ] > 0)
-print(total_cells_expressing_gene)
+Cluster13.gene_ids <- bitr(Cluster13.markers$gene, fromType = "SYMBOL",
+                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.72% of input gene IDs are fail to map...
 ```
+```{r}
+Cluster0.ego <- enrichGO(gene = Cluster0.gene_ids$ENTREZID, 
+                OrgDb = org.Ce.eg.db, 
+                ont = "BP", # biological process
+                pAdjustMethod = "BH", 
+                pvalueCutoff = 0.05, 
+                qvalueCutoff = 0.05, 
+                readable = TRUE)
+
+```
+```{r}
+barplot(Cluster0.ego, showCategory=10, 
+        title="GO Enrichment Analysis for Cluster 0")
+
+```
+```{r}
+p1 <- dotplot(Cluster0.ego, showCategory=20, 
+        title="GO Enrichment Analysis for Cluster 0")
+p1 + theme(axis.text.y = element_text(size = 3))
+
+```
+```{r}
+Cluster0.ego <- pairwise_termsim(Cluster0.ego)
+emapplot(Cluster0.ego, showCategory=20)
+```
+
+#for all clusters 
+```{r}
+cluster_gene_list <- split(emb.GFPpooled_v2.finalfiltClusters.markers$gene, emb.GFPpooled_v2.finalfiltClusters.markers$cluster)
+
+cluster_gene_list <- lapply(cluster_gene_list, function(genes) {
+  gene_ids <- bitr(genes, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db)
+  return(gene_ids$ENTREZID)
+})
+
+#Use the compareCluster() function from clusterProfiler package to perform gene ontology analysis for all clusters together.
+
+# GO enrichment analysis for BP
+go_compare_bp <- compareCluster(geneCluster = cluster_gene_list, 
+                             fun = "enrichGO", 
+                             OrgDb = org.Ce.eg.db, 
+                             ont = "BP",  # "BP"、"MF" or "CC"
+                             pAdjustMethod = "BH",
+                             pvalueCutoff = 0.05,
+                             qvalueCutoff = 0.05)
+
+bp <- simplify(go_compare_bp, cutoff=1, by="p.adjust", select_fun=min)
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.dotPlot-GO-BP.pdf", height = 10, width = 20)
+cluster.p1 <- dotplot(bp, showCategory = 1,
+              title = "GO Enrichment (Biological Process)")
+cluster.p1 + theme(
+  axis.text.y = element_text(size = 15),
+  axis.text.x = element_text(size = 15),
+  legend.text = element_text(size = 15)
+  )
+dev.off()
+
+
+#Dot plots are not good for showing the relationship between GO terms. Can select and cluster GO terms first, and then use a tree plot to show the correlations between GO terms.
+trim_bp <- pairwise_termsim(bp, showCategory = 50)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.treeMap-GO-BP.pdf", height = 10, width = 20)
+treeplot(trim_bp, showCategory = 5, layout = "circular", offset_tiplab = rel(0.4))
+dev.off()
+```
+```{r}
+#early int
+VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = c('end-1', 'acp-2', 'ugt-14', 'C10C5.4'), raster=F)
+
+#mid int
+VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = c('T19D7.6', 'T21E8.4', 'klo-1', 'C10A4.3'), raster=F)
+
+#late int
+VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = c('C14C6.5', 'clec-56', 'cpr-1', 'lec-9'), raster=F)
+  
+clusters_to_use <- as.character(c(0:7, 9:13))
+developmental.clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% clusters_to_use]
+
+go_compare_bp_dev <- compareCluster(geneCluster = developmental.clusters.list, 
+                             fun = "enrichGO", 
+                             OrgDb = org.Ce.eg.db, 
+                             ont = "BP",  # "BP"、"MF" or "CC"
+                             pAdjustMethod = "BH",
+                             pvalueCutoff = 0.05,
+                             qvalueCutoff = 0.05)
+
+bp_dev <- simplify(go_compare_bp_dev, cutoff=1, by="p.adjust", select_fun=min)
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.dotPlot-GO-BP_developmental.pdf", height = 10, width = 20)
+cluster.p1 <- dotplot(bp_dev, showCategory = 1,
+              title = "GO Enrichment (Biological Process)")
+cluster.p1 + theme(
+  axis.text.y = element_text(size = 15),
+  axis.text.x = element_text(size = 15),
+  legend.text = element_text(size = 15)
+  )
+dev.off()
+
+
+trim_bp_dev <- pairwise_termsim(bp_dev, showCategory = 50)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.treeMap-GO-BP_developmental.pdf", height = 10, width = 20)
+treeplot(trim_bp_dev, showCategory = 5, layout = "circular", offset_tiplab = rel(0.4))
+dev.off()
+```
+```{r}
+#anterior
+VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = c('C14C6.5', 'cpr-1'), raster=F)
+
+#central
+VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = c('endu-2', 'clec-56'), raster=F)
+
+#posterior
+VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = c('pbo-4'), raster=F)
+
+
+clusters_to_use2 <- as.character(c(1, 3:9, 11:13))
+regional.clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% clusters_to_use2]
+
+
+go_compare_bp_region <- compareCluster(geneCluster = regional.clusters.list, 
+                             fun = "enrichGO", 
+                             OrgDb = org.Ce.eg.db, 
+                             ont = "BP",  # "BP"、"MF" or "CC"
+                             pAdjustMethod = "BH",
+                             pvalueCutoff = 0.05,
+                             qvalueCutoff = 0.05)
+
+bp_region <- simplify(go_compare_bp_region, cutoff=1, by="p.adjust", select_fun=min)
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.dotPlot-GO-BP_region.pdf", height = 10, width = 20)
+cluster.p1 <- dotplot(bp_region, showCategory = 1,
+              title = "GO Enrichment (Biological Process)")
+cluster.p1 + theme(
+  axis.text.y = element_text(size = 15),
+  axis.text.x = element_text(size = 15),
+  legend.text = element_text(size = 15)
+  )
+dev.off()
+
+
+trim_bp_region <- pairwise_termsim(bp_region, showCategory = 50)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.treeMap-GO-BP_region.pdf", height = 10, width = 20)
+treeplot(trim_bp_region, showCategory = 5, layout = "circular", offset_tiplab = rel(0.4))
+dev.off()
+```
+
+```{r}
+# simplify() in clusterprofiler and GOSemSim
+#BiocManager::install("GOSemSim")
+#browseVignettes("GOSemSim")
+# https://yulab-smu.top/biomedical-knowledge-mining-book/
+
+#If you use [clusterProfiler](https://www.bioconductor.org/packages/clusterProfiler) in published research, please cite:
+
+
+#__*G Yu*__, LG Wang, Y Han, QY He. clusterProfiler: an R package for comparing biological themes among gene clusters. **_OMICS: A Journal of Integrative Biology_** 2012, 16(5):284-287. doi:[10.1089/omi.2011.0118](http://dx.doi.org/10.1089/omi.2011.0118)
+
+# bp1 <- simplify(go_compare_bp, cutoff=1, by="p.adjust", select_fun=min)
+# bp0.3 <- simplify(go_compare_bp, cutoff=0.3, by="p.adjust", select_fun=min)
+# 
+# cluster.p1 <- dotplot(bp1, showCategory = 1,
+#               title = "GO Enrichment (Biological Process)")
+# cluster.p1 + theme(
+#   axis.text.y = element_text(size = 15),
+#   axis.text.x = element_text(size = 15),
+#   legend.text = element_text(size = 15))
+```
+
+
+
+#calculate gene level variance in expression across clusters
+```{r}
+# Step 1: Compute average expression per cluster
+avg_expr <- AverageExpression(emb.GFPpooled_v2.finalfiltClusters, return.seurat = FALSE)$RNA
+# Rows = genes, Columns = clusters
+
+# Step 2: Compute variance of each gene across clusters
+gene_variances <- apply(avg_expr, 1, var)
+
+# Step 3: Select top variable genes (e.g., top 50)
+top_genes <- names(sort(gene_variances, decreasing = TRUE))[1:50]
+
+# Step 4: Extract the expression values for top genes
+heatmap_data <- avg_expr[top_genes, ]
+
+# Step 5: Optional — scale genes (z-score across clusters)
+scaled_data <- t(scale(t(as.matrix(heatmap_data))))
+
+# Step 6: Plot heatmap
+pheatmap(scaled_data,
+         cluster_rows = TRUE,
+         cluster_cols = TRUE,
+         show_rownames = TRUE,
+         show_colnames = TRUE,
+         fontsize_row = 8,
+         main = "Top Variable Genes Across Clusters")
+```
+
+
+
+
+
+
+
+
+
+----
+
 
 
 # Perform gene ontology
@@ -825,29 +1326,115 @@ tea <- import("tissue_enrichment_analysis")
 tissue_df <- tea$fetch_dictionary("tissue")
 phenotype_df <- tea$fetch_dictionary("phenotype")
 go_df <- tea$fetch_dictionary("go")
-
-#set up go_df to represent only our background genes 
-#view(go_df) 
-#dim(go_df)
-
-#go_df <- go_df %>% rename(WBGeneID = wbid)
-#go_df_background <- go_df %>% filter(WBGeneID %in% emb.ALLpooled.markers$WBGeneID)
-#go_df_background <- go_df_background %>% rename(wbid = WBGeneID)
-
-
-#tissue_df <- tissue_df %>% rename(WBGeneID = wbid)
-#tissue_df_background <- tissue_df %>% filter(WBGeneID %in% emb.ALLpooled.markers$WBGeneID)
-#tissue_df_background <- tissue_df_background %>% rename(wbid = WBGeneID)
 ```
 
 ```{r}
-emb.GFPpooled_v2.markers <- emb.GFPpooled_v2.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
-emb.GFPpooled_v2.markers <- emb.GFPpooled_v2.markers %>% rename(WBGeneID = wbps_gene_id)
+emb.GFPpooled_v2.clean.markers_1 <- emb.GFPpooled_v2.clean.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
+view(emb.GFPpooled_v2.clean.markers_1)
+
+
+emb.GFPpooled_v2.clean.markers_1 <- emb.GFPpooled_v2.clean.markers_1 %>% rename(WBGeneID = wbps_gene_id)
+#emb.GFPpooled_v2.clean.markers_1 <- emb.GFPpooled_v2.clean.markers_1 %>% rename(wbid = WBGeneID)
+view(emb.GFPpooled_v2.clean.markers_1)
+
+
+emb.ALLpooled_v2.markers_1 <- emb.ALLpooled_v2.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
+view(emb.ALLpooled_v2.markers_1)
+
+
+emb.ALLpooled_v2.markers_1 <- emb.ALLpooled_v2.markers_1 %>% rename(WBGeneID = wbps_gene_id)
+#emb.ALLpooled_v2.markers_1 <- emb.ALLpooled_v2.markers_1 %>% rename(wbid = WBGeneID)
+view(emb.ALLpooled_v2.markers_1)
 ```
 
 ```{r}
-clusters <- unique(emb.GFPpooled_v2.markers$cluster)
+# set up go_df to represent only our background genes 
+view(go_df)
 
+cluster0 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 0)
+view(cluster0)
+cluster1 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 1)
+view(cluster1)
+cluster2 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 2)
+view(cluster2)
+cluster3 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 3)
+view(cluster3)
+cluster4 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 4)
+view(cluster4)
+cluster5 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 5)
+view(cluster5)
+cluster6 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 6)
+view(cluster6)
+cluster7 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 7)
+view(cluster7)
+cluster8 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 8)
+view(cluster8)
+cluster9 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 9)
+view(cluster9)
+cluster10 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 10)
+view(cluster10)
+cluster11 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 11)
+view(cluster11)
+cluster12 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 12)
+view(cluster12)
+cluster13 <- emb.GFPpooled_v2.clean.markers_1 %>% filter(cluster == 13)
+view(cluster13)
+
+
+
+go_df_background <- go_df %>% filter(wbid %in% emb.GFPpooled_v2.clean.markers_1$WBGeneID)
+view(go_df_background)
+
+go_df_background_0 <- go_df %>% filter(wbid %in% cluster0$WBGeneID)
+view(go_df_background_0)
+go_df_background_1 <- go_df %>% filter(wbid %in% cluster1$WBGeneID)
+view(go_df_background_1)
+go_df_background_2 <- go_df %>% filter(wbid %in% cluster2$WBGeneID)
+view(go_df_background_2)
+go_df_background_3 <- go_df %>% filter(wbid %in% cluster3$WBGeneID)
+view(go_df_background_3)
+go_df_background_4 <- go_df %>% filter(wbid %in% cluster4$WBGeneID)
+view(go_df_background_4)
+go_df_background_5 <- go_df %>% filter(wbid %in% cluster5$WBGeneID)
+view(go_df_background_5)
+go_df_background_6 <- go_df %>% filter(wbid %in% cluster6$WBGeneID)
+view(go_df_background_6)
+go_df_background_7 <- go_df %>% filter(wbid %in% cluster7$WBGeneID)
+view(go_df_background_7)
+go_df_background_8 <- go_df %>% filter(wbid %in% cluster8$WBGeneID)
+view(go_df_background_8)
+go_df_background_9 <- go_df %>% filter(wbid %in% cluster9$WBGeneID)
+view(go_df_background_9)
+go_df_background_10 <- go_df %>% filter(wbid %in% cluster10$WBGeneID)
+view(go_df_background_10)
+go_df_background_11 <- go_df %>% filter(wbid %in% cluster11$WBGeneID)
+view(go_df_background_11)
+go_df_background_12 <- go_df %>% filter(wbid %in% cluster12$WBGeneID)
+view(go_df_background_12)
+go_df_background_13 <- go_df %>% filter(wbid %in% cluster13$WBGeneID)
+view(go_df_background_13)
+```
+
+
+```{r}
+clusters <- emb.GFPpooled_v2.clean.markers_1$cluster
+
+clusters <- cluster0$cluster
+clusters <- cluster1$cluster
+clusters <- cluster2$cluster
+clusters <- cluster3$cluster
+clusters <- cluster4$cluster
+clusters <- cluster5$cluster
+clusters <- cluster6$cluster
+clusters <- cluster7$cluster
+clusters <- cluster8$cluster
+clusters <- cluster9$cluster
+clusters <- cluster10$cluster
+clusters <- cluster11$cluster
+clusters <- cluster12$cluster
+clusters <- cluster13$cluster
+```
+```{r}
 my_tea_analysis <- function(input_df, tea_dict){
   tea_df <- data.frame()
   for (i in clusters){
@@ -891,38 +1478,155 @@ my_ontology_plot <- function(input_df, xlabel){
 ```
 
 ```{r}
-#filter(Q.value < 0.001,  Observed > 50)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_0_background.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster0 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df_background_0), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
 
-quartz(width = 10, height = 20)
-my_ontology_plot(my_tea_analysis(emb.GFPpooled_v2.markers %>% filter(p_val_adj < 0.01, avg_log2FC > 2), tissue_df), "Tissue Ontology")
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_0.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster0 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_1_background.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster1 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df_background_1), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
 
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.GO_T.png", limitsize = FALSE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_1.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster1 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+# pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_2_background.pdf", height = 10, width = 20)
+# my_ontology_plot(my_tea_analysis(cluster2 %>% filter(p_val_adj < 0.01, avg_log2FC > 0.5), go_df_background_2), "Gene Ontology") + theme(text = element_text(size = 30))
+# dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_2.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster2 %>% filter(p_val_adj < 0.01, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_3_background.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster3 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df_background_3), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_3.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster3 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_4_background.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster4 %>% filter(p_val_adj < 0.01, avg_log2FC > 1), go_df_background_4), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_4.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster4 %>% filter(p_val_adj < 0.01, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+# pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_5_background.pdf", height = 10, width = 20)
+# my_ontology_plot(my_tea_analysis(cluster5 %>% filter(p_val_adj < 0.01, avg_log2FC > 0.5), go_df_background_5), "Gene Ontology") + theme(text = element_text(size = 30))
+# dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_5.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster5 %>% filter(p_val_adj < 0.01, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_6_background.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster6 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df_background_6), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_6.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster6 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_7_background.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster7 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df_background_7), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_7.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster7 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+# pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_8_background.pdf", height = 10, width = 20)
+# my_ontology_plot(my_tea_analysis(cluster8 %>% filter(p_val_adj < 0.01, avg_log2FC > 0.5), go_df_background_8), "Gene Ontology") + theme(text = element_text(size = 30))
+# dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_8.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster8 %>% filter(p_val_adj < 0.01, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+# pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_9_background.pdf", height = 10, width = 20)
+# my_ontology_plot(my_tea_analysis(cluster9 %>% filter(p_val_adj < 0.05, avg_log2FC > 0.5), go_df_background_9), "Gene Ontology") + theme(text = element_text(size = 30))
+# dev.off()
+# 
+# pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_9.pdf", height = 10, width = 20)
+# my_ontology_plot(my_tea_analysis(cluster9 %>% filter(p_val_adj < 0.01, avg_log2FC > 0.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+# dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_10_background.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster10 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df_background_10), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_10.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster10 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_11_background.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster11 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df_background_11), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_11.pdf", height = 10, width = 20)
+my_ontology_plot(my_tea_analysis(cluster11 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_12_background.pdf", height = 10, width = 25)
+my_ontology_plot(my_tea_analysis(cluster12 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df_background_12), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_12.pdf", height = 10, width = 25)
+my_ontology_plot(my_tea_analysis(cluster12 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_13_background.pdf", height = 10, width = 25)
+my_ontology_plot(my_tea_analysis(cluster13 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df_background_13), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_13.pdf", height = 10, width = 25)
+my_ontology_plot(my_tea_analysis(cluster13 %>% filter(p_val_adj < 0.01, avg_log2FC > 1.5), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
 ```
 
 ```{r}
-#filter(Q.value < 0.001,  Observed > 10)
+# not wide enough output, the figures are smooshed 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G_background.pdf", height = 10, width = 25)
+my_ontology_plot(my_tea_analysis(emb.GFPpooled_v2.clean.markers_1 %>% filter(p_val_adj < 0.01, avg_log2FC > 1), go_df_background), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
 
-quartz(width = 60, height = 40)
-my_ontology_plot(my_tea_analysis(emb.GFPpooled_v2.markers %>% filter(p_val_adj < 0.01, avg_log2FC > 2), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.GO_G.png", limitsize = FALSE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.clean.GO_G.pdf", height = 10, width = 25)
+my_ontology_plot(my_tea_analysis(emb.GFPpooled_v2.clean.markers_1 %>% filter(p_val_adj < 0.01, avg_log2FC > 1), go_df), "Gene Ontology") + theme(text = element_text(size = 30))
+dev.off()
 ```
 
-```{r}
-# #filter(Q.value < 0.001,  Observed > 10)
-# 
-# quartz(width = 60, height = 40)
-# my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), go_df_background), "Gene Ontology") + theme(text = element_text(size = 30))
-# 
-# ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_G_background.png", limitsize = FALSE)
-```
-```{r}
-# #filter(Q.value < 0.001,  Observed > 10)
-# 
-# quartz(width = 60, height = 100)
-# my_ontology_plot(my_tea_analysis(emb.GFPpooled.markers %>% filter(p_val_adj < 0.04, avg_log2FC > 1), tissue_df_background), "Gene Ontology") + theme(text = element_text(size = 30))
-# 
-# ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.GO_T_background.png", limitsize = FALSE)
-```
+
+
+
+
+
+
+
+
+
+
+
+
 
 # plot genes of interest
 From John Murray dataset 
