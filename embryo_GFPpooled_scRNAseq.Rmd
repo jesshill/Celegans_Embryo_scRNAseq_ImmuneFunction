@@ -960,6 +960,14 @@ dev.off()
 
 
 
+# tissue marker genes
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.tissuemarkergenes.pdf", height = 10, width = 20)  
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "rab-3", "odr-2", "mec-7", "myo-3", "pat-10", "lev-11", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+
+
+
 # early intestine
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.earlyint.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("end-1", "acp-2", "ugt-14", "C10C5.4"), ncol = 2 , coord.fixed = TRUE)
@@ -1280,23 +1288,35 @@ dev.off()
 
 #calculate gene level variance in expression across clusters
 ```{r}
-# Step 1: Compute average expression per cluster
+# average expression per cluster. Rows = genes, Columns = clusters
 avg_expr <- AverageExpression(emb.GFPpooled_v2.finalfiltClusters, return.seurat = FALSE)$RNA
-# Rows = genes, Columns = clusters
 
-# Step 2: Compute variance of each gene across clusters
+# variance of each gene across clusters
 gene_variances <- apply(avg_expr, 1, var)
 
-# Step 3: Select top variable genes (e.g., top 50)
-top_genes <- names(sort(gene_variances, decreasing = TRUE))[1:50]
+threshold <- 0.1
 
-# Step 4: Extract the expression values for top genes
+# select top variable genes (e.g., top 50)
+#top_genes <- names(sort(gene_variances, decreasing = TRUE))[1:500]
+#top_genes <- names(sort(gene_variances, decreasing = TRUE))[1:50]
+
+top_genes <- names(gene_variances[gene_variances > threshold])
+top_genes <- top_genes[order(gene_variances[top_genes], decreasing = TRUE)]
+
+
+# extract the expression values for top genes
 heatmap_data <- avg_expr[top_genes, ]
+num_genes <- nrow(heatmap_data)
+print(num_genes)
 
-# Step 5: Optional — scale genes (z-score across clusters)
+# scale genes (z-score across clusters)
 scaled_data <- t(scale(t(as.matrix(heatmap_data))))
 
-# Step 6: Plot heatmap
+# plot heatmap
+#install.packages('pheatmap')
+#library(pheatmap)
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.varianceHM.pdf", height = 10, width = 20)
 pheatmap(scaled_data,
          cluster_rows = TRUE,
          cluster_cols = TRUE,
@@ -1304,12 +1324,8 @@ pheatmap(scaled_data,
          show_colnames = TRUE,
          fontsize_row = 8,
          main = "Top Variable Genes Across Clusters")
+dev.off()
 ```
-
-
-
-
-
 
 
 
