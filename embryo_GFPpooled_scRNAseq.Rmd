@@ -832,6 +832,10 @@ DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", pt.size = 1, lab
 dev.off()
 
 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.UMAP-rep.pdf", height = 6, width = 6)
+DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", split.by = "rep_group")
+dev.off()
+
 
 
 #check clusters for expression of intestine marker genes
