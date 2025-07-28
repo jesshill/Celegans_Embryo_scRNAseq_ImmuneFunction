@@ -924,39 +924,51 @@ FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c
 dev.off()
 
 
-
-
 # intestine
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.intestine.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1"), ncol = 3, coord.fixed = TRUE)
 dev.off() 
+
+#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("elt-2", "elt-7", "ges-1"))
+
 
 # germline
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.germ.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("glh-1", "nos-1", "pgl-1"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
+#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("glh-1", "nos-1", "pgl-1"))
+
+
 # muscle
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.muscle.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("myo-3", "pat-10", "mls-1"), ncol = 3, coord.fixed = TRUE)
+FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("myo-3", "pat-10", "lev-11"), ncol = 3, coord.fixed = TRUE)
 dev.off()
+
+#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("myo-3", "pat-10", "lev-11"))
+
 
 # neuron
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.neuron.pdf", height = 6, width = 15)
 FeaturePlot(eemb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("rab-3", "odr-2", "mec-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
+#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("rab-3", "odr-2", "mec-7"))
+
 # pharynx
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.pharynx.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("myo-2", "tnc-2", "phat-2"), ncol = 3, coord.fixed = TRUE)
 dev.off()
+
+#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("myo-2", "tnc-2", "phat-2"))
+
 
 # hypodermis
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.hypodermis.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-
+VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("elt-1", "elt-3", "dpy-7"))
 
 
 
