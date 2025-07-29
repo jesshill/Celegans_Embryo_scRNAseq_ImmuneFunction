@@ -1412,6 +1412,51 @@ p4 <- p + geom_point(aes(harmony_7, harmony_8, color = rep_group))
 p1 + p2 + p3 + p4 + plot_layout(ncol = 4)
 dev.off()
 ```
+```{r}
+metadata_har_long <- metadata_har %>%
+  pivot_longer(
+    cols = starts_with("harmony_"),  # or use harmony_1:harmony_3 to be specific
+    names_to = "Harmony_PC",
+    values_to = "Embedding_Value"
+  )
+ 
+# Plot density distributions of Harmony components grouped by rep
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.harmony_embeddings_hist.pdf", height = 10, width = 20)
+ggplot(metadata_har_long, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
+  geom_density(alpha = 0.3) +
+  facet_wrap(~ Harmony_PC, scales = "free") +
+  theme_minimal() +
+  labs(
+    title = "Density of Harmony components by replicate group",
+    x = "Embedding Value",
+    y = "Density"
+  )
+dev.off()
+
+
+
+
+metadata_pca_long <- metadata_pca %>%
+  pivot_longer(
+    cols = starts_with("PC_"),  # or use harmony_1:harmony_3 to be specific
+    names_to = "PCA_PC",
+    values_to = "Embedding_Value"
+  )
+ 
+# Plot density distributions of Harmony components grouped by rep
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.pca_embeddings_hist.pdf", height = 10, width = 20)
+ggplot(metadata_pca_long, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
+  geom_density(alpha = 0.3) +
+  facet_wrap(~ PCA_PC, scales = "free") +
+  theme_minimal() +
+  labs(
+    title = "Density of Harmony components by replicate group",
+    x = "Embedding Value",
+    y = "Density"
+  )
+dev.off()
+```
+
 
 ```{r}
 sessionInfo() 
