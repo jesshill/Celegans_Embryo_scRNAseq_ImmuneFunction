@@ -837,7 +837,6 @@ DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", split.by = "rep_
 dev.off()
 
 
-
 #check clusters for expression of intestine marker genes
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.FeaturePlot.INTmarkergenes.pdf", height = 6, width = 9)
 FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
@@ -1344,8 +1343,79 @@ dev.off()
 ```
 
 
+```{r}
+# genes and cells in each counts matrix
+dim(emb.GFPpooled_v2) #15289  2579
+dim(emb.GFPpooled_v2.filteredClusters) #15289   973
+dim(emb.GFPpooled_v2.finalfiltClusters) #15289   945 
+
+dim(emb.ALLpooled_v2) #18794 18748
+```
+
+```{r}
+#visualize cell embeddings (the principle components, the dimensionality)
+head(emb.GFPpooled_v2@reductions$pca@cell.embeddings)
+view(emb.GFPpooled_v2@reductions$pca@cell.embeddings)
+
+head(emb.GFPpooled_v2@reductions$harmony@cell.embeddings)
+view(emb.GFPpooled_v2@reductions$harmony@cell.embeddings)
+
+#library(tibble)
+metadata_pca <- as.data.frame(emb.GFPpooled_v2@reductions$pca@cell.embeddings)
+metadata_pca <- rownames_to_column(metadata_pca)
+metadata_pca$rep_group <- ""
+metadata_pca$rep_group <- dplyr::case_when(
+  grepl("-1$", metadata_pca$rowname) ~ "Rep_1",
+  grepl("-2$", metadata_pca$rowname) ~ "Rep_2",
+  grepl("-3$", metadata_pca$rowname) ~ "Rep_3",
+  grepl("-4$", metadata_pca$rowname) ~ "Rep_4",
+  TRUE ~ "Unknown"
+)
+
+view(metadata_pca)
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.pca_embeddings.pdf", height = 10, width = 20)
+p <- ggplot(metadata_pca[sample(nrow(metadata_pca)),]) 
+#p1 <- p + geom_point(aes(PC_1, PC_2, color = rep_group, size = rep_group))
+p1 <- p + geom_point(aes(PC_1, PC_2, color = rep_group))
+#p2 <- p + geom_point(aes(PC_3, PC_4, color = rep_group, size = rep_group))
+p2 <- p + geom_point(aes(PC_3, PC_4, color = rep_group))
+#p3 <- p + geom_point(aes(PC_5, PC_6, color = rep_group, size = rep_group))
+p3 <- p + geom_point(aes(PC_5, PC_6, color = rep_group))
+#p4 <- p + geom_point(aes(PC_7, PC_8, color = rep_group, size = rep_group))
+p4 <- p + geom_point(aes(PC_7, PC_8, color = rep_group))
+p1 + p2 + p3 + p4 + plot_layout(ncol = 4)
+dev.off()
 
 
+
+
+metadata_har <- as.data.frame(emb.GFPpooled_v2@reductions$harmony@cell.embeddings)
+metadata_har <- rownames_to_column(metadata_har)
+metadata_har$rep_group <- ""
+metadata_har$rep_group <- dplyr::case_when(
+  grepl("-1$", metadata_har$rowname) ~ "Rep_1",
+  grepl("-2$", metadata_har$rowname) ~ "Rep_2",
+  grepl("-3$", metadata_har$rowname) ~ "Rep_3",
+  grepl("-4$", metadata_har$rowname) ~ "Rep_4",
+  TRUE ~ "Unknown"
+)
+
+view(metadata_har)
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.harmony_embeddings.pdf", height = 10, width = 20)
+p <- ggplot(metadata_har[sample(nrow(metadata_har)),]) 
+p1 <- p + geom_point(aes(harmony_1, harmony_2, color = rep_group))
+p2 <- p + geom_point(aes(harmony_3, harmony_4, color = rep_group))
+p3 <- p + geom_point(aes(harmony_5, harmony_6, color = rep_group))
+p4 <- p + geom_point(aes(harmony_7, harmony_8, color = rep_group))
+p1 + p2 + p3 + p4 + plot_layout(ncol = 4)
+dev.off()
+```
+
+```{r}
+sessionInfo() 
+```
 ----
 
 
