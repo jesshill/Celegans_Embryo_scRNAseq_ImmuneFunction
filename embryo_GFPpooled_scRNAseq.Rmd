@@ -1453,7 +1453,7 @@ ggplot(metadata_pca_long, aes(x = Embedding_Value, color = rep_group, fill = rep
     title = "Density of Harmony components by replicate group",
     x = "Embedding Value",
     y = "Density"
-  )
+  )oco
 dev.off()
 ```
 
