@@ -11,41 +11,41 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ---
 
+```{r include=FALSE}
 # Install packages
-```{r}
-#install.packages('Seurat')
-#packageVersion('Seurat') # 5.3.0
-#install.packages('Matrix')
-#install.packages("hdf5r")
-#install.packages("clustree")
-#install.packages("tidyverse")
-#install.packages("patchwork")
-#install.packages("remotes")
-#install.packages("R.utils")
+
+install.packages('Seurat')
+packageVersion('Seurat') # 5.3.1
+install.packages('Matrix')
+install.packages("hdf5r")
+install.packages("clustree")
+install.packages("tidyverse")
+install.packages("patchwork")
+install.packages("remotes")
+install.packages("R.utils")
 
 
-# if (!require("BiocManager", quietly = TRUE))
-#     install.packages("BiocManager")
-# BiocManager::install(version = "3.21")
-#BiocManager::install(version = "3.19") #cant use with this version of R anymore
+if (!require("BiocManager", quietly = TRUE))
+     install.packages("BiocManager")
+BiocManager::install(version = "3.22")
 
-#BiocManager::install("biomaRt")
+BiocManager::install("biomaRt")
 
-#BiocManager::install('multtest')
-#install.packages('metap')
+BiocManager::install('multtest')
+install.packages('metap')
 
-#install.packages('devtools')
+install.packages('devtools')
 ```
 
+```{r include=FALSE}
 # Load packages
-```{r echo=FALSE}
-#library(biomaRt)
-#library(Seurat)
-#library(ggplot2)
-#library(tidyverse)
-#library(patchwork)
-#library(clustree)
-#library(metap)
+library(biomaRt)
+library(Seurat)
+library(ggplot2)
+library(tidyverse)
+library(patchwork)
+library(clustree)
+library(metap)
 ```
 
 ---
@@ -61,6 +61,9 @@ Non-linear dimensional reduction (UMAP/t-SNE)
 
 # Load the data
 ```{r}
+getwd()
+setwd("/Users/jessicahill/Documents/GitHub/Celegans_Embryo_scRNAseq_ImmuneFunction")
+
 emb.GFPpooled_v2.data <- Read10X_h5("./cellranger/all_GFP_v2/filtered_feature_bc_matrix.h5")
 
 emb.ALLpooled_v2.data <- Read10X_h5("./cellranger/all_pooled_v2/filtered_feature_bc_matrix.h5")
@@ -222,7 +225,6 @@ emb.ALLpooled_v2
 emb.GFPpooled_v2[["RNA"]] <- split(emb.GFPpooled_v2[["RNA"]], f = emb.GFPpooled_v2$rep_group)
 emb.GFPpooled_v2
 ```
-
 
 
 
