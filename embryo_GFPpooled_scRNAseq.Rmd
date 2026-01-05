@@ -1,17 +1,15 @@
 ---
 title: "embryo_intestine_scRNAseq"
 author: "Jessica Hill"
-date: "9/22/2021"
+date: 
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
----
-
-```{r include=FALSE}
+```{r warning=FALSE, message=FALSE}
 # Install packages
 
 install.packages('Seurat')
@@ -30,15 +28,15 @@ if (!require("BiocManager", quietly = TRUE))
 BiocManager::install(version = "3.22")
 
 BiocManager::install("biomaRt")
-
 BiocManager::install('multtest')
 install.packages('metap')
-
 install.packages('devtools')
+install.packages('sctransform')
 ```
 
-```{r include=FALSE}
+```{r warning=FALSE, message=FALSE}
 # Load packages
+
 library(biomaRt)
 library(Seurat)
 library(ggplot2)
@@ -46,107 +44,111 @@ library(tidyverse)
 library(patchwork)
 library(clustree)
 library(metap)
+library(sctransform)
 ```
 
----
-count matrix
-QC and filtering
-Normalization
-Linear dimensionality reduction (PCA)
-Scale data
-Identify highly variable genes
-Clustering
-Non-linear dimensional reduction (UMAP/t-SNE)
----
-
-# Load the data
 ```{r}
-getwd()
-setwd("/Users/jessicahill/Documents/GitHub/Celegans_Embryo_scRNAseq_ImmuneFunction")
-
+# Load the data
 emb.GFPpooled_v2.data <- Read10X_h5("./cellranger/all_GFP_v2/filtered_feature_bc_matrix.h5")
 
 emb.ALLpooled_v2.data <- Read10X_h5("./cellranger/all_pooled_v2/filtered_feature_bc_matrix.h5")
 ```
 
-
-
-Get filternames from https://parasite.wormbase.org/biomart/martview
 ```{r}
+# Get filternames from "https://parasite.wormbase.org/biomart/martview"
+
+# Connect to Wormbase Parasite Biomart
 mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
+# Query gene annotations 
 genes.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "gene_name"),
       value = list("caelegprjna13758", rownames(emb.ALLpooled_v2.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
 
+# Identify mitochondrial genes
 mitoList = genes.df[genes.df$chromosome_name == 'MtDNA', 'external_gene_id']
+
+# Clean up the annotation table (removes chromosome column)
 genes.df$chromosome_name = NULL
 
+# Check annotation coverage
 c(nrow(genes.df), nrow(emb.ALLpooled_v2.data))
 
-# there are genes missing
+# Count missing genes
 nrow(emb.ALLpooled_v2.data)-nrow(genes.df)
 ```
+
 ```{r}
+# Get filternames from "https://parasite.wormbase.org/biomart/martview"
+
+# Connect to Wormbase Parasite Biomart
 mart <- useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
+# Query gene annotations
 genes1.df <- getBM(mart = mart, 
       filters = c("species_id_1010", "gene_name"),
       value = list("caelegprjna13758", rownames(emb.GFPpooled_v2.data)),
       attributes = c('wbps_gene_id','external_gene_id', 'chromosome_name'))
 
+# Identify mitochondrial genes
 mitoList1 = genes1.df[genes1.df$chromosome_name == 'MtDNA', 'external_gene_id']
+
+# Clean up the annotation table (removes chromosome column)
 genes1.df$chromosome_name = NULL
 
+# Check annotation coverage
 c(nrow(genes1.df), nrow(emb.GFPpooled_v2.data))
 
-# there are genes missing
+# Count missing genes
 nrow(emb.GFPpooled_v2.data)-nrow(genes1.df)
 ```
 
-
-
-Remove missing genes (`nrow(emb.GFPpooled.data)-nrow(genes.df)`) from the input matrix 
 ```{r}
+# Filter the expression matrix to annotated genes only, so removing the missing genes (identified above) from the input matrix
 emb.ALLpooled_v2.data.filt <- emb.ALLpooled_v2.data[rownames(emb.ALLpooled_v2.data) %in% genes.df$external_gene_id,]
 
-# The two data structures do not have the same order of WBGeneIDs
+# Check whether gene order matches between objects
 identical(rownames(emb.ALLpooled_v2.data.filt), genes.df$external_gene_id)
 
-# Use match to make sure they are in the same order
+# They do not, so use match to make sure they are in the same order and then verify with identical 
 identical(rownames(emb.ALLpooled_v2.data.filt),
           genes.df[match(rownames(emb.ALLpooled_v2.data.filt), genes.df$external_gene_id),]$external_gene_id)
 
-# are there NAs?
-sum(!is.na(rownames(emb.ALLpooled_v2.data.filt)))
+# Check for missing matches (sanity check), are there NAs?
+sum(is.na(rownames(emb.ALLpooled_v2.data.filt)))
 
+# Inspect the filtered matrix
 head(emb.ALLpooled_v2.data.filt)
 ```
+
 ```{r}
+# Filter the expression matrix to annotated genes only, so removing the missing genes (identified above) from the input matrix
 emb.GFPpooled_v2.data.filt <- emb.GFPpooled_v2.data[rownames(emb.GFPpooled_v2.data) %in% genes1.df$external_gene_id,]
 
-# The two data structures do not have the same order of WBGeneIDs
+# Check whether gene order matches between objects
 identical(rownames(emb.GFPpooled_v2.data.filt), genes1.df$external_gene_id)
 
-# Use match to make sure they are in the same order
+# They do not, so use match to make sure they are in the same order and then verify with identical 
 identical(rownames(emb.GFPpooled_v2.data.filt),
           genes1.df[match(rownames(emb.GFPpooled_v2.data.filt), genes1.df$external_gene_id),]$external_gene_id)
 
-# are there NAs?
-sum(!is.na(rownames(emb.GFPpooled_v2.data.filt)))
+# Check for missing matches (sanity check), are there NAs?
+sum(is.na(rownames(emb.GFPpooled_v2.data.filt)))
 
+# Inspect the filtered matrix
 head(emb.GFPpooled_v2.data.filt)
 ```
 
-
-
 ```{r}
-# extract the cell codes (barcode info with the trailing integer which signifies the order of the samples in the aggregation step)
+# Extract the cell codes (barcode info with the trailing integer which signifies the order of the samples in the aggregation step)
 cellcodes <- as.data.frame(emb.ALLpooled_v2.data.filt@Dimnames[[2]])
+
+# Clean up barcode dataframe
 colnames(cellcodes) <- "barcodes"
 rownames(cellcodes) <- cellcodes$barcodes
 
+# Assign replicate groups using barcode suffixes
 cellcodes$rep_group <- dplyr::case_when(
   grepl("-(1|5)$", cellcodes$barcodes) ~ "Rep_1",
   grepl("-(2|6)$", cellcodes$barcodes) ~ "Rep_2",
@@ -155,22 +157,27 @@ cellcodes$rep_group <- dplyr::case_when(
   TRUE ~ "Unknown"
 )
 
-view(cellcodes)
-
-
+# Assign experimental condition (GFP vs Unsorted)
 cellcodes$condition <- dplyr::case_when(
   grepl("-(1|2|3|4)$", cellcodes$barcodes) ~ "GFP",
   grepl("-(5|6|7|8)$", cellcodes$barcodes) ~ "Unsorted",
   TRUE ~ "Unknown"
 )
 
+# Examine the dataframe
 view(cellcodes)
+head(cellcodes)
 ```
+
 ```{r}
+# Extract the cell codes (barcode info with the trailing integer which signifies the order of the samples in the aggregation step)
 cellcodes_1 <- as.data.frame(emb.GFPpooled_v2.data.filt@Dimnames[[2]])
+
+# Clean up barcode dataframe
 colnames(cellcodes_1) <- "barcodes"
 rownames(cellcodes_1) <- cellcodes_1$barcodes 
 
+# Assign replicate groups using barcode suffixes
 cellcodes_1$rep_group <- dplyr::case_when(
   grepl("-1$", cellcodes_1$barcodes) ~ "Rep_1",
   grepl("-2$", cellcodes_1$barcodes) ~ "Rep_2",
@@ -179,120 +186,133 @@ cellcodes_1$rep_group <- dplyr::case_when(
   TRUE ~ "Unknown"
 )
 
-view(cellcodes_1)
-
-
+# Assign experimental condition (GFP)
 cellcodes_1$condition <- dplyr::case_when(
   grepl("-(1|2|3|4)$", cellcodes_1$barcodes) ~ "GFP",
   TRUE ~ "Unknown"
 )
 
+# Examine the dataframe
 view(cellcodes_1)
+head(cellcodes_1) 
 ```
 
-
-
-
 ```{r}
-# Check data for mismatch. Make sure that rownames(cellcodes) and colnames(counts) match.
-
+# Check data for mismatch, make sure that rownames(cellcodes) and colnames(counts) match
 all(colnames(emb.ALLpooled_v2.data.filt) == rownames(cellcodes))
 all(colnames(emb.GFPpooled_v2.data.filt) == rownames(cellcodes_1))
 ```
 
-
-# Set up the Seurat object
-# Initialize the Seurat object with the raw (non-normalized data).
 ```{r}
+# Set up the Seurat object. Initialize the Seurat object with the raw (non-normalized data)
 emb.ALLpooled_v2 <- CreateSeuratObject(counts = emb.ALLpooled_v2.data.filt, project = "emb.ALLpooled_v2", min.cells = 3, min.features = 200, meta.data = cellcodes)
 
 view(emb.ALLpooled_v2@meta.data)
 ```
+
 ```{r}
+# Set up the Seurat object. Initialize the Seurat object with the raw (non-normalized data)
 emb.GFPpooled_v2 <- CreateSeuratObject(counts = emb.GFPpooled_v2.data.filt, project = "emb.GFPpooled_v2", min.cells = 3, min.features = 200, meta.data = cellcodes_1)
 
 view(emb.GFPpooled_v2@meta.data)
 ```
 
-
-
-Create a list of Seurat objects, one for each rep_group. Can now loop over these for normalization, variable feature detection, etc.
 ```{r}
+# Takes the RNA assay in our Seurat object and splits it into multiply layers (sub-assays-->one per rep_group), so each replicate can be processed independently (normalized, scaled, variable feature detection, etc. and then integrated)
 emb.ALLpooled_v2[["RNA"]] <- split(emb.ALLpooled_v2[["RNA"]], f = emb.ALLpooled_v2$rep_group)
+
+# Now check the layers (raw data only at this point 'counts.')
 emb.ALLpooled_v2
 ```
+
 ```{r}
+# Takes the RNA assay in our Seurat object and splits it into multiply layers (sub-assays-->one per rep_group), so each replicate can be processed independently (normalization, scaling, variable feature detection, etc. and then integrated)
 emb.GFPpooled_v2[["RNA"]] <- split(emb.GFPpooled_v2[["RNA"]], f = emb.GFPpooled_v2$rep_group)
+
+# Now check the layers (raw data only at this point 'counts.')
 emb.GFPpooled_v2
 ```
-
-
 
 ```
 # this code chunk wont work becuase i havent renamed the rownames of the count matrix (seurat object)!!
 
 length(unique(genes.df$wbps_gene_id))
 length(unique(rownames(emb.ALLpooled_v2)))
+
 rownames(emb.ALLpooled_v2)[!(rownames(emb.ALLpooled_v2) %in% genes.df$external_gene_id)]
 
 
 length(unique(genes1.df$wbps_gene_id))
 length(unique(rownames(emb.GFPpooled_v2)))
+
 rownames(emb.GFPpooled_v2)[!(rownames(emb.GFPpooled_v2) %in% genes1.df$external_gene_id)]
 ```
 
-
-
-# Quality control metrics
-- `nFeature_RNA` is the number of genes detected in each cell. 
-- `nCount_RNA` is the total number of molecules detected within a cell (AKA total UMIs per cell)
-- Low `nFeature_RNA` indicates that the cell may be dead or dying or an empty droplet
-- High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
-
 ```{r}
-# show QC metrics for the first 5 cells 
+## QC - Peak at the data 
+# `nFeature_RNA` is number of genes detected in each cell. 
+# `nCount_RNA` is total number of molecules detected within a cell (AKA total UMIs per cell)
+# Low `nFeature_RNA` indicates that the cell may be dead or dying or an empty droplet
+# High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
+
 view(emb.ALLpooled_v2@meta.data)
 head(emb.ALLpooled_v2@meta.data, 5)
 ```
+
 ```{r}
+## QC - Peak at the data 
+# `nFeature_RNA` is number of genes detected in each cell. 
+# `nCount_RNA` is total number of molecules detected within a cell (AKA total UMIs per cell)
+# Low `nFeature_RNA` indicates that the cell may be dead or dying or an empty droplet
+# High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
+
 view(emb.GFPpooled_v2@meta.data)
 head(emb.GFPpooled_v2@meta.data, 5)
 ```
 
-
-Mitochondrial genome percentage 
 ```{r}
+# QC - Mitochondrial genome percentage 
 mitoIndices <- rownames(emb.ALLpooled_v2)[rownames(emb.ALLpooled_v2) %in% mitoList]
+
 emb.ALLpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.ALLpooled_v2, features = mitoIndices)
 ```
+
 ```{r}
+# QC - Mitochondrial genome percentage
 mitoIndices_1 <- rownames(emb.GFPpooled_v2)[rownames(emb.GFPpooled_v2) %in% mitoList1]
+
 emb.GFPpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled_v2, features = mitoIndices_1)
 ```
 
-
-
-Visualize QC metrics as a violin plot
 ```{r}
+#Visualize QC metrics as a violin plot
+
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.pdf", height = 6, width = 9)
-VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-dev.off()
-```
-```{r}
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.pdf", height = 6, width = 9)
-VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), layer = "counts", ncol = 3)
 dev.off()
 ```
 
-FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 ```{r}
+#Visualize QC metrics as a violin plot
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.pdf", height = 6, width = 9)
+VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), layer = "counts", ncol = 3)
+dev.off()
+```
+
+```{r}
+# FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
+
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.pdf", height = 6, width = 9)
 plot1 <- FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 dev.off()
 ```
+
 ```{r}
+# FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
+
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.pdf", height = 6, width = 9)
 plot1 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "percent.mt") + geom_hline(yintercept = 50)
 plot2 <- FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
@@ -300,32 +320,35 @@ plot1 + plot2
 dev.off()
 ```
 
-
-Filter based on features.
-cells being filtered due to mito percent: 
 ```{r}
+# Filter based on features. Cells being filtered due to mito percent. 
 sum(emb.ALLpooled_v2$percent.mt > 50)/ length(emb.ALLpooled_v2$percent.mt)
 emb.ALLpooled_v2 <- subset(emb.ALLpooled_v2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
+
 ```{r}
+# Filter based on features. Cells being filtered due to mito percent.
 sum(emb.GFPpooled_v2$percent.mt > 50)/ length(emb.GFPpooled_v2$percent.mt)
 emb.GFPpooled_v2 <- subset(emb.GFPpooled_v2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
 
-
-Visualize after filtering
 ```{r}
+# Visualize after filtering
+
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.VlnPlot.filt.pdf", height = 6, width = 9)
-VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+VlnPlot(emb.ALLpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), layer = "counts")
 dev.off()
 
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeatureScatter.filt.pdf", height = 6, width = 9)
 FeatureScatter(emb.ALLpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 dev.off()
 ```
+
 ```{r}
+# Visualize after filtering
+
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.filt.pdf", height = 6, width = 9)
-VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"))
+VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), layer = "counts")
 dev.off()
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.filt.pdf", height = 6, width = 9)
@@ -343,6 +366,7 @@ exp_matrix <- as.matrix(emb.ALLpooled_v2@assays$RNA$counts)
 gene_express_per_cell <- rowSums(exp_matrix)
 genes_express_only_once <- sum(gene_express_per_cell==1)
 ```
+
 ```{r}
 view(emb.GFPpooled_v2@meta.data)
 hist(emb.GFPpooled_v2$nFeature_RNA)
