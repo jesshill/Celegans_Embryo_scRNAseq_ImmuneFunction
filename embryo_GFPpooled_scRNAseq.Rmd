@@ -31,7 +31,6 @@ BiocManager::install("biomaRt")
 BiocManager::install('multtest')
 install.packages('metap')
 install.packages('devtools')
-install.packages('sctransform')
 ```
 
 ```{r warning=FALSE, message=FALSE}
@@ -44,7 +43,6 @@ library(tidyverse)
 library(patchwork)
 library(clustree)
 library(metap)
-library(sctransform)
 ```
 
 ```{r}
@@ -367,21 +365,24 @@ view(emb.ALLpooled_v2@assays$RNA$counts.Rep_2)
 view(emb.ALLpooled_v2@assays$RNA$counts.Rep_3)
 view(emb.ALLpooled_v2@assays$RNA$counts.Rep_4)
 
+# Extract the raw count matrix (genes x cells) from the RNA assay
 exp_matrix <- as.matrix(emb.ALLpooled_v2@assays$RNA$counts.Rep_1)
-gene_express_per_cell <- rowSums(exp_matrix)
-genes_express_only_once <- sum(gene_express_per_cell==1)
+# Sum counts for each gene across all cells
+total_cts_per_gene <- rowSums(exp_matrix)
+# Count how many genes have a total expression count of exactly one, indicating they are expressed in only a single cell at a single UMI
+genes_express_only_once <- sum(total_cts_per_gene==1)
 
 exp_matrix2 <- as.matrix(emb.ALLpooled_v2@assays$RNA$counts.Rep_2)
-gene_express_per_cell2 <- rowSums(exp_matrix2)
-genes_express_only_once2 <- sum(gene_express_per_cell2==1)
+total_cts_per_gene2 <- rowSums(exp_matrix2)
+genes_express_only_once2 <- sum(total_cts_per_gene2==1)
 
 exp_matrix3 <- as.matrix(emb.ALLpooled_v2@assays$RNA$counts.Rep_3)
-gene_express_per_cell3 <- rowSums(exp_matrix3)
-genes_express_only_once3 <- sum(gene_express_per_cell3==1)
+total_cts_per_gene3 <- rowSums(exp_matrix3)
+genes_express_only_once3 <- sum(total_cts_per_gene3==1)
 
 exp_matrix4 <- as.matrix(emb.ALLpooled_v2@assays$RNA$counts.Rep_4)
-gene_express_per_cell4 <- rowSums(exp_matrix4)
-genes_express_only_once4 <- sum(gene_express_per_cell4==1)
+total_cts_per_gene4 <- rowSums(exp_matrix4)
+genes_express_only_once4 <- sum(total_cts_per_gene4==1)
 ```
 
 ```{r}
@@ -395,53 +396,44 @@ view(emb.GFPpooled_v2@assays$RNA$counts.Rep_2)
 view(emb.GFPpooled_v2@assays$RNA$counts.Rep_3)
 view(emb.GFPpooled_v2@assays$RNA$counts.Rep_4)
 
+# Extract the raw count matrix (genes x cells) from the RNA assay
 exp_matrix <- as.matrix(emb.GFPpooled_v2@assays$RNA$counts.Rep_1)
-gene_express_per_cell <- rowSums(exp_matrix)
-genes_express_only_once <- sum(gene_express_per_cell==1)
+# Sum counts for each gene across all cells
+total_cts_per_gene <- rowSums(exp_matrix)
+# Count how many genes have a total expression count of exactly one, indicating they are expressed in only a single cell at a single UMI
+genes_express_only_once <- sum(total_cts_per_gene==1)
 
 exp_matrix2 <- as.matrix(emb.GFPpooled_v2@assays$RNA$counts.Rep_2)
-gene_express_per_cell2 <- rowSums(exp_matrix2)
-genes_express_only_once2 <- sum(gene_express_per_cell2==1)
+total_cts_per_gene2 <- rowSums(exp_matrix2)
+genes_express_only_once2 <- sum(total_cts_per_gene2==1)
 
 exp_matrix3 <- as.matrix(emb.GFPpooled_v2@assays$RNA$counts.Rep_3)
-gene_express_per_cell3 <- rowSums(exp_matrix3)
-genes_express_only_once3 <- sum(gene_express_per_cell3==1)
+total_cts_per_gene3 <- rowSums(exp_matrix3)
+genes_express_only_once3 <- sum(total_cts_per_gene3==1)
 
 exp_matrix4 <- as.matrix(emb.GFPpooled_v2@assays$RNA$counts.Rep_4)
-gene_express_per_cell4 <- rowSums(exp_matrix4)
-genes_express_only_once4 <- sum(gene_express_per_cell4==1)
+total_cts_per_gene4 <- rowSums(exp_matrix4)
+genes_express_only_once4 <- sum(total_cts_per_gene4==1)
 ```
 
----
-Note that this single command replaces: 
-NormalizeData() 
-ScaleData() 
-FindVariableFeatures()
-
-Transformed data will be available in the SCT assay, which is set as the default after running sctransform
-
-During normalization, we can also remove confounding sources of variation, for example, mitochondrial mapping percentage
----
-
-# Normalize the data
-After removing unwanted cells from the dataset, we next normalize the data. 
-By default, we employ a global-scaling normalization method "LogNormalize" that normalizes the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10,000 is the default), and log-transforms the result. 
-
-Normalized values are stored in emb.GFPpooled[["RNA]]@data
-
 ```{r}
-library(sctransform)
+# Normalize the data: after removing unwanted cells from the dataset normalize the data. By default, a global-scaling normalization method "LogNormalize" that normalizes the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10,000 is the default), and log-transforms the result.
+
+# Normalized values are stored in emb.ALLpooled_v2@assays$RNA$data.Rep_1
 
 emb.ALLpooled_v2 <- NormalizeData(emb.ALLpooled_v2, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
+
 ```{r}
+# Normalize the data: after removing unwanted cells from the dataset normalize the data. By default, a global-scaling normalization method "LogNormalize" that normalizes the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10,000 is the default), and log-transforms the result.
+
+# Normalized values are stored in emb.GFPpooled_v2@assays$RNA$data.Rep_1
+
 emb.GFPpooled_v2 <- NormalizeData(emb.GFPpooled_v2, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
 
-
-# Feature selection
-Identify highly variable features to focus on in downstream analysis
 ```{r}
+# Feature selection: Identify highly variable features to focus on in downstream analysis
 emb.ALLpooled_v2 <- FindVariableFeatures(emb.ALLpooled_v2, selection.method = "vst", nfeatures = 2000)
 
 # Identify the 10 most highly variable genes
@@ -453,7 +445,9 @@ plot1 <- VariableFeaturePlot(emb.ALLpooled_v2)
 LabelPoints(plot = plot1, points = top10_all, repel = TRUE)
 dev.off()
 ```
+
 ```{r}
+# Feature selection: Identify highly variable features to focus on in downstream analysis
 emb.GFPpooled_v2 <- FindVariableFeatures(emb.GFPpooled_v2, selection.method = "vst", nfeatures = 2000)
 
 top10_GFP <- head(VariableFeatures(emb.GFPpooled_v2), 10)
