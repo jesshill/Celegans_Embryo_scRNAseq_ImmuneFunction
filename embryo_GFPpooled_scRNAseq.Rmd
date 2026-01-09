@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
 ```{r warning=FALSE, message=FALSE}
 # Install packages
 
@@ -33,6 +34,7 @@ install.packages('metap')
 install.packages('devtools')
 ```
 
+
 ```{r warning=FALSE, message=FALSE}
 # Load packages
 
@@ -45,12 +47,14 @@ library(clustree)
 library(metap)
 ```
 
+
 ```{r}
 # Load the data
 emb.GFPpooled_v2.data <- Read10X_h5("./cellranger/all_GFP_v2/filtered_feature_bc_matrix.h5")
 
 emb.ALLpooled_v2.data <- Read10X_h5("./cellranger/all_pooled_v2/filtered_feature_bc_matrix.h5")
 ```
+
 
 ```{r}
 # Get filternames from "https://parasite.wormbase.org/biomart/martview"
@@ -102,6 +106,7 @@ c(nrow(genes1.df), nrow(emb.GFPpooled_v2.data))
 nrow(emb.GFPpooled_v2.data)-nrow(genes1.df)
 ```
 
+
 ```{r}
 # Filter the expression matrix to annotated genes only, so removing the missing genes (identified above) from the input matrix
 emb.ALLpooled_v2.data.filt <- emb.ALLpooled_v2.data[rownames(emb.ALLpooled_v2.data) %in% genes.df$external_gene_id,]
@@ -137,6 +142,7 @@ sum(is.na(rownames(emb.GFPpooled_v2.data.filt)))
 # Inspect the filtered matrix
 head(emb.GFPpooled_v2.data.filt)
 ```
+
 
 ```{r}
 # Extract the cell codes (barcode info with the trailing integer which signifies the order of the samples in the aggregation step)
@@ -195,11 +201,13 @@ view(cellcodes_1)
 head(cellcodes_1) 
 ```
 
+
 ```{r}
 # Check data for mismatch, make sure that rownames(cellcodes) and colnames(counts) match
 all(colnames(emb.ALLpooled_v2.data.filt) == rownames(cellcodes))
 all(colnames(emb.GFPpooled_v2.data.filt) == rownames(cellcodes_1))
 ```
+
 
 ```{r}
 # Set up the Seurat object. Initialize the Seurat object with the raw (non-normalized data)
@@ -214,6 +222,7 @@ emb.GFPpooled_v2 <- CreateSeuratObject(counts = emb.GFPpooled_v2.data.filt, proj
 
 view(emb.GFPpooled_v2@meta.data)
 ```
+
 
 ```{r}
 # Takes the RNA assay in our Seurat object and splits it into multiply layers (sub-assays-->one per rep_group), so each replicate can be processed independently (normalized, scaled, variable feature detection, etc. and then integrated)
@@ -231,6 +240,7 @@ emb.GFPpooled_v2[["RNA"]] <- split(emb.GFPpooled_v2[["RNA"]], f = emb.GFPpooled_
 emb.GFPpooled_v2
 ```
 
+
 ```
 # this code chunk wont work becuase i havent renamed the rownames of the count matrix (seurat object)!!
 
@@ -245,6 +255,7 @@ length(unique(rownames(emb.GFPpooled_v2)))
 
 rownames(emb.GFPpooled_v2)[!(rownames(emb.GFPpooled_v2) %in% genes1.df$external_gene_id)]
 ```
+
 
 ```{r}
 ## QC - Peak at the data 
@@ -268,6 +279,7 @@ view(emb.GFPpooled_v2@meta.data)
 head(emb.GFPpooled_v2@meta.data, 5)
 ```
 
+
 ```{r}
 # QC - Mitochondrial genome percentage 
 mitoIndices <- rownames(emb.ALLpooled_v2)[rownames(emb.ALLpooled_v2) %in% mitoList]
@@ -281,6 +293,7 @@ mitoIndices_1 <- rownames(emb.GFPpooled_v2)[rownames(emb.GFPpooled_v2) %in% mito
 
 emb.GFPpooled_v2[["percent.mt"]] <- PercentageFeatureSet(emb.GFPpooled_v2, features = mitoIndices_1)
 ```
+
 
 ```{r}
 #Visualize QC metrics as a violin plot
@@ -297,6 +310,7 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.pdf", height = 6, width
 VlnPlot(emb.GFPpooled_v2, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), layer = "counts", ncol = 3)
 dev.off()
 ```
+
 
 ```{r}
 # FeatureScatter is typically used to visualize feature-feature relationships, but can be used for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
@@ -318,6 +332,7 @@ plot1 + plot2
 dev.off()
 ```
 
+
 ```{r}
 # Filter based on features. Cells being filtered due to mito percent. 
 sum(emb.ALLpooled_v2$percent.mt > 50)/ length(emb.ALLpooled_v2$percent.mt)
@@ -329,6 +344,7 @@ emb.ALLpooled_v2 <- subset(emb.ALLpooled_v2, subset = nFeature_RNA > 200 & nFeat
 sum(emb.GFPpooled_v2$percent.mt > 50)/ length(emb.GFPpooled_v2$percent.mt)
 emb.GFPpooled_v2 <- subset(emb.GFPpooled_v2, subset = nFeature_RNA > 200 & nFeature_RNA < 5000 & nCount_RNA < 50000 & percent.mt < 50)
 ```
+
 
 ```{r}
 # Visualize after filtering
@@ -353,6 +369,7 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeatureScatter.filt.pdf", heigh
 FeatureScatter(emb.GFPpooled_v2, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 dev.off()
 ```
+
 
 ```{r}
 # Check out the metadata, inspect QC metrics, labels, etc. 
@@ -416,6 +433,7 @@ total_cts_per_gene4 <- rowSums(exp_matrix4)
 genes_express_only_once4 <- sum(total_cts_per_gene4==1)
 ```
 
+
 ```{r}
 # Normalize the data: after removing unwanted cells from the dataset normalize the data. By default, a global-scaling normalization method "LogNormalize" that normalizes the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10,000 is the default), and log-transforms the result.
 
@@ -431,6 +449,7 @@ emb.ALLpooled_v2 <- NormalizeData(emb.ALLpooled_v2, normalization.method = "LogN
 
 emb.GFPpooled_v2 <- NormalizeData(emb.GFPpooled_v2, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
+
 
 ```{r}
 # Feature selection: Identify highly variable features to focus on in downstream analysis
@@ -459,38 +478,40 @@ dev.off()
 ```
 
 
-# Scaling the data
-Apply a linear transformation ("scaling") prior to dimensional reduction, PCA. 
-Shifts the expression of each gene, so that the mean expression across cells is 0. 
-Scales the expression of each gene, so that the variance across cells is 1. 
-This gives equal weight in downstream analysis, so that highly expressed genes dont dominate. 
 ```{r}
+# Scaling the data: Apply a linear transformation ("scaling") prior to dimensional reduction, PCA. Shifts the expression of each gene, so that the mean expression across cells is 0. Scales the expression of each gene, so that the variance across cells is 1. This gives equal weight in downstream analysis, so that highly expressed genes don't dominate.
 all.genes <- rownames(emb.ALLpooled_v2)
 emb.ALLpooled_v2 <- ScaleData(emb.ALLpooled_v2, features = all.genes)
 ```
+
 ```{r}
+# Scaling the data: Apply a linear transformation ("scaling") prior to dimensional reduction, PCA. Shifts the expression of each gene, so that the mean expression across cells is 0. Scales the expression of each gene, so that the variance across cells is 1. This gives equal weight in downstream analysis, so that highly expressed genes don't dominate.
 all.genes_1 <- rownames(emb.GFPpooled_v2)
 emb.GFPpooled_v2 <- ScaleData(emb.GFPpooled_v2, features = all.genes_1)
 ```
 
 
-# Linear dimensional reduction 
-perform PCA on the scaled data. 
-By default, only the previously determined variable features are used as input. 
 ```{r}
+# Linear dimensional reduction: Perform PCA on the scaled data. By default, only the previously determined variable features are used as input. 
 emb.ALLpooled_v2 <- RunPCA(emb.ALLpooled_v2, features = VariableFeatures(object = emb.ALLpooled_v2))
 ```
+
 ```{r}
+# Linear dimensional reduction: Perform PCA on the scaled data. By default, only the previously determined variable features are used as input.
 emb.GFPpooled_v2 <- RunPCA(emb.GFPpooled_v2, features = VariableFeatures(object = emb.GFPpooled_v2))
 ```
 
-Examine and visualize PCA results a few different ways
+
 ```{r}
-print(emb.ALLpooled_v2[["pca"]], dims = 1:5, nfeatures = 5)
+# Examine and visualize PCA results a few different ways
+print(emb.ALLpooled_v2[["pca"]], dims = 1:5, nfeatures = 10)
 ```
+
 ```{r}
-print(emb.GFPpooled_v2[["pca"]], dims = 1:5, nfeatures = 5)
+# Examine and visualize PCA results a few different ways
+print(emb.GFPpooled_v2[["pca"]], dims = 1:5, nfeatures = 10)
 ```
+
 
 ```{r}
 # top genes associated with reduction components
@@ -498,39 +519,46 @@ pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimLoadings.pdf", height = 6
 VizDimLoadings(emb.ALLpooled_v2, dims = 1:2, reduction = "pca")
 dev.off()
 ```
+
 ```{r}
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimLoadings.pdf", height = 6, width = 9)
 VizDimLoadings(emb.GFPpooled_v2, dims = 1:2, reduction = "pca")
 dev.off()
 ```
 
+
 ```{r}
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.DimPlot.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "pca")
 dev.off()
 ```
+
 ```{r}
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2, reduction = "pca")
 dev.off()
 ```
 
+
 ```{r}
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1.pdf", height = 6, width = 9)
 DimHeatmap(emb.ALLpooled_v2, dims = 1, cells = 500, balanced = TRUE)
 dev.off()
 ```
+
 ```{r}
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1.pdf", height = 6, width = 9)
 DimHeatmap(emb.GFPpooled_v2, dims = 1, cells = 500, balanced = TRUE)
 dev.off()
 ```
 
+
 ```{r}
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.HeatMap1-6.pdf", height = 6, width = 9)
 DimHeatmap(emb.ALLpooled_v2, dims = 1:6, cells = 500, balanced = TRUE)
 dev.off()
 ```
+
 ```{r}
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.HeatMap1-6.pdf", height = 6, width = 9)
 DimHeatmap(emb.GFPpooled_v2, dims = 1:6, cells = 500, balanced = TRUE)
@@ -538,15 +566,15 @@ dev.off()
 ```
 
 
-# Determine dataset dimensionality
-To overcome the extensive technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a ‘metafeature’ that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. However, how many components should we choose to include? 
-
-Seurat implements a resampling test inspired by the JackStraw procedure. We randomly permute a subset of the data (1% by default) and rerun PCA, constructing a ‘null distribution’ of feature scores, and repeat this procedure. We identify ‘significant’ PCs as those who have a strong enrichment of low p-value features
 ```{r}
+# Determine dataset dimensionality: To overcome technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a ‘metafeature’ that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. But how many components should we choose to include? Seurat implements a resampling test inspired by the JackStraw procedure. We randomly permute a subset of the data (1% by default) and rerun PCA, constructing a ‘null distribution’ of feature scores, and repeat this procedure. We identify ‘significant’ PCs as those who have a strong enrichment of low p-value features.
+
 emb.ALLpooled_v2 <- JackStraw(emb.ALLpooled_v2, num.replicate = 100)
 emb.ALLpooled_v2 <- ScoreJackStraw(emb.ALLpooled_v2, dims = 1:20)
 ```
+
 ```{r}
+# Determine dataset dimensionality: To overcome technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a ‘metafeature’ that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. But how many components should we choose to include? Seurat implements a resampling test inspired by the JackStraw procedure. We randomly permute a subset of the data (1% by default) and rerun PCA, constructing a ‘null distribution’ of feature scores, and repeat this procedure. We identify ‘significant’ PCs as those who have a strong enrichment of low p-value features.
 emb.GFPpooled_v2 <- JackStraw(emb.GFPpooled_v2, num.replicate = 100)
 emb.GFPpooled_v2 <- ScoreJackStraw(emb.GFPpooled_v2, dims = 1:20)
 ```
