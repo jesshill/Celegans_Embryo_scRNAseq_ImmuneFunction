@@ -846,53 +846,56 @@ DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
 ```
 
 
-
-
-
-
-
-
-
-output total gene list for cells in clusters (not just variable features)
 ```{r}
+# output the metadata for each gene
 # `nFeature_RNA` is the number of genes detected in each cell. 
 # `nCount_RNA` is the total number of molecules detected within a cell (AKA total UMIs per cell)
 
-head(emb.GFPpooled_v2@meta.data)
-head(emb.GFPpooled_v2@assays$RNA$data)
-
 write.csv(emb.GFPpooled_v2@meta.data,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2_meta.data.csv", row.names = TRUE)
+```
+
+```{r}
+# output total gene list for cells in clusters (not just variable features)
+# this will be the normalized and stabalized data
 
 write.csv(emb.GFPpooled_v2@assays$RNA$data,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.csv", row.names = TRUE)
 ```
 
 
-
-
-
-
-
-# Find differentially expressed features (cluster biomarkers)
-Find markers that define clusters via differential expression. By default, Seurat identifies positive and negative markers of a single cluster compared to all other cells. You can do for all clusters, you can test groups of clusters vs. each other, or against all cells. 
-
-The min.pct argument requires a feature to be detected at a minimum percentage in either of the two groups of cells, and the thresh.test argument requires a feature to be differentially expressed (on average) by some amount between the two groups. max.cells.per.ident can also be set and will downsample each identity class to have no more cells than whatever this is set to. 
 ```{r}
+# Find differentially expressed features (cluster biomarkers): Find markers that define clusters via differential expression. By default, Seurat identifies positive and negative markers of a single cluster (specified in ident.1) compared to all other cells. 'FindAllMarkers()' automates this process for all clusters, but you can also test groups of clusters vs. each other, or against all cells.
+
+# The 'min.pct' argument requires a feature to be detected at a minimum percentage in either of the two groups of cells, and the 'thresh.test' argument requires a feature to be differentially expressed (on average) by some amount between the two groups. 'max.cells.per.ident' can also be set and will downsample each identity class to have no more cells than whatever this is set to. 
+
+# find markers for every cluster compared to all remaining cells, report only the positive
 emb.GFPpooled_v2.markers <- FindAllMarkers(emb.GFPpooled_v2, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
-emb.GFPpooled_v2.markers %>% 
-  group_by(cluster) %>% filter(p_val_adj < .01) %>%
-  slice_max(n = 2, order_by = avg_log2FC) 
-
+# write the marker gene list for each cluster 
 write.csv(emb.GFPpooled_v2.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2_markers.csv", row.names = TRUE)
+
+# pct.1 = The fraction of cells in the target cluster (the cluster listed in the cluster column) that have non-zero expression of the gene.
+# pct.2 = The fraction of cells in all other cells (i.e., all remaining clusters combined) that have non-zero expression of the gene.
+
+# peek at the top marker genes for each cluster 
+emb.GFPpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% slice_max(n = 3, order_by = avg_log2FC) 
 ```
+
 ```{r}
+# Find differentially expressed features (cluster biomarkers): Find markers that define clusters via differential expression. By default, Seurat identifies positive and negative markers of a single cluster (specified in ident.1) compared to all other cells. 'FindAllMarkers()' automates this process for all clusters, but you can also test groups of clusters vs. each other, or against all cells.
+
+# The 'min.pct' argument requires a feature to be detected at a minimum percentage in either of the two groups of cells, and the 'thresh.test' argument requires a feature to be differentially expressed (on average) by some amount between the two groups. 'max.cells.per.ident' can also be set and will downsample each identity class to have no more cells than whatever this is set to. 
+
+# find markers for every cluster compared to all remaining cells, report only the positive
 emb.ALLpooled_v2.markers <- FindAllMarkers(emb.ALLpooled_v2, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
-emb.ALLpooled_v2.markers %>% 
-  group_by(cluster) %>% filter(p_val_adj < .01) %>%
-  slice_max(n = 2, order_by = avg_log2FC) 
-
+# write the marker gene list for each cluster 
 write.csv(emb.ALLpooled_v2.markers,"./Seurat_output/all_pooled_v2/emb.ALLpooled_v2_markers.csv", row.names = TRUE)
+
+# pct.1 = The fraction of cells in the target cluster (the cluster listed in the cluster column) that have non-zero expression of the gene.
+# pct.2 = The fraction of cells in all other cells (i.e., all remaining clusters combined) that have non-zero expression of the gene.
+
+# peek at the top marker genes for each cluster 
+emb.ALLpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% slice_max(n = 3, order_by = avg_log2FC) 
 ```
 
 
