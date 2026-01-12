@@ -754,10 +754,23 @@ emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.nam
 emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, reduction = "integrated.cca", dims = 1:20, reduction.name = "umap.cca")
 emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, reduction = "integrated.harmony", dims = 1:20, reduction.name = "umap.harmony")
 
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.cca.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.cca", group.by = c("rep_group", "cca_clusters"), label.size = 4, pt.size = 1)
+dev.off()
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.cca.rep.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.cca", split.by = "rep_group", label.size = 4, pt.size = 1)
+dev.off()
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "harmony_clusters"), label.size = 4, pt.size = 1)
+dev.off()
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.rep.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", split.by = "rep_group", label.size = 4, pt.size = 1)
+dev.off()
+
 
 # re-join layers after integration
 emb.ALLpooled_v2[["RNA"]] <- JoinLayers(emb.ALLpooled_v2[["RNA"]])
@@ -781,85 +794,39 @@ emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.nam
 emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:20, reduction.name = "umap.cca")
 emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.harmony", dims = 1:20, reduction.name = "umap.harmony")
 
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.cca.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", group.by = c("rep_group", "cca_clusters"), label.size = 4, pt.size = 1)
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.cca.rep.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", split.by = "rep_group", label.size = 4, pt.size = 1)
-
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "harmony_clusters"), label.size = 4, pt.size = 1)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group", label.size = 4, pt.size = 1)
-
-# re-join layers after integration
-emb.GFPpooled_v2[["RNA"]] <- JoinLayers(emb.GFPpooled_v2[["RNA"]])
-```
-
-
-
-
---------
-Harmony
-```{r}
-set.seed(42)
-```
-```{r}
-emb.ALLpooled_v2 <- IntegrateLayers(object = emb.ALLpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
-    verbose = FALSE)
-
-# re-join layers after integration
-emb.ALLpooled_v2[["RNA"]] <- JoinLayers(emb.ALLpooled_v2[["RNA"]])
-
-emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, reduction = "harmony", dims = 1:20)
-emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
-emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, dims = 1:20, reduction = "harmony", reduction.name = "umap.harmony")
-
-
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.pdf", height = 6, width = 9)
-DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "seurat_clusters"))
 dev.off()
-
-
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.rep.pdf", height = 6, width = 9)
-DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
-dev.off()
-
-
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony2.pdf", height = 6, width = 6)
-DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", label = TRUE, pt.size = 1, label.size = 4) + theme(legend.text = element_text(size = 10))
-dev.off()
-```
-
-```{r}
-emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
-    verbose = FALSE)
-
-# re-join layers after integration
-emb.GFPpooled_v2[["RNA"]] <- JoinLayers(emb.GFPpooled_v2[["RNA"]])
-
-emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "harmony", dims = 1:20)
-emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
-
-emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "harmony", reduction.name = "umap.harmony")
-
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "seurat_clusters"))
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "harmony_clusters"), label.size = 4, pt.size = 1)
 dev.off()
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.rep.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group", label.size = 4, pt.size = 1)
 dev.off()
+
+
+# re-join layers after integration
+emb.GFPpooled_v2[["RNA"]] <- JoinLayers(emb.GFPpooled_v2[["RNA"]])
 ```
 
 
---------
+
+
 
 
 ```{r}
-# so variability in the umap projections is coming from the integration (harmony) not from the PCA or umap, those have a set.seed default = 42
-# so need to set a global seed
-
-
 emb.GFPpooled_v2@reductions$pca
 emb.GFPpooled_v2@reductions$umap.unintegrated
-emb.GFPpooled_v2@reductions$harmony
+emb.GFPpooled_v2@reductions$integrated.cca
+emb.GFPpooled_v2@reductions$umap.cca
+emb.GFPpooled_v2@reductions$integrated.harmony
 emb.GFPpooled_v2@reductions$umap.harmony
 
 
