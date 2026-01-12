@@ -32,6 +32,7 @@ BiocManager::install("biomaRt")
 BiocManager::install('multtest')
 install.packages('metap')
 install.packages('devtools')
+install.packages("harmony")
 ```
 
 
@@ -45,6 +46,7 @@ library(tidyverse)
 library(patchwork)
 library(clustree)
 library(metap)
+library(harmony)
 ```
 
 
@@ -238,22 +240,6 @@ emb.GFPpooled_v2[["RNA"]] <- split(emb.GFPpooled_v2[["RNA"]], f = emb.GFPpooled_
 
 # Now check the layers (raw data only at this point 'counts.')
 emb.GFPpooled_v2
-```
-
-
-```
-# this code chunk wont work becuase i havent renamed the rownames of the count matrix (seurat object)!!
-
-length(unique(genes.df$wbps_gene_id))
-length(unique(rownames(emb.ALLpooled_v2)))
-
-rownames(emb.ALLpooled_v2)[!(rownames(emb.ALLpooled_v2) %in% genes.df$external_gene_id)]
-
-
-length(unique(genes1.df$wbps_gene_id))
-length(unique(rownames(emb.GFPpooled_v2)))
-
-rownames(emb.GFPpooled_v2)[!(rownames(emb.GFPpooled_v2) %in% genes1.df$external_gene_id)]
 ```
 
 
@@ -493,11 +479,17 @@ emb.GFPpooled_v2 <- ScaleData(emb.GFPpooled_v2, features = all.genes_1)
 
 ```{r}
 # Linear dimensional reduction: Perform PCA on the scaled data. By default, only the previously determined variable features are used as input. 
+
+# default: seed.use = 42
+
 emb.ALLpooled_v2 <- RunPCA(emb.ALLpooled_v2, features = VariableFeatures(object = emb.ALLpooled_v2))
 ```
 
 ```{r}
 # Linear dimensional reduction: Perform PCA on the scaled data. By default, only the previously determined variable features are used as input.
+
+# default: seed.use = 42
+
 emb.GFPpooled_v2 <- RunPCA(emb.GFPpooled_v2, features = VariableFeatures(object = emb.GFPpooled_v2))
 ```
 
@@ -567,57 +559,71 @@ dev.off()
 
 
 ```{r}
-# Determine dataset dimensionality: To overcome technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a ‘metafeature’ that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. But how many components should we choose to include? Seurat implements a resampling test inspired by the JackStraw procedure. We randomly permute a subset of the data (1% by default) and rerun PCA, constructing a ‘null distribution’ of feature scores, and repeat this procedure. We identify ‘significant’ PCs as those who have a strong enrichment of low p-value features.
+# Determine dataset dimensionality: To overcome technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a ‘metafeature’ that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. But how many components should we choose to include? 
+
+# Seurat implements a resampling test inspired by the JackStraw procedure. We randomly permute a subset of the data (1% by default) and rerun PCA, constructing a ‘null distribution’ of feature scores, and repeat this procedure. We identify ‘significant’ PCs as those who have a strong enrichment of low p-value features.
 
 emb.ALLpooled_v2 <- JackStraw(emb.ALLpooled_v2, num.replicate = 100)
 emb.ALLpooled_v2 <- ScoreJackStraw(emb.ALLpooled_v2, dims = 1:20)
 ```
 
 ```{r}
-# Determine dataset dimensionality: To overcome technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a ‘metafeature’ that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. But how many components should we choose to include? Seurat implements a resampling test inspired by the JackStraw procedure. We randomly permute a subset of the data (1% by default) and rerun PCA, constructing a ‘null distribution’ of feature scores, and repeat this procedure. We identify ‘significant’ PCs as those who have a strong enrichment of low p-value features.
+# Determine dataset dimensionality: To overcome technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a ‘metafeature’ that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. But how many components should we choose to include? 
+
+# Seurat implements a resampling test inspired by the JackStraw procedure. We randomly permute a subset of the data (1% by default) and rerun PCA, constructing a ‘null distribution’ of feature scores, and repeat this procedure. We identify ‘significant’ PCs as those who have a strong enrichment of low p-value features.
 emb.GFPpooled_v2 <- JackStraw(emb.GFPpooled_v2, num.replicate = 100)
 emb.GFPpooled_v2 <- ScoreJackStraw(emb.GFPpooled_v2, dims = 1:20)
 ```
 
-The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
+
 ```{r}
+# The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
+
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.JackStrawPlot.pdf", height = 6, width = 9)
 JackStrawPlot(emb.ALLpooled_v2, dims = 1:20)
 dev.off()
 ```
+
 ```{r}
+# The JackStrawPlot() function provides a visualization tool for comparing the distribution of p-values for each PC with a uniform distribution (dashed line). ‘Significant’ PCs will show a strong enrichment of features with low p-values (solid curve above the dashed line). 
+
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.JackStrawPlot.pdf", height = 6, width = 9)
 JackStrawPlot(emb.GFPpooled_v2, dims = 1:20)
 dev.off()
 ```
 
 
-An alternative heuristic method generates an ‘Elbow plot’: a ranking of principle components based on the percentage of variance explained by each one.
 ```{r}
+# An alternative heuristic method generates an ‘Elbow plot’: a ranking of principle components based on the percentage of variance explained by each one. 
+
+# The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
+
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.ElbowPlot.pdf", height = 6, width = 9)
 ElbowPlot(emb.ALLpooled_v2)
 dev.off()
 ```
+
 ```{r}
+# An alternative heuristic method generates an ‘Elbow plot’: a ranking of principle components based on the percentage of variance explained by each one. 
+
+# The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
+
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ElbowPlot.pdf", height = 6, width = 9)
 ElbowPlot(emb.GFPpooled_v2)
 dev.off()
 ```
 
-The elbow plot is helpful when determining how many PCs we need to capture the majority of the variation in the data. The elbow plot visualizes the standard deviation of each PC. Where the elbow appears is usually the threshold for identifying the majority of the variation. However, this method can be a bit subjective about where the elbow is located.
 
-
-# Cluster the cells
-Seurat applies a graph-based clustering approach.
-
-Seurat first constructs a KNN graph based on the euclidean distance in PCA space, and refines the edge weights between any two cells based on the shared overlap in their local neighborhoods (Jaccard similarity). This step is performed using the FindNeighbors() function, and takes as input the previously defined dimensionality of the dataset.
-
-To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
 ```{r}
-emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, dims = 1:20)
+# Cluster the cells: Seurat applies a graph-based clustering approach.
 
-# deviation form original seurat pipeline
-# generate a vector of different resolutions to see which one performs best 
+# Seurat first constructs a KNN graph based on the euclidean distance in PCA space, and refines the edge weights between any two cells based on the shared overlap in their local neighborhoods (Jaccard similarity). This step is performed using the FindNeighbors() function, and takes as input the previously defined dimensionality of the dataset.
+
+# To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
+
+emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, dims = 1:20, reduction = "pca")
+
+# deviation form seurat pipeline: generate a vector of different resolutions to see which one performs best 
 emb.ALLpooled_v2.clust <- FindClusters(
   object = emb.ALLpooled_v2,
   reduction.type = "pca",
@@ -625,22 +631,26 @@ emb.ALLpooled_v2.clust <- FindClusters(
   dims.use = 1:20,
   save.SNN = TRUE)
 
-clustree(emb.ALLpooled_v2.clust, prefix = "RNA_snn_res.")
-
-
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above 
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.Clustree.pdf", height = 6, width = 9)
 clustree(emb.ALLpooled_v2.clust, prefix = "RNA_snn_res.")
 dev.off()
 
-
 # can also see how the different resolutions look like this
+
 DimPlot(emb.ALLpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
 ```
+
 ```{r}
-emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:20)
+# Cluster the cells: Seurat applies a graph-based clustering approach.
 
+# Seurat first constructs a KNN graph based on the euclidean distance in PCA space, and refines the edge weights between any two cells based on the shared overlap in their local neighborhoods (Jaccard similarity). This step is performed using the FindNeighbors() function, and takes as input the previously defined dimensionality of the dataset.
 
+# To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
+
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:20, reduction = "pca")
+
+# deviation form seurat pipeline: generate a vector of different resolutions to see which one performs best 
 emb.GFPpooled_v2.clust <- FindClusters(
   object = emb.GFPpooled_v2,
   reduction.type = "pca",
@@ -648,14 +658,11 @@ emb.GFPpooled_v2.clust <- FindClusters(
   dims.use = 1:20,
   save.SNN = TRUE)
 
-
-clustree(emb.GFPpooled_v2.clust, prefix = "RNA_snn_res.")
-
+## Now use Clustree to build a clustering tree based on the chosen resolutions specified above
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.Clustree.pdf", height = 6, width = 9)
 clustree(emb.GFPpooled_v2.clust, prefix = "RNA_snn_res.")
 dev.off()
-
 
 # can also see how the different resolutions look like this
 DimPlot(emb.GFPpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
@@ -666,26 +673,32 @@ DimPlot(emb.GFPpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
 # now choose the appropriate resolution for the given dimensions using the Clustree data
 emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
 ```
+
 ```{r}
 emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
 ```
 
 
-
-# Run non-linear dimensional reduction (UMAP or tSNE)
-Visualize and explore data with UMAP or tSNE.
-The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
 ```{r}
+# Run non-linear dimensional reduction (UMAP) and visualize/explore data: The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
+
 emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
 ```
+
 ```{r}
+# Run non-linear dimensional reduction (UMAP) and visualize/explore data: The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
+
 emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
 ```
 
+
 ```{r}
-# Note that you can set `label = TRUE` or use the LabelClusters function to help label individual clusters
+# Set `label = TRUE` or use the LabelClusters function to help label individual clusters
+
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint.pdf", height = 6, width = 9)
-DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1) 
+DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "unintegrated_clusters"), label = TRUE, label.size = 4, pt.size = 1)
+
+#label.box = TRUE,
 # + theme(axis.title.x = element_text(size = 20),
 #         axis.ticks.x = element_line(size = 6),
 #         axis.title.y = element_text(size = 20),
@@ -693,19 +706,20 @@ DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_gro
 #         legend.text = element_text(size = 20))
 dev.off()
 
-
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint2.pdf", height = 6, width = 9)
-DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"))
-dev.off()
 
 
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.unint.rep.pdf", height = 6, width = 9)
-DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group")
+DimPlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group", pt.size = 1)
+#label = TRUE, label.size = 4,
 dev.off()
 ```
 ```{r}
+# Set `label = TRUE` or use the LabelClusters function to help label individual clusters
+
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"), label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1) 
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "unintegrated_clusters"), label = TRUE, label.size = 4, pt.size = 1) 
+
+# label.box = TRUE,
 # + theme(axis.title.x = element_text(size = 20),
 #         axis.ticks.x = element_line(size = 6),
 #         axis.title.y = element_text(size = 20),
@@ -714,26 +728,75 @@ DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_gro
 dev.off()
 
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint2.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = c("rep_group", "seurat_clusters"))
-dev.off()
-
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.unint.rep.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group")
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", split.by = "rep_group", pt.size = 1)
+#label = TRUE, label.size = 4,
 dev.off()
 ```
 
 
+```{r}
+# Perform integration:  Aims to return a single dimensional reduction that captures the shared sources of variance across multiple layers, so that cells in a similar biological state will cluster. The method returns a dimensional reduction (i.e. integrated.cca, harmony) which can be used for visualization and unsupervised clustering analysis.
 
-# Perform integration 
-Aims to return a single dimensional reduction that captures the shared sources of variance across multiple layers, so that cells in a similar biological state will cluster. The method returns a dimensional reduction (i.e. integrated.cca, harmony) which can be used for visualization and unsupervised clustering analysis. 
+set.seed(42) # this will match the default seed.use = 42 for RunPCR
+
+emb.ALLpooled_v2 <- IntegrateLayers(object = emb.ALLpooled_v2, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca", verbose = FALSE)
+
+emb.ALLpooled_v2 <- IntegrateLayers(object = emb.ALLpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "integrated.harmony", verbose = FALSE)
+
+emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, reduction = "integrated.cca", dims = 1:20)
+emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, reduction = "integrated.harmony", dims = 1:20)
+
+emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "cca_clusters")
+emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
+
+emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, reduction = "integrated.cca", dims = 1:20, reduction.name = "umap.cca")
+emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, reduction = "integrated.harmony", dims = 1:20, reduction.name = "umap.harmony")
+
+DimPlot(emb.ALLpooled_v2, reduction = "umap.cca", group.by = c("rep_group", "cca_clusters"), label.size = 4, pt.size = 1)
+DimPlot(emb.ALLpooled_v2, reduction = "umap.cca", split.by = "rep_group", label.size = 4, pt.size = 1)
+DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "harmony_clusters"), label.size = 4, pt.size = 1)
+DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", split.by = "rep_group", label.size = 4, pt.size = 1)
+
+# re-join layers after integration
+emb.ALLpooled_v2[["RNA"]] <- JoinLayers(emb.ALLpooled_v2[["RNA"]])
+```
+
+```{r}
+# Perform integration:  Aims to return a single dimensional reduction that captures the shared sources of variance across multiple layers, so that cells in a similar biological state will cluster. The method returns a dimensional reduction (i.e. integrated.cca, harmony) which can be used for visualization and unsupervised clustering analysis.
+
+set.seed(42) # this will match the default seed.use = 42 for RunPCR
+
+emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca", verbose = FALSE)
+
+emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "integrated.harmony", verbose = FALSE)
+
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:20)
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.harmony", dims = 1:20)
+
+emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "cca_clusters")
+emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
+
+emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:20, reduction.name = "umap.cca")
+emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.harmony", dims = 1:20, reduction.name = "umap.harmony")
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", group.by = c("rep_group", "cca_clusters"), label.size = 4, pt.size = 1)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", split.by = "rep_group", label.size = 4, pt.size = 1)
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "harmony_clusters"), label.size = 4, pt.size = 1)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group", label.size = 4, pt.size = 1)
+
+# re-join layers after integration
+emb.GFPpooled_v2[["RNA"]] <- JoinLayers(emb.GFPpooled_v2[["RNA"]])
+```
 
 
+
+
+--------
 Harmony
 ```{r}
-#install.packages("harmony")
-#library(harmony)
 set.seed(42)
 ```
 ```{r}
@@ -761,9 +824,8 @@ dev.off()
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony2.pdf", height = 6, width = 6)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", label = TRUE, pt.size = 1, label.size = 4) + theme(legend.text = element_text(size = 10))
 dev.off()
-
-#labels = c('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z')
 ```
+
 ```{r}
 emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "harmony",
     verbose = FALSE)
@@ -785,6 +847,10 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.rep.pdf", heig
 DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
 dev.off()
 ```
+
+
+--------
+
 
 ```{r}
 # so variability in the umap projections is coming from the integration (harmony) not from the PCA or umap, those have a set.seed default = 42
@@ -816,6 +882,12 @@ write.csv(emb.GFPpooled_v2@meta.data,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v
 
 write.csv(emb.GFPpooled_v2@assays$RNA$data,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.csv", row.names = TRUE)
 ```
+
+
+
+
+
+
 
 # Find differentially expressed features (cluster biomarkers)
 Find markers that define clusters via differential expression. By default, Seurat identifies positive and negative markers of a single cluster compared to all other cells. You can do for all clusters, you can test groups of clusters vs. each other, or against all cells. 
