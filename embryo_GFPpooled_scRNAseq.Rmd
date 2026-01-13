@@ -689,7 +689,7 @@ emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, dims = 1:20, reduction = "pca", re
 ```{r}
 # Run non-linear dimensional reduction (UMAP) and visualize/explore data: The goal of these algorithms is to learn the underlying manifold of the data in order to place similar cells together in low-dimensional space. Cells within the graph-based clusters determined above should co-localize on these dimension reduction plots. As input to the UMAP or tSNE, it is suggested to use the same PCs as input to the clustering analysis.
 
-emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:20, reduction = "pca", reduction.name = "umap.unintegrated")
+emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, dims = 1:5, reduction = "pca", reduction.name = "umap.unintegrated")
 ```
 
 
@@ -786,14 +786,14 @@ emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = CCAInteg
 
 emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "integrated.harmony", verbose = FALSE)
 
-emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:20)
-emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.harmony", dims = 1:20)
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:5)
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.harmony", dims = 1:5)
 
 emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "cca_clusters")
 emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
 
-emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:20, reduction.name = "umap.cca")
-emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.harmony", dims = 1:20, reduction.name = "umap.harmony")
+emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:5, reduction.name = "umap.cca")
+emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.harmony", dims = 1:5, reduction.name = "umap.harmony")
 
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.cca.pdf", height = 6, width = 9)
