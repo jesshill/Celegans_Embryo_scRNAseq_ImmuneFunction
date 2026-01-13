@@ -899,34 +899,57 @@ emb.ALLpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% s
 ```
 
 
-checking which clusters are intestinal based on the expression of known intestine marker genes
 ```{r}
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.INTmarkergenes.pdf", height = 6, width = 9)
+# checking which clusters are intestinal based on the expression of known intestine marker genes
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.INTmarkergenes.umap-harmony.pdf", height = 6, width = 9)
 FeaturePlot(emb.ALLpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.INTmarkergenes.umap-cca.pdf", height = 6, width = 9)
+FeaturePlot(emb.ALLpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+dev.off()
 
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.INTmarkergenes.umap-unint.pdf", height = 6, width = 9)
 FeaturePlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
-
-
-
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.alltissuemarkergenes.pdf", height = 12, width = 9)
+dev.off()
+```
+```{r}
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.alltissuemarkergenes.umap-harmony.pdf", height = 12, width = 12)
 FeaturePlot(emb.ALLpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.alltissuemarkergenes.umap-cca.pdf", height = 12, width = 12)
+FeaturePlot(emb.ALLpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
+dev.off()
 
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.alltissuemarkergenes.umap-unint.pdf", height = 12, width = 12)
+FeaturePlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+```
+```{r}
 #VlnPlot(object = emb.ALLpooled_v2, features = c("ugt-14", "c10c5.4", "acp-2", "end-1"))
 #VlnPlot(object = emb.ALLpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
 
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.INTmarkergenes.pdf", height = 6, width = 9)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.INTmarkergenes.umap-harmony.pdf", height = 6, width = 9)
 FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.INTmarkergenes.umap-cca.pdf", height = 6, width = 9)
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.INTmarkergenes.umap-unint.pdf", height = 6, width = 9)
+FeaturePlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+dev.off()
 
 #VlnPlot(object = emb.GFPpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
 
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = "seurat_clusters", label = "TRUE", label.box = TRUE, label.size = 4, pt.size = 1)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = "harmony_clusters", label = TRUE, label.box = TRUE, label.size = 4, pt.size = 1)
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", group.by = "cca_clusters", label = TRUE, label.box = TRUE, label.size = 4, pt.size = 1)
+
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = "unintegrated_clusters", label = TRUE, label.box = TRUE, label.size = 4, pt.size = 1)
 ```
 
 
