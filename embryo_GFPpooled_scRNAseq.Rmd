@@ -946,13 +946,18 @@ dev.off()
 #VlnPlot(object = emb.GFPpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.umap-harmony.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = "harmony_clusters", label = TRUE, label.size = 4, pt.size = 1)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = "harmony_clusters", label = TRUE, label.size = 6, pt.size = 1)
 dev.off()
 
-DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", group.by = "cca_clusters", label = TRUE, label.box = TRUE, label.size = 4, pt.size = 1)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.umap-cca.pdf", height = 6, width = 9)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", group.by = "cca_clusters", label = TRUE, label.size = 6, pt.size = 1)
+dev.off()
 
-DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = "unintegrated_clusters", label = TRUE, label.box = TRUE, label.size = 4, pt.size = 1)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.umap-unint.pdf", height = 6, width = 9)
+DimPlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", group.by = "unintegrated_clusters", label = TRUE, label.size = 6, pt.size = 1)
+dev.off()
 ```
+
 
 
 
