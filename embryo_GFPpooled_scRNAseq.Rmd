@@ -648,14 +648,14 @@ DimPlot(emb.ALLpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
 
 # To cluster the cells, Seurat then applies modularity optimization techniques such as the Louvain algorithm (default) or SLM, to iteratively group cells together, with the goal of optimizing the standard modularity function. The FindClusters() function implements this procedure, and contains a resolution parameter that sets the ‘granularity’ of the downstream clustering, with increased values leading to a greater number of clusters.
 
-emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:20, reduction = "pca")
+emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, dims = 1:5, reduction = "pca")
 
 # deviation form seurat pipeline: generate a vector of different resolutions to see which one performs best 
 emb.GFPpooled_v2.clust <- FindClusters(
   object = emb.GFPpooled_v2,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:20,
+  dims.use = 1:5,
   save.SNN = TRUE)
 
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above
@@ -675,6 +675,7 @@ emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.nam
 ```
 
 ```{r}
+# now choose the appropriate resolution for the given dimensions using the Clustree data
 emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
 ```
 
@@ -943,7 +944,9 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.INTmarkergenes.umap
 FeaturePlot(emb.GFPpooled_v2, reduction = "umap.unintegrated", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-#VlnPlot(object = emb.GFPpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.INTmarkergenes.pdf", height = 9, width = 12)
+VlnPlot(object = emb.GFPpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3)
+dev.off()
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.umap-harmony.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = "harmony_clusters", label = TRUE, label.size = 6, pt.size = 1)
@@ -959,21 +962,40 @@ dev.off()
 ```
 
 
-
-
-# Remove contamination clusters
-clusters we want to keep = 1, 2, 5, 11, 14, 15, 16
-based on above checking of intestine marker genes
-contamination clusters = 0, 3, 4, 6, 7, 8, 9, 10, 12, 13, 17, 18, 19, 20
 ```{r}
-emb.GFPpooled_v2.filteredClusters <- subset(emb.GFPpooled_v2, idents = c('0', '3', '4', '6', '7', '8', '9', '10', '12', '13', '17', '18', '19'), invert = TRUE)
-emb.GFPpooled_v2.filteredClusters <- RunPCA(emb.GFPpooled_v2.filteredClusters)
-ElbowPlot(emb.GFPpooled_v2.filteredClusters)
-emb.GFPpooled_v2.filteredClusters <- FindNeighbors(emb.GFPpooled_v2.filteredClusters, dims = 1:10)
-emb.GFPpooled_v2.filteredClusters <- FindClusters(emb.GFPpooled_v2.filteredClusters, resolution = 1.2)
-emb.GFPpooled_v2.filteredClusters <- RunUMAP(emb.GFPpooled_v2.filteredClusters, dims = 1:10)
-DimPlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap", label = TRUE)
+# Remove contamination cluster(s)
+# (Loose filtering) contamination clusters we want to remove = 8
 
+emb.GFPpooled_v2.filteredClusters <- subset(emb.GFPpooled_v2, idents = c('8'), invert = TRUE)
+```
+
+```{r}
+# Re-run PCA and clustering 
+
+emb.GFPpooled_v2.filteredClusters <- RunPCA(emb.GFPpooled_v2.filteredClusters)
+
+ElbowPlot(emb.GFPpooled_v2.filteredClusters)
+
+emb.GFPpooled_v2.filteredClusters <- FindNeighbors(emb.GFPpooled_v2.filteredClusters, dims = 1:5)
+
+
+emb.GFPpooled_v2.filteredClusters.clust <- FindClusters(
+  object = emb.GFPpooled_v2.filteredClusters,
+  reduction.type = "pca",
+  resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+  dims.use = 1:5,
+  save.SNN = TRUE)
+clustree(emb.GFPpooled_v2.filteredClusters.clust, prefix = "RNA_snn_res.")
+
+
+emb.GFPpooled_v2.filteredClusters <- FindClusters(emb.GFPpooled_v2.filteredClusters, resolution = 1.2, cluster.name = "filtered_clusters")
+
+emb.GFPpooled_v2.filteredClusters <- RunUMAP(emb.GFPpooled_v2.filteredClusters, dims = 1:5, reduction = "pca", reduction.name = "umap.filtered")
+
+DimPlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", label = TRUE)
+```
+
+```{r}
 #check clusters for expression of intestine marker genes
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
 
@@ -985,7 +1007,7 @@ VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7
 emb.GFPpooled_v2.finalfiltClusters <- subset(emb.GFPpooled_v2.filteredClusters, idents = c('11'), invert = TRUE)
 emb.GFPpooled_v2.finalfiltClusters <- RunPCA(emb.GFPpooled_v2.finalfiltClusters)
 ElbowPlot(emb.GFPpooled_v2.finalfiltClusters)
-emb.GFPpooled_v2.finalfiltClusters <- FindNeighbors(emb.GFPpooled_v2.finalfiltClusters, dims = 1:10)
+emb.GFPpooled_v2.finalfiltClusters <- FindNeighbors(emb.GFPpooled_v2.finalfiltClusters, dims = 1:5)
 emb.GFPpooled_v2.finalfiltClusters <- FindClusters(emb.GFPpooled_v2.finalfiltClusters, resolution = 1.2)
 emb.GFPpooled_v2.finalfiltClusters <- RunUMAP(emb.GFPpooled_v2.finalfiltClusters, dims = 1:10)
 DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", label = TRUE)
