@@ -1059,15 +1059,14 @@ print(paste("Number of all cells in UMAP:", num_all_cells))
 
 emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
 
-emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10
-
-
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.HeatMap-top3.pdf", height = 10, width = 15)
 DoHeatmap(emb.GFPpooled_v2.filteredClusters, features = c(top3$gene), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
 dev.off()
 
+
+emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.HeatMap-top10.pdf", height = 20, width = 15)
 DoHeatmap(emb.GFPpooled_v2.filteredClusters, features = c(top10$gene), raster=F) + 
@@ -1077,31 +1076,20 @@ dev.off()
 
 
 
-# With smiFISH targets in the heatmap as well
+# With smiFISH targets in the heatmap as well (will be on the bottom)
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.HeatMap-top1.smifish.pdf", height = 6, width = 15)
-DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c(top1$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) +
+emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.HeatMap-top2.smifish.pdf", height = 10, width = 15)
+DoHeatmap(emb.GFPpooled_v2.filteredClusters, features = c(top2$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) +
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
 dev.off()
 
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.HeatMap-smiFISH.pdf", height = 6, width = 15)
-DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c("clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.HeatMap-smiFISH.pdf", height = 8, width = 10)
+DoHeatmap(emb.GFPpooled_v2.filteredClusters, features = c("clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-dev.off()
-
-
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.HeatMap-all.pdf", height = 12, width = 30)
-DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c(all$gene), raster=F) + 
-  theme(axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-dev.off()
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.HeatMap-almost_all_15.pdf", height = 12, width = 30)
-DoHeatmap(emb.GFPpooled_v2.finalfiltClusters, features = c(almost_all$gene), raster=F) + theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
 dev.off()
 ```
