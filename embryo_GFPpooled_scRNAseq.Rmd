@@ -1044,12 +1044,12 @@ emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val
 ```
 
 ```{r}
-#The UMAP embeddings are stored in the Seurat object under the reductions slot. Extract the number of cells by checking the number of rows in the UMAP embedding matrix. Counting the number of rows in this matrix, directly corresponds to the number of cells that have UMAP embeddings.
+# The UMAP embedding are stored in the Seurat object under the reductions slot. Extract the number of cells by checking the number of rows in the UMAP embedding matrix. Counting the number of rows in this matrix, directly corresponds to the number of cells that have UMAP embedding.
 
-num_int_cells <- nrow(Embeddings(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap"))
+num_int_cells <- nrow(Embeddings(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered"))
 print(paste("Number of intestinal cells in UMAP:", num_int_cells))
 
-num_all_cells <- nrow(Embeddings(emb.ALLpooled_v2, reduction = "umap.harmony"))
+num_all_cells <- nrow(Embeddings(emb.ALLpooled_v2, reduction = "umap.unintegrated"))
 print(paste("Number of all cells in UMAP:", num_all_cells))
 ```
 
