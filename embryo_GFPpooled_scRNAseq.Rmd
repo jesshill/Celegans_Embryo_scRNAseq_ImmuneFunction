@@ -1172,8 +1172,6 @@ dev.off()
 ```{r}
 # how many cells are expressing these markers of other tissues in our intestine specific cell population?
 
-view(emb.GFPpooled_v2.filteredClusters@assays$RNA$data)
-
 total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["hlh-2", ] > 0) 
 print(total_cells_expressing_gene) #716
 
@@ -1185,30 +1183,21 @@ print(total_cells_expressing_gene) #149
 ```
 
 
-# how many intestinal cells were in our all cells pooled sample?
 ```{r}
-view(emb.ALLpooled_v2@assays$RNA$data)
-
+# how many intestinal cells were in our all cells pooled sample?
+# Will count all cells that express at least one of these intestinal marker genes
 unique_cells <- colSums(emb.ALLpooled_v2@assays$RNA$data[c("elt-2", "elt-7", "ges-1"), ] > 0) > 0
-sum(unique_cells) # 1388
-
-unique_cells <- sum(emb.ALLpooled_v2@assays$RNA$data["elt-2", ] > 0) #749
-unique_cells <- sum(emb.ALLpooled_v2@assays$RNA$data["elt-7", ] > 0) #698
-unique_cells <- sum(emb.ALLpooled_v2@assays$RNA$data["ges-1", ] > 0) #515
-sum(unique_cells) 
-
-b <- (749+698+515)
-print(b)
+sum(unique_cells) # 1389
 
 total_cells <- ncol(emb.ALLpooled_v2@assays$RNA$data)
-print(total_cells) #18748
+print(total_cells) #18738
 
-a <- (1388/18748)*100
-print(a) #7.5%
-
-c <- (1962/18748)*100
-print(c) #10%
+a <- (1389/18738)*100
+print(a) #7.4%
 ```
+
+
+
 
 
 ---- alternate GO analysis
