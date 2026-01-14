@@ -1036,13 +1036,11 @@ dev.off()
 ```{r}
 # find new cluster marker genes in our filtered dataset
 
-emb.GFPpooled_v2.finalfiltClusters.markers <- FindAllMarkers(emb.GFPpooled_v2.finalfiltClusters, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+emb.GFPpooled_v2.filteredClusters.markers <- FindAllMarkers(emb.GFPpooled_v2.filteredClusters, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
-emb.GFPpooled_v2.finalfiltClusters.markers %>% 
-  group_by(cluster) %>% filter(p_val_adj < .01) %>%
-  slice_max(n = 2, order_by = avg_log2FC) 
+write.csv(emb.GFPpooled_v2.filteredClusters.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters_markers.csv", row.names = TRUE)
 
-write.csv(emb.GFPpooled_v2.finalfiltClusters.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2_finalfiltClusters_markers.csv", row.names = TRUE)
+emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% slice_max(n = 3, order_by = avg_log2FC) 
 ```
 
 ```{r}
