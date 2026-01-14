@@ -1197,35 +1197,15 @@ print(a) #7.4%
 ```
 
 
-
-
-
----- alternate GO analysis
 ```{r}
-Cluster0.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==0 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster1.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==1 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster2.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==2 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster3.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==3 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster4.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==4 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster5.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==5 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster6.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==6 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster7.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==7 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster8.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==8 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster9.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==9 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster10.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==10 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster11.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==11 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster12.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==12 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-Cluster13.markers <- emb.GFPpooled_v2.finalfiltClusters.markers[emb.GFPpooled_v2.finalfiltClusters.markers$cluster==13 & emb.GFPpooled_v2.finalfiltClusters.markers$p_val_adj < 0.05, ]
-```
-```{r}
+# GO analysis version 1
+
+#  install packages
 BiocManager::install("Rsamtools")
-
 install.packages("Signac")
 install.packages("cowplot")
-
 BiocManager::install("org.Ce.eg.db")
 BiocManager::install("biovizBase")
-#BiocManager::install(c('BSgenome.Hsapiens.UCSC.hg38', 'EnsDb.Hsapiens.v86'))
 BiocManager::install("clusterProfiler")
 BiocManager::install("enrichplot")
 BiocManager::install("ggtree")
@@ -1239,38 +1219,47 @@ library(enrichplot)
 library(ggtree)
 ```
 
+```{r}
+Cluster0.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==0 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster1.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==1 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster2.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==2 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster3.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==3 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster4.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==4 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster5.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==5 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster6.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==6 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster7.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==7 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster8.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==8 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster9.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==9 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster10.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==10 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster11.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==11 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster12.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==12 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster13.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==13 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster14.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==14 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster15.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==15 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster16.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==16 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+```
 
 ```{r}
-Cluster0.gene_ids <- bitr(Cluster0.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.37% of input gene IDs are fail to map...
-Cluster1.gene_ids <- bitr(Cluster1.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.6% of input gene IDs are fail to map...
-Cluster2.gene_ids <- bitr(Cluster2.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.17% of input gene IDs are fail to map...
-Cluster3.gene_ids <- bitr(Cluster3.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #4.73% of input gene IDs are fail to map...
-Cluster4.gene_ids <- bitr(Cluster4.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.36% of input gene IDs are fail to map...
-Cluster5.gene_ids <- bitr(Cluster5.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.98% of input gene IDs are fail to map...
-Cluster6.gene_ids <- bitr(Cluster6.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.64% of input gene IDs are fail to map...
-Cluster7.gene_ids <- bitr(Cluster7.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.83% of input gene IDs are fail to map...
-Cluster8.gene_ids <- bitr(Cluster8.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #4.89% of input gene IDs are fail to map...
-Cluster9.gene_ids <- bitr(Cluster9.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.43% of input gene IDs are fail to map...
-Cluster10.gene_ids <- bitr(Cluster10.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.3% of input gene IDs are fail to map...
-Cluster11.gene_ids <- bitr(Cluster11.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.14% of input gene IDs are fail to map...
-Cluster12.gene_ids <- bitr(Cluster12.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.56% of input gene IDs are fail to map...
+Cluster0.gene_ids <- bitr(Cluster0.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #3.76% of input gene IDs are fail to map...
+Cluster1.gene_ids <- bitr(Cluster1.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #3.31% of input gene IDs are fail to map...
+Cluster2.gene_ids <- bitr(Cluster2.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #6.09% of input gene IDs are fail to map...
+Cluster3.gene_ids <- bitr(Cluster3.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.58% of input gene IDs are fail to map...
+Cluster4.gene_ids <- bitr(Cluster4.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #0.96% of input gene IDs are fail to map...
+Cluster5.gene_ids <- bitr(Cluster5.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.39% of input gene IDs are fail to map...
+Cluster6.gene_ids <- bitr(Cluster6.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.82% of input gene IDs are fail to map...
+Cluster7.gene_ids <- bitr(Cluster7.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.04% of input gene IDs are fail to map...
+Cluster8.gene_ids <- bitr(Cluster8.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.56% of input gene IDs are fail to map...
+Cluster9.gene_ids <- bitr(Cluster9.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.85% of input gene IDs are fail to map...
+Cluster10.gene_ids <- bitr(Cluster10.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.58% of input gene IDs are fail to map...
+Cluster11.gene_ids <- bitr(Cluster11.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.74% of input gene IDs are fail to map...
+Cluster12.gene_ids <- bitr(Cluster12.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.52% of input gene IDs are fail to map...
 
-Cluster13.gene_ids <- bitr(Cluster13.markers$gene, fromType = "SYMBOL",
-                                   toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.72% of input gene IDs are fail to map...
+Cluster13.gene_ids <- bitr(Cluster13.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #5.62% of input gene IDs are fail to map...
+Cluster14.gene_ids <- bitr(Cluster14.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.7% of input gene IDs are fail to map...
+Cluster15.gene_ids <- bitr(Cluster15.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #4.33% of input gene IDs are fail to map...
+Cluster16.gene_ids <- bitr(Cluster16.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #0.96% of input gene IDs are fail to map...
 ```
+
 ```{r}
 Cluster0.ego <- enrichGO(gene = Cluster0.gene_ids$ENTREZID, 
                 OrgDb = org.Ce.eg.db, 
@@ -1279,12 +1268,9 @@ Cluster0.ego <- enrichGO(gene = Cluster0.gene_ids$ENTREZID,
                 pvalueCutoff = 0.05, 
                 qvalueCutoff = 0.05, 
                 readable = TRUE)
-
 ```
 ```{r}
-barplot(Cluster0.ego, showCategory=10, 
-        title="GO Enrichment Analysis for Cluster 0")
-
+barplot(Cluster0.ego, showCategory=10, title="GO Enrichment Analysis for Cluster 0")
 ```
 ```{r}
 p1 <- dotplot(Cluster0.ego, showCategory=20, 
