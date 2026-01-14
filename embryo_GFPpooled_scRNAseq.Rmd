@@ -986,13 +986,9 @@ dev.off()
 ```{r}
 # Remove contamination cluster(s)
 # (Loose filtering) contamination clusters we want to remove = 8
-
 emb.GFPpooled_v2.filteredClusters <- subset(emb.GFPpooled_v2, idents = c('9', '18'), invert = TRUE)
-```
 
-```{r}
 # Re-run PCA and clustering 
-
 emb.GFPpooled_v2.filteredClusters <- RunPCA(emb.GFPpooled_v2.filteredClusters)
 
 ElbowPlot(emb.GFPpooled_v2.filteredClusters)
@@ -1013,65 +1009,33 @@ emb.GFPpooled_v2.filteredClusters <- FindClusters(emb.GFPpooled_v2.filteredClust
 
 emb.GFPpooled_v2.filteredClusters <- RunUMAP(emb.GFPpooled_v2.filteredClusters, dims = 1:5, reduction = "pca", reduction.name = "umap.filtered")
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.UMAP.pdf", height = 6, width = 12)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.UMAP.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", label = TRUE, label.size = 7, pt.size = 1)
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.UMAP-rep.pdf", height = 6, width = 9)
+DimPlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", split.by = "rep_group")
 dev.off()
 ```
 
+
 ```{r}
 #check clusters for expression of intestine marker genes
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
 
 VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
 
+#check clusters for expression of all tissue marker genes
 
-
-
-emb.GFPpooled_v2.finalfiltClusters <- subset(emb.GFPpooled_v2.filteredClusters, idents = c('11'), invert = TRUE)
-emb.GFPpooled_v2.finalfiltClusters <- RunPCA(emb.GFPpooled_v2.finalfiltClusters)
-ElbowPlot(emb.GFPpooled_v2.finalfiltClusters)
-emb.GFPpooled_v2.finalfiltClusters <- FindNeighbors(emb.GFPpooled_v2.finalfiltClusters, dims = 1:5)
-emb.GFPpooled_v2.finalfiltClusters <- FindClusters(emb.GFPpooled_v2.finalfiltClusters, resolution = 1.2)
-emb.GFPpooled_v2.finalfiltClusters <- RunUMAP(emb.GFPpooled_v2.finalfiltClusters, dims = 1:10)
-DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", label = TRUE)
-
-#check clusters for expression of intestine marker genes
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
-
-VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
-```
-
-```{r}
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.UMAP.pdf", height = 6, width = 6)
-DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", pt.size = 1) 
-# + theme(axis.title.x = element_text(size = 20),
-#         axis.ticks.x = element_line(size = 6),
-#         axis.title.y = element_text(size = 20),
-#         axis.ticks.y = element_line(size = 6),
-#         legend.text = element_text(size = 20))
-dev.off()
-
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.UMAP-lab.pdf", height = 6, width = 6)
-DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", pt.size = 1, label = TRUE, label.size = 6) + theme(legend.text = element_text(size = 10))
-#DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", label = TRUE, pt.size = 1, label.size = 4) + theme(legend.text = element_text(size = 10))
-dev.off()
-
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.UMAP-rep.pdf", height = 6, width = 6)
-DimPlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", split.by = "rep_group")
-dev.off()
-
-
-#check clusters for expression of intestine marker genes
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.FeaturePlot.INTmarkergenes.pdf", height = 6, width = 9)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.FeaturePlot.AllTissueMarkerGenes.pdf", height = 20, width = 24)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 ```
 
 
-
 ```{r}
+# find new cluster marker genes in our filtered dataset
+
 emb.GFPpooled_v2.finalfiltClusters.markers <- FindAllMarkers(emb.GFPpooled_v2.finalfiltClusters, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
 emb.GFPpooled_v2.finalfiltClusters.markers %>% 
