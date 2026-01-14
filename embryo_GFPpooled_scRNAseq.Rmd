@@ -1096,116 +1096,92 @@ dev.off()
 
 
 ```{r}
-# RNAi 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.rnai.pdf", height = 6, width = 15)  
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), ncol = 3, coord.fixed = TRUE)
+# RNAi/FISH targets
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.rnai-FISH.pdf", height = 6, width = 15)  
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
+VlnPlot(emb.GFPpooled_v2.filteredClusters, features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), raster=F, ncol = 3)
 
 # intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.intestine.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.intestine.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-2", "elt-7", "ges-1"), ncol = 3, coord.fixed = TRUE)
 dev.off() 
 
-#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("elt-2", "elt-7", "ges-1"))
-
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7", "ges-1"))
 
 # germline
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.germ.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("glh-1", "nos-1", "pgl-1"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.germ.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("glh-1", "nos-1", "pgl-1"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("glh-1", "nos-1", "pgl-1"))
-
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("glh-1", "nos-1", "pgl-1"))
 
 # muscle
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.muscle.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("myo-3", "pat-10", "lev-11"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.muscle.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("myo-3", "pat-10", "lev-11"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("myo-3", "pat-10", "lev-11"))
-
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("myo-3", "pat-10", "lev-11"))
 
 # neuron
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.neuron.pdf", height = 6, width = 15)
-FeaturePlot(eemb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("rab-3", "odr-2", "mec-7"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.neuron.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("rab-3", "odr-2", "mec-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("rab-3", "odr-2", "mec-7"))
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("rab-3", "odr-2", "mec-7"))
 
 # pharynx
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.pharynx.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("myo-2", "tnc-2", "phat-2"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.pharynx.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("myo-2", "tnc-2", "phat-2"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-#VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("myo-2", "tnc-2", "phat-2"))
-
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("myo-2", "tnc-2", "phat-2"))
 
 # hypodermis
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.hypodermis.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.hypodermis.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.finalfiltClusters, features = c("elt-1", "elt-3", "dpy-7"))
-
-
-
-# tissue marker genes
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.tissuemarkergenes.pdf", height = 10, width = 20)  
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "rab-3", "odr-2", "mec-7", "myo-3", "pat-10", "lev-11", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
-dev.off()
-
-
-
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-1", "elt-3", "dpy-7"))
 
 # early intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.earlyint.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("end-1", "acp-2", "ugt-14", "C10C5.4"), ncol = 2 , coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.earlyint.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("end-1", "acp-2", "ugt-14", "C10C5.4"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 
 # mid intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.midint.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("T19D7.6", "T21E8.4", "C10A4.3", "klo-1"), ncol = 2 , coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.midint.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("T19D7.6", "T21E8.4", "C10A4.3", "klo-1"), ncol = 2 , coord.fixed = TRUE) #(not the best) "T20D4.19", "F47B8.4"
 dev.off()
-# (not the best) "T20D4.19", "F47B8.4"
 
 # late intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.featureplot.lateint.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("C14C6.5", "clec-56", "cpr-1", "lec-9"), ncol = 2 , coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.lateint.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("C14C6.5", "clec-56", "cpr-1", "lec-9"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 
+# anterior intestine
 
+# central intestine
 
-#smiFISH targets
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.FeaturePlot-FISH.pdf", height = 10, width = 20)
-FeaturePlot(emb.GFPpooled_v2.finalfiltClusters, reduction = "umap", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), raster=F, ncol = 3, coord.fixed = TRUE) +
-  theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(size = 14),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
-        legend.text = element_text(size = 14))
-dev.off()
+# posterior intestine
 
-
-
-VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = c("C14C6.5", "cpr-1", "Y32F6A.5"), raster=F, ncol = 2)
-VlnPlot(emb.GFPpooled_v2.finalfiltClusters, features = "pbo-4", raster=F)
 ```
 
 
-
-# how many cells are expressing these markers of other tissues?
 ```{r}
-view(emb.GFPpooled_v2.finalfiltClusters@assays$RNA$data)
+# how many cells are expressing these markers of other tissues in our intestine specific cell population?
 
-total_cells_expressing_gene <- sum(emb.GFPpooled_v2.finalfiltClusters@assays$RNA$data["hlh-2", ] > 0) #12
-print(total_cells_expressing_gene)
+view(emb.GFPpooled_v2.filteredClusters@assays$RNA$data)
 
-total_cells_expressing_gene <- sum(emb.GFPpooled_v2.finalfiltClusters@assays$RNA$data["myo-3", ] > 0) #11
-print(total_cells_expressing_gene)
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["hlh-2", ] > 0) 
+print(total_cells_expressing_gene) #716
 
-total_cells_expressing_gene <- sum(emb.GFPpooled_v2.finalfiltClusters@assays$RNA$data["rab-3", ] > 0) #133
-print(total_cells_expressing_gene)
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["myo-3", ] > 0) 
+print(total_cells_expressing_gene) #85
+
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["rab-3", ] > 0) 
+print(total_cells_expressing_gene) #149
 ```
 
 
