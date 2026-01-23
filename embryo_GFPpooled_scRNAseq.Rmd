@@ -1281,6 +1281,12 @@ p1 + theme(axis.text.y = element_text(size = 3))
 Cluster0.ego <- pairwise_termsim(Cluster0.ego)
 emapplot(Cluster0.ego, showCategory=20)
 ```
+```{r}
+#install.packages("ggupset")
+#library(ggupset)
+
+upsetplot(Cluster0.ego)
+```
 
 ```{r}
 # how to do for all clusters 
@@ -1324,7 +1330,6 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.treeMap-GO-BP.
 treeplot(trim_bp, showCategory = 3, cladelab_offset=5, tiplab_offset=.3, fontsize_cladelab =6, fontsize_tiplab =5, hexpand(.2), legend_n = 3,  nCluster = 5)  
 dev.off()
 ```
-
 
 
 
