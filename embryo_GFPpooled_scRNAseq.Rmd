@@ -33,6 +33,7 @@ BiocManager::install('multtest')
 install.packages('metap')
 install.packages('devtools')
 install.packages("harmony")
+install.packages('pheatmap')
 ```
 
 
@@ -47,6 +48,7 @@ library(patchwork)
 library(clustree)
 library(metap)
 library(harmony)
+library(pheatmap)
 ```
 
 
@@ -1439,26 +1441,23 @@ dev.off()
 ```
 
 
-
-
-
-#calculate gene level variance in expression across clusters
 ```{r}
-# average expression per cluster. Rows = genes, Columns = clusters
-avg_expr <- AverageExpression(emb.GFPpooled_v2.finalfiltClusters, return.seurat = FALSE)$RNA
+# Calculate gene level variance in expression across clusters: for a given gene, how different is its typical expression between clusters?
 
-# variance of each gene across clusters
+# Average expression per cluster. Rows = genes, Columns = clusters. Removes cluster size as a confound, so when compute variance across clusters you’re measuring biological differences in expression, not how many cells happened to be in each cluster.
+avg_expr <- AverageExpression(emb.GFPpooled_v2.filteredClusters, return.seurat = FALSE)$RNA
+
+# variance of each gene across clusters: apply(X, MARGIN, FUNction)
 gene_variances <- apply(avg_expr, 1, var)
-
-threshold <- 0.1
 
 # select top variable genes (e.g., top 50)
 #top_genes <- names(sort(gene_variances, decreasing = TRUE))[1:500]
 #top_genes <- names(sort(gene_variances, decreasing = TRUE))[1:50]
 
+threshold <- 0.1
+
 top_genes <- names(gene_variances[gene_variances > threshold])
 top_genes <- top_genes[order(gene_variances[top_genes], decreasing = TRUE)]
-
 
 # extract the expression values for top genes
 heatmap_data <- avg_expr[top_genes, ]
@@ -1469,10 +1468,7 @@ print(num_genes)
 scaled_data <- t(scale(t(as.matrix(heatmap_data))))
 
 # plot heatmap
-#install.packages('pheatmap')
-#library(pheatmap)
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.finalfiltClusters.varianceHM.pdf", height = 10, width = 20)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.varianceHM.pdf", height = 10, width = 20)
 pheatmap(scaled_data,
          cluster_rows = TRUE,
          cluster_cols = TRUE,
@@ -1486,12 +1482,12 @@ dev.off()
 
 ```{r}
 # genes and cells in each counts matrix
-dim(emb.GFPpooled_v2) #15289  2579
-dim(emb.GFPpooled_v2.filteredClusters) #15289   973
-dim(emb.GFPpooled_v2.finalfiltClusters) #15289   945 
+dim(emb.GFPpooled_v2) #15116  2571
+dim(emb.GFPpooled_v2.filteredClusters) #15116   2414
 
-dim(emb.ALLpooled_v2) #18794 18748
+dim(emb.ALLpooled_v2) #18590 18738
 ```
+
 
 ```{r}
 #visualize cell embeddings (the principle components, the dimensionality)
