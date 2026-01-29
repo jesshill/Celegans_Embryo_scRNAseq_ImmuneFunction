@@ -49,6 +49,7 @@ library(clustree)
 library(metap)
 library(harmony)
 library(pheatmap)
+library(tibble)
 ```
 
 
@@ -1490,14 +1491,12 @@ dim(emb.ALLpooled_v2) #18590 18738
 
 
 ```{r}
-#visualize cell embeddings (the principle components, the dimensionality)
+# Diagnostic plots for the integration techniques
+
+# Visualize cell embeddings (the principle components, the dimensionality)
 head(emb.GFPpooled_v2@reductions$pca@cell.embeddings)
 view(emb.GFPpooled_v2@reductions$pca@cell.embeddings)
 
-head(emb.GFPpooled_v2@reductions$harmony@cell.embeddings)
-view(emb.GFPpooled_v2@reductions$harmony@cell.embeddings)
-
-#library(tibble)
 metadata_pca <- as.data.frame(emb.GFPpooled_v2@reductions$pca@cell.embeddings)
 metadata_pca <- rownames_to_column(metadata_pca)
 metadata_pca$rep_group <- ""
@@ -1526,8 +1525,10 @@ dev.off()
 
 
 
+head(emb.GFPpooled_v2@reductions$integrated.harmony@cell.embeddings)
+view(emb.GFPpooled_v2@reductions$integrated.harmony@cell.embeddings)
 
-metadata_har <- as.data.frame(emb.GFPpooled_v2@reductions$harmony@cell.embeddings)
+metadata_har <- as.data.frame(emb.GFPpooled_v2@reductions$integrated.harmony@cell.embeddings)
 metadata_har <- rownames_to_column(metadata_har)
 metadata_har$rep_group <- ""
 metadata_har$rep_group <- dplyr::case_when(
@@ -1548,7 +1549,36 @@ p3 <- p + geom_point(aes(harmony_5, harmony_6, color = rep_group))
 p4 <- p + geom_point(aes(harmony_7, harmony_8, color = rep_group))
 p1 + p2 + p3 + p4 + plot_layout(ncol = 4)
 dev.off()
+
+
+
+head(emb.GFPpooled_v2@reductions$integrated.cca@cell.embeddings)
+view(emb.GFPpooled_v2@reductions$integrated.cca@cell.embeddings)
+
+metadata_cca <- as.data.frame(emb.GFPpooled_v2@reductions$integrated.cca@cell.embeddings)
+metadata_cca <- rownames_to_column(metadata_cca)
+metadata_cca$rep_group <- ""
+metadata_cca$rep_group <- dplyr::case_when(
+  grepl("-1$", metadata_cca$rowname) ~ "Rep_1",
+  grepl("-2$", metadata_cca$rowname) ~ "Rep_2",
+  grepl("-3$", metadata_cca$rowname) ~ "Rep_3",
+  grepl("-4$", metadata_cca$rowname) ~ "Rep_4",
+  TRUE ~ "Unknown"
+)
+
+view(metadata_cca)
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.cca_embeddings.pdf", height = 10, width = 20)
+p <- ggplot(metadata_cca[sample(nrow(metadata_cca)),]) 
+p1 <- p + geom_point(aes(integratedcca_1, integratedcca_2, color = rep_group))
+p2 <- p + geom_point(aes(integratedcca_3, integratedcca_4, color = rep_group))
+p3 <- p + geom_point(aes(integratedcca_5, integratedcca_6, color = rep_group))
+p4 <- p + geom_point(aes(integratedcca_7, integratedcca_8, color = rep_group))
+p1 + p2 + p3 + p4 + plot_layout(ncol = 4)
+dev.off()
 ```
+
+
 ```{r}
 metadata_har_long <- metadata_har %>%
   pivot_longer(
@@ -1575,7 +1605,7 @@ dev.off()
 
 metadata_pca_long <- metadata_pca %>%
   pivot_longer(
-    cols = starts_with("PC_"),  # or use harmony_1:harmony_3 to be specific
+    cols = starts_with("PC_"),
     names_to = "PCA_PC",
     values_to = "Embedding_Value"
   )
@@ -1590,7 +1620,29 @@ ggplot(metadata_pca_long, aes(x = Embedding_Value, color = rep_group, fill = rep
     title = "Density of Harmony components by replicate group",
     x = "Embedding Value",
     y = "Density"
-  )oco
+  )
+dev.off()
+
+
+
+metadata_cca_long <- metadata_cca %>%
+  pivot_longer(
+    cols = starts_with("integratedcca_"),
+    names_to = "CCA_PC",
+    values_to = "Embedding_Value"
+  )
+ 
+# Plot density distributions of Harmony components grouped by rep
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.cca_embeddings_hist.pdf", height = 10, width = 20)
+ggplot(metadata_cca_long, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
+  geom_density(alpha = 0.3) +
+  facet_wrap(~ CCA_PC, scales = "free") +
+  theme_minimal() +
+  labs(
+    title = "Density of CCA components by replicate group",
+    x = "Embedding Value",
+    y = "Density"
+  )
 dev.off()
 ```
 
