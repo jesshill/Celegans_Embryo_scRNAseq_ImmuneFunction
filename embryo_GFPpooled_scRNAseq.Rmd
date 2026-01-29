@@ -760,7 +760,7 @@ emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, reduction = "integrated.harmony", 
 
 
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.cca.pdf", height = 6, width = 9)
-DimPlot(emb.ALLpooled_v2, reduction = "umap.cca", group.by = c("rep_group", "cca_clusters"), label.size = 4, pt.size = 1)
+DimPlot(emb.ALLpooled_v2, reduction = "umap.cca", group.by = c("rep_group", "cca_clusters"), label = TRUE, label.size = 4, pt.size = 1)
 dev.off()
 
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.cca.rep.pdf", height = 6, width = 9)
