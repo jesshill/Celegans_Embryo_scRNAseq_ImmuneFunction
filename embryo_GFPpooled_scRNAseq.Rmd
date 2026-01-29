@@ -1224,6 +1224,8 @@ library(ggtree)
 #If you use [clusterProfiler](https://www.bioconductor.org/packages/clusterProfiler) in published research, please cite:
 
 #__*G Yu*__, LG Wang, Y Han, QY He. clusterProfiler: an R package for comparing biological themes among gene clusters. **_OMICS: A Journal of Integrative Biology_** 2012, 16(5):284-287. doi:[10.1089/omi.2011.0118](http://dx.doi.org/10.1089/omi.2011.0118)
+
+# https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html
 ```
 
 
