@@ -1164,11 +1164,19 @@ FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", feat
 dev.off()
 
 # anterior intestine
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.anterior-int.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("C14C6.5", "cpr-1"), ncol = 2 , coord.fixed = TRUE)
+dev.off()
 
 # central intestine
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.central-int.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("clec-56", "endu-2"), ncol = 2 , coord.fixed = TRUE)
+dev.off()
 
 # posterior intestine
-
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.central-int.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("pbo-4"), ncol = 2 , coord.fixed = TRUE)
+dev.off()
 ```
 
 
@@ -1176,10 +1184,10 @@ dev.off()
 # how many cells are expressing these markers of other tissues in our intestine specific cell population?
 
 total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["hlh-2", ] > 0) 
-print(total_cells_expressing_gene) #716
+print(total_cells_expressing_gene) #639
 
 total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["myo-3", ] > 0) 
-print(total_cells_expressing_gene) #85
+print(total_cells_expressing_gene) #20
 
 total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["rab-3", ] > 0) 
 print(total_cells_expressing_gene) #149
