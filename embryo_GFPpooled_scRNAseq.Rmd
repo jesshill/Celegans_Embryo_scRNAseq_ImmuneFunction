@@ -1111,42 +1111,42 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.in
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-2", "elt-7", "ges-1"), ncol = 3, coord.fixed = TRUE)
 dev.off() 
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7", "ges-1"))
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7", "ges-1"), ncol = 2)
 
 # germline
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.germ.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("glh-1", "nos-1", "pgl-1"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("glh-1", "nos-1", "pgl-1"))
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("glh-1", "nos-1", "pgl-1"), ncol = 2)
 
 # muscle
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.muscle.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("myo-3", "pat-10", "lev-11"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("myo-3", "pat-10", "lev-11"))
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("myo-3", "pat-10", "lev-11"), ncol = 2)
 
 # neuron
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.neuron.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("rab-3", "odr-2", "mec-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("rab-3", "odr-2", "mec-7"))
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("rab-3", "odr-2", "mec-7"), ncol = 2)
 
 # pharynx
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.pharynx.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("myo-2", "tnc-2", "phat-2"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("myo-2", "tnc-2", "phat-2"))
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("myo-2", "tnc-2", "phat-2"), ncol = 2)
 
 # hypodermis
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.hypodermis.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-1", "elt-3", "dpy-7"))
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-1", "elt-3", "dpy-7"), ncol = 2)
 
 # early intestine
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.earlyint.pdf", height = 6, width = 15)
@@ -1627,7 +1627,7 @@ ggplot(metadata_pca_long, aes(x = Embedding_Value, color = rep_group, fill = rep
   facet_wrap(~ PCA_PC, scales = "free") +
   theme_minimal() +
   labs(
-    title = "Density of Harmony components by replicate group",
+    title = "Density of unintegrated PC components by replicate group",
     x = "Embedding Value",
     y = "Density"
   )
@@ -1658,9 +1658,122 @@ dev.off()
 
 
 ```{r}
+metadata_pca_all <- as.data.frame(emb.ALLpooled_v2@reductions$pca@cell.embeddings)
+metadata_pca_all <- rownames_to_column(metadata_pca_all)
+metadata_pca_all$rep_group <- ""
+metadata_pca_all$rep_group <- dplyr::case_when(
+  grepl("-(1|5)$", metadata_pca_all$rowname) ~ "Rep_1",
+  grepl("-(2|6)$", metadata_pca_all$rowname) ~ "Rep_2",
+  grepl("-(3|7)$", metadata_pca_all$rowname) ~ "Rep_3",
+  grepl("-(4|8)$", metadata_pca_all$rowname) ~ "Rep_4",
+  TRUE ~ "Unknown"
+)
+
+view(metadata_pca_all)
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.pca_embeddings.pdf", height = 10, width = 20)
+p <- ggplot(metadata_pca_all[sample(nrow(metadata_pca_all)),]) 
+#p1 <- p + geom_point(aes(PC_1, PC_2, color = rep_group, size = rep_group))
+p1 <- p + geom_point(aes(PC_1, PC_2, color = rep_group))
+#p2 <- p + geom_point(aes(PC_3, PC_4, color = rep_group, size = rep_group))
+p2 <- p + geom_point(aes(PC_3, PC_4, color = rep_group))
+#p3 <- p + geom_point(aes(PC_5, PC_6, color = rep_group, size = rep_group))
+p3 <- p + geom_point(aes(PC_5, PC_6, color = rep_group))
+#p4 <- p + geom_point(aes(PC_7, PC_8, color = rep_group, size = rep_group))
+p4 <- p + geom_point(aes(PC_7, PC_8, color = rep_group))
+p1 + p2 + p3 + p4 + plot_layout(ncol = 4)
+dev.off()
+
+
+
+
+
+
+metadata_cca_all <- as.data.frame(emb.ALLpooled_v2@reductions$integrated.cca@cell.embeddings)
+metadata_cca_all <- rownames_to_column(metadata_cca_all)
+metadata_cca_all$rep_group <- ""
+metadata_cca_all$rep_group <- dplyr::case_when(
+  grepl("-(1|5)$", metadata_cca_all$rowname) ~ "Rep_1",
+  grepl("-(2|6)$", metadata_cca_all$rowname) ~ "Rep_2",
+  grepl("-(3|7)$", metadata_cca_all$rowname) ~ "Rep_3",
+  grepl("-(4|8)$", metadata_cca_all$rowname) ~ "Rep_4",
+  TRUE ~ "Unknown"
+)
+
+view(metadata_cca_all)
+
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.cca_embeddings.pdf", height = 10, width = 20)
+p <- ggplot(metadata_cca_all[sample(nrow(metadata_cca_all)),]) 
+p1 <- p + geom_point(aes(integratedcca_1, integratedcca_2, color = rep_group))
+p2 <- p + geom_point(aes(integratedcca_3, integratedcca_4, color = rep_group))
+p3 <- p + geom_point(aes(integratedcca_5, integratedcca_6, color = rep_group))
+p4 <- p + geom_point(aes(integratedcca_7, integratedcca_8, color = rep_group))
+p1 + p2 + p3 + p4 + plot_layout(ncol = 4)
+dev.off()
+```
+
+
+```{r}
+metadata_pca_long_all <- metadata_pca_all %>%
+  pivot_longer(
+    cols = starts_with("PC_"),
+    names_to = "PCA_PC",
+    values_to = "Embedding_Value"
+  )
+ 
+# Plot density distributions of Harmony components grouped by rep
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.pca_embeddings_hist.pdf", height = 10, width = 20)
+ggplot(metadata_pca_long_all, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
+  geom_density(alpha = 0.3) +
+  facet_wrap(~ PCA_PC, scales = "free") +
+  theme_minimal() +
+  labs(
+    title = "Density of unintegrated PC components by replicate group",
+    x = "Embedding Value",
+    y = "Density"
+  )
+dev.off()
+
+
+
+metadata_cca_long_all <- metadata_cca_all %>%
+  pivot_longer(
+    cols = starts_with("integratedcca_"),
+    names_to = "CCA_PC",
+    values_to = "Embedding_Value"
+  )
+ 
+# Plot density distributions of Harmony components grouped by rep
+pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.cca_embeddings_hist.pdf", height = 10, width = 20)
+ggplot(metadata_cca_long_all, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
+  geom_density(alpha = 0.3) +
+  facet_wrap(~ CCA_PC, scales = "free") +
+  theme_minimal() +
+  labs(
+    title = "Density of CCA components by replicate group",
+    x = "Embedding Value",
+    y = "Density"
+  )
+dev.off()
+```
+
+
+```{r}
 sessionInfo() 
 ```
 ----
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
