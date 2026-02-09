@@ -747,16 +747,11 @@ set.seed(42) # this will match the default seed.use = 42 for RunPCR
 
 emb.ALLpooled_v2 <- IntegrateLayers(object = emb.ALLpooled_v2, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca", verbose = FALSE)
 
-emb.ALLpooled_v2 <- IntegrateLayers(object = emb.ALLpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "integrated.harmony", verbose = FALSE)
-
 emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, reduction = "integrated.cca", dims = 1:20)
-emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, reduction = "integrated.harmony", dims = 1:20)
 
 emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "cca_clusters")
-emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
 
 emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, reduction = "integrated.cca", dims = 1:20, reduction.name = "umap.cca")
-emb.ALLpooled_v2 <- RunUMAP(emb.ALLpooled_v2, reduction = "integrated.harmony", dims = 1:20, reduction.name = "umap.harmony")
 
 
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.cca.pdf", height = 6, width = 9)
@@ -765,14 +760,6 @@ dev.off()
 
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.cca.rep.pdf", height = 6, width = 9)
 DimPlot(emb.ALLpooled_v2, reduction = "umap.cca", split.by = "rep_group", label.size = 4, pt.size = 1)
-dev.off()
-
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.pdf", height = 6, width = 9)
-DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "harmony_clusters"), label.size = 4, pt.size = 1)
-dev.off()
-
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.UMAP.int.harmony.rep.pdf", height = 6, width = 9)
-DimPlot(emb.ALLpooled_v2, reduction = "umap.harmony", split.by = "rep_group", label.size = 4, pt.size = 1)
 dev.off()
 
 
@@ -787,16 +774,12 @@ set.seed(42) # this will match the default seed.use = 42 for RunPCR
 
 emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca", verbose = FALSE)
 
-emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = HarmonyIntegration, orig.reduction = "pca", new.reduction = "integrated.harmony", verbose = FALSE)
 
 emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:5)
-emb.GFPpooled_v2 <- FindNeighbors(emb.GFPpooled_v2, reduction = "integrated.harmony", dims = 1:5)
 
 emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "cca_clusters")
-emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "harmony_clusters")
 
 emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.cca", dims = 1:5, reduction.name = "umap.cca")
-emb.GFPpooled_v2 <- RunUMAP(emb.GFPpooled_v2, reduction = "integrated.harmony", dims = 1:5, reduction.name = "umap.harmony")
 
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.cca.pdf", height = 6, width = 9)
@@ -805,14 +788,6 @@ dev.off()
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.cca.rep.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", split.by = "rep_group", label.size = 4, pt.size = 1)
-dev.off()
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = c("rep_group", "harmony_clusters"), label.size = 4, pt.size = 1)
-dev.off()
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.UMAP.int.harmony.rep.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group", label.size = 4, pt.size = 1)
 dev.off()
 
 
@@ -826,8 +801,6 @@ emb.GFPpooled_v2@reductions$pca
 emb.GFPpooled_v2@reductions$umap.unintegrated
 emb.GFPpooled_v2@reductions$integrated.cca
 emb.GFPpooled_v2@reductions$umap.cca
-emb.GFPpooled_v2@reductions$integrated.harmony
-emb.GFPpooled_v2@reductions$umap.harmony
 
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.pca.rep.pdf", height = 6, width = 9)
@@ -841,12 +814,6 @@ DimPlot(emb.GFPpooled_v2, reduction = "integrated.cca", split.by = "rep_group")
 dev.off()
 
 DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", split.by = "rep_group") #already have dont need to save again 
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.harmony.rep.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "integrated.harmony", split.by = "rep_group")
-dev.off()
-
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", split.by = "rep_group")
 ```
 
 
@@ -906,10 +873,6 @@ emb.ALLpooled_v2.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% s
 ```{r}
 # checking which clusters are intestinal based on the expression of known intestine marker genes
 
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.INTmarkergenes.umap-harmony.pdf", height = 6, width = 9)
-FeaturePlot(emb.ALLpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
-dev.off()
-
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.INTmarkergenes.umap-cca.pdf", height = 6, width = 9)
 FeaturePlot(emb.ALLpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt-7", "ges-1", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
 dev.off()
@@ -919,10 +882,6 @@ FeaturePlot(emb.ALLpooled_v2, reduction = "umap.unintegrated", features = c("elt
 dev.off()
 ```
 ```{r}
-pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.alltissuemarkergenes.umap-harmony.pdf", height = 12, width = 12)
-FeaturePlot(emb.ALLpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
-dev.off()
-
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.FeaturePlot.alltissuemarkergenes.umap-cca.pdf", height = 12, width = 12)
 FeaturePlot(emb.ALLpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
@@ -936,10 +895,6 @@ dev.off()
 #VlnPlot(object = emb.ALLpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
 ```
 ```{r}
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.INTmarkergenes.umap-harmony.pdf", height = 6, width = 9)
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
-dev.off()
-
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.INTmarkergenes.umap-cca.pdf", height = 6, width = 9)
 FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
 dev.off()
@@ -952,9 +907,6 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.INTmarkergenes.pdf", he
 VlnPlot(object = emb.GFPpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3)
 dev.off()
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.umap-harmony.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2, reduction = "umap.harmony", group.by = "harmony_clusters", label = TRUE, label.size = 6, pt.size = 1)
-dev.off()
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.DimPlot.umap-cca.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2, reduction = "umap.cca", group.by = "cca_clusters", label = TRUE, label.size = 6, pt.size = 1)
@@ -973,11 +925,6 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.alltissuemarkergene
 FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.alltissuemarkergenes.umap-harmony.pdf", height = 12, width = 12)
-FeaturePlot(emb.GFPpooled_v2, reduction = "umap.harmony", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
-dev.off()
-
-
 
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.AllTissueMarkerGenes.pdf", height = 20, width = 24)
@@ -988,8 +935,8 @@ dev.off()
 
 ```{r}
 # Remove contamination cluster(s)
-# (Loose filtering) contamination clusters we want to remove = 9, 18, 8, 12
-emb.GFPpooled_v2.filteredClusters <- subset(emb.GFPpooled_v2, idents = c('9', '18', '8', '12'), invert = TRUE)
+# (Loose filtering) contamination clusters we want to remove = 0, 2, 3, 6, 7, 8, 15, 16  
+emb.GFPpooled_v2.filteredClusters <- subset(emb.GFPpooled_v2, idents = c('0', '2', '3', '6', '7', '8', '15', '16'), invert = TRUE)
 
 # Re-run PCA and clustering 
 emb.GFPpooled_v2.filteredClusters <- RunPCA(emb.GFPpooled_v2.filteredClusters)
@@ -1032,6 +979,56 @@ VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.FeaturePlot.AllTissueMarkerGenes.pdf", height = 20, width = 24)
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "rab-3", "odr-2",  "mec-7", "myo-3", "pat-10", "lev-11", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+```
+
+
+```{r}
+# Remove more contamination cluster(s) AS NEEDED 
+# (Loose filtering) contamination clusters we want to remove = 6, 8, 12, 16  
+emb.GFPpooled_v2.filteredClustersFINAL <- subset(emb.GFPpooled_v2.filteredClusters, idents = c('6', '8', '12', '16'), invert = TRUE)
+
+# Re-run PCA and clustering 
+emb.GFPpooled_v2.filteredClustersFINAL <- RunPCA(emb.GFPpooled_v2.filteredClustersFINAL)
+
+ElbowPlot(emb.GFPpooled_v2.filteredClustersFINAL)
+
+emb.GFPpooled_v2.filteredClustersFINAL <- FindNeighbors(emb.GFPpooled_v2.filteredClustersFINAL, dims = 1:5, reduction = "pca")
+
+
+emb.GFPpooled_v2.filteredClustersFINAL.clust <- FindClusters(
+  object = emb.GFPpooled_v2.filteredClustersFINAL,
+  reduction.type = "pca",
+  resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+  dims.use = 1:5,
+  save.SNN = TRUE)
+clustree(emb.GFPpooled_v2.filteredClustersFINAL.clust, prefix = "RNA_snn_res.")
+
+
+emb.GFPpooled_v2.filteredClustersFINAL <- FindClusters(emb.GFPpooled_v2.filteredClustersFINAL, resolution = 1.2, cluster.name = "filtered_clusters_FINAL")
+
+emb.GFPpooled_v2.filteredClustersFINAL <- RunUMAP(emb.GFPpooled_v2.filteredClustersFINAL, dims = 1:5, reduction = "pca", reduction.name = "umap.filtered.final")
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.UMAP.pdf", height = 6, width = 9)
+DimPlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", label = TRUE, label.size = 7, pt.size = 1)
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.UMAP-rep.pdf", height = 6, width = 9)
+DimPlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", split.by = "rep_group")
+dev.off()
+```
+
+
+```{r}
+#check clusters for expression of intestine marker genes
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
+
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
+
+#check clusters for expression of all tissue marker genes
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.FeaturePlot.AllTissueMarkerGenes.pdf", height = 20, width = 24)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "rab-3", "odr-2",  "mec-7", "myo-3", "pat-10", "lev-11", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 ```
 
@@ -1174,7 +1171,7 @@ FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", feat
 dev.off()
 
 # posterior intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.central-int.pdf", height = 6, width = 15)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.posterior-int.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("pbo-4"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 ```
