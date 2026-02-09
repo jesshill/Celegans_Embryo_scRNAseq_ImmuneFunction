@@ -1401,7 +1401,7 @@ bp_late_dev <- clusterProfiler::simplify(go_compare_bp_late, cutoff=0.7, by="p.a
 
 
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.dotPlot-GO-BP_developmental.pdf", height = 10, width = 20)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_early_dev-background.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_early_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
 cluster.p1 + theme(
@@ -1412,48 +1412,8 @@ cluster.p1 + theme(
 dev.off()
 
 
-trim_bp_dev <- pairwise_termsim(bp_dev, method = "JC")
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.treeMap-GO-BP_developmental.pdf", height = 10, width = 20)
-treeplot(trim_bp_dev, showCategory = 3, cladelab_offset=5, tiplab_offset=.3, fontsize_cladelab =5, fontsize_tiplab =5, hexpand(.2), legend_n = 3,  nCluster = 5)  
-dev.off()
-```
-
-# re-order the clusters to have the "early, mid, to late intestine" display
-bp_dev@compareClusterResult$Cluster <- factor(bp_dev@compareClusterResult$Cluster, levels = c("6", "5", "3", "4", "8", "11", "12"))
-
-```{r}
-#anterior intestine
-VlnPlot(emb.GFPpooled_v2.filteredClusters, features = c('C14C6.5', 'cpr-1'), raster=F, ncol = 2)
-# anterior_clusters: 8, 12, 3
-
-#central intestine
-VlnPlot(emb.GFPpooled_v2.filteredClusters, features = c('endu-2', 'clec-56'), raster=F, ncol = 2)
-# central_clusters: 3, 8 
-
-#posterior
-VlnPlot(emb.GFPpooled_v2.filteredClusters, features = c('pbo-4'), raster=F, ncol = 2)
-# posterior_clusters: 3, 8, 11 
-
-clusters_to_use2 <- as.character(c(3, 8, 11, 12))
-regional.clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% clusters_to_use2]
-
-
-go_compare_bp_region <- compareCluster(geneCluster = regional.clusters.list, 
-                             fun = "enrichGO", 
-                             OrgDb = org.Ce.eg.db, 
-                             ont = "BP",
-                             pAdjustMethod = "BH",
-                             pvalueCutoff = 0.05,
-                             qvalueCutoff = 0.05)
-
-bp_region <- clusterProfiler::simplify(go_compare_bp_region, cutoff=0.7, by="p.adjust", select_fun=min)
-
-# re-order the clusters to have the "early, mid, to late intestine" display
-bp_region@compareClusterResult$Cluster <- factor(bp_region@compareClusterResult$Cluster, levels = c("12", "3", "8", "11"))
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.dotPlot-GO-BP_region.pdf", height = 10, width = 20)
-cluster.p1 <- dotplot(bp_region, showCategory = 1,
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_mid_dev-background.pdf", height = 10, width = 20)
+cluster.p1 <- dotplot(bp_mid_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
 cluster.p1 + theme(
   axis.text.y = element_text(size = 15),
@@ -1463,10 +1423,106 @@ cluster.p1 + theme(
 dev.off()
 
 
-trim_bp_region <- pairwise_termsim(bp_region, method = "JC")
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.treeMap-GO-BP_region.pdf", height = 10, width = 20)
-treeplot(trim_bp_region, showCategory = 3, cladelab_offset=5, tiplab_offset=.3, fontsize_cladelab =5, fontsize_tiplab =5, hexpand(.2), legend_n = 3,  nCluster = 5)  
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_late_dev-background.pdf", height = 10, width = 20)
+cluster.p1 <- dotplot(bp_late_dev, showCategory = 1,
+              title = "GO Enrichment (Biological Process)")
+cluster.p1 + theme(
+  axis.text.y = element_text(size = 15),
+  axis.text.x = element_text(size = 15),
+  legend.text = element_text(size = 15)
+  )
+dev.off()
+```
+
+
+```{r}
+#anterior intestine
+VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c('C14C6.5', 'cpr-1'), raster=F, ncol = 2)
+
+#central intestine
+VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c('endu-2', 'clec-56'), raster=F, ncol = 2)
+
+#posterior
+VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c('pbo-4'), raster=F, ncol = 2)
+
+
+
+anterior_clusters <- as.character(c(4,7,8,12))
+central_clusters <- as.character(c(2,4,5,7,8,9))
+posterior_clusters <- as.character(c(2,5,9,11,14))
+
+background_gene_list <- cluster_gene_list
+
+anterior_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters]
+central_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% central_clusters]
+posterior_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% posterior_clusters]
+
+go_compare_bp_ant <- compareCluster(geneCluster = anterior_clusters.list, 
+                             fun = "enrichGO", 
+                             OrgDb = org.Ce.eg.db, 
+                             ont = "BP",
+                             universe = background_gene_list,
+                             pAdjustMethod = "BH",
+                             pvalueCutoff = 0.05,
+                             qvalueCutoff = 0.05)
+
+go_compare_bp_cen <- compareCluster(geneCluster = central_clusters.list, 
+                             fun = "enrichGO", 
+                             OrgDb = org.Ce.eg.db, 
+                             ont = "BP",
+                             universe = background_gene_list,
+                             pAdjustMethod = "BH",
+                             pvalueCutoff = 0.05,
+                             qvalueCutoff = 0.05)
+
+go_compare_bp_post <- compareCluster(geneCluster = posterior_clusters.list, 
+                             fun = "enrichGO", 
+                             OrgDb = org.Ce.eg.db, 
+                             ont = "BP",
+                             universe = background_gene_list,
+                             pAdjustMethod = "BH",
+                             pvalueCutoff = 0.05,
+                             qvalueCutoff = 0.05)
+
+
+bp_ant_dev <- clusterProfiler::simplify(go_compare_bp_ant, cutoff=0.7, by="p.adjust", select_fun=min)
+bp_cen_dev <- clusterProfiler::simplify(go_compare_bp_cen, cutoff=0.7, by="p.adjust", select_fun=min)
+bp_post_dev <- clusterProfiler::simplify(go_compare_bp_post, cutoff=0.7, by="p.adjust", select_fun=min)
+
+
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_anterior-background.pdf", height = 10, width = 20)
+cluster.p1 <- dotplot(bp_ant_dev, showCategory = 1,
+              title = "GO Enrichment (Biological Process)")
+cluster.p1 + theme(
+  axis.text.y = element_text(size = 15),
+  axis.text.x = element_text(size = 15),
+  legend.text = element_text(size = 15)
+  )
+dev.off()
+
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_central-background.pdf", height = 10, width = 20)
+cluster.p1 <- dotplot(bp_cen_dev, showCategory = 1,
+              title = "GO Enrichment (Biological Process)")
+cluster.p1 + theme(
+  axis.text.y = element_text(size = 15),
+  axis.text.x = element_text(size = 15),
+  legend.text = element_text(size = 15)
+  )
+dev.off()
+
+
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_posterior-background.pdf", height = 10, width = 20)
+cluster.p1 <- dotplot(bp_post_dev, showCategory = 1,
+              title = "GO Enrichment (Biological Process)")
+cluster.p1 + theme(
+  axis.text.y = element_text(size = 15),
+  axis.text.x = element_text(size = 15),
+  legend.text = element_text(size = 15)
+  )
 dev.off()
 ```
 
