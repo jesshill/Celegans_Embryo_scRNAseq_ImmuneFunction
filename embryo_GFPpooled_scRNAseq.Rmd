@@ -32,7 +32,6 @@ BiocManager::install("biomaRt")
 BiocManager::install('multtest')
 install.packages('metap')
 install.packages('devtools')
-install.packages("harmony")
 install.packages('pheatmap')
 ```
 
@@ -47,7 +46,6 @@ library(tidyverse)
 library(patchwork)
 library(clustree)
 library(metap)
-library(harmony)
 library(pheatmap)
 library(tibble)
 ```
@@ -1036,17 +1034,17 @@ dev.off()
 ```{r}
 # find new cluster marker genes in our filtered dataset
 
-emb.GFPpooled_v2.filteredClusters.markers <- FindAllMarkers(emb.GFPpooled_v2.filteredClusters, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
+emb.GFPpooled_v2.filteredClustersFINAL.markers <- FindAllMarkers(emb.GFPpooled_v2.filteredClustersFINAL, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
 
-write.csv(emb.GFPpooled_v2.filteredClusters.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters_markers.csv", row.names = TRUE)
+write.csv(emb.GFPpooled_v2.filteredClustersFINAL.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL_markers.csv", row.names = TRUE)
 
-emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% slice_max(n = 3, order_by = avg_log2FC) 
+emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% slice_max(n = 3, order_by = avg_log2FC) 
 ```
 
 ```{r}
 # The UMAP embedding are stored in the Seurat object under the reductions slot. Extract the number of cells by checking the number of rows in the UMAP embedding matrix. Counting the number of rows in this matrix, directly corresponds to the number of cells that have UMAP embedding.
 
-num_int_cells <- nrow(Embeddings(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered"))
+num_int_cells <- nrow(Embeddings(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final"))
 print(paste("Number of intestinal cells in UMAP:", num_int_cells))
 
 num_all_cells <- nrow(Embeddings(emb.ALLpooled_v2, reduction = "umap.unintegrated"))
@@ -1057,19 +1055,19 @@ print(paste("Number of all cells in UMAP:", num_all_cells))
 ```{r}
 # make some pretty heatmaps 
 
-emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
+emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.HeatMap-top3.pdf", height = 10, width = 15)
-DoHeatmap(emb.GFPpooled_v2.filteredClusters, features = c(top3$gene), raster=F) + 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-top3.pdf", height = 10, width = 15)
+DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c(top3$gene), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
 dev.off()
 
 
-emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10
+emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.HeatMap-top10.pdf", height = 20, width = 15)
-DoHeatmap(emb.GFPpooled_v2.filteredClusters, features = c(top10$gene), raster=F) + 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-top10.pdf", height = 20, width = 15)
+DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c(top10$gene), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
 dev.off()
@@ -1078,17 +1076,17 @@ dev.off()
 
 # With smiFISH targets in the heatmap as well (will be on the bottom)
 
-emb.GFPpooled_v2.filteredClusters.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
+emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.HeatMap-top2.smifish.pdf", height = 10, width = 15)
-DoHeatmap(emb.GFPpooled_v2.filteredClusters, features = c(top2$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) +
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-top2.smifish.pdf", height = 10, width = 15)
+DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c(top2$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) +
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
 dev.off()
 
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.HeatMap-smiFISH.pdf", height = 8, width = 10)
-DoHeatmap(emb.GFPpooled_v2.filteredClusters, features = c("clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-smiFISH.pdf", height = 8, width = 10)
+DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c("clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + 
   theme(axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14))
 dev.off()
@@ -1097,82 +1095,82 @@ dev.off()
 
 ```{r}
 # RNAi/FISH targets
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.rnai-FISH.pdf", height = 6, width = 15)  
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.rnai-FISH.pdf", height = 6, width = 15)  
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(emb.GFPpooled_v2.filteredClusters, features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), raster=F, ncol = 3)
+VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c("C14C6.5", "cpr-1", "Y32F6A.5", "endu-2", "clec-56", "pbo-4", "ugt-14"), raster=F, ncol = 3)
 
 # intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.intestine.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-2", "elt-7", "ges-1"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.intestine.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("elt-2", "elt-7", "ges-1"), ncol = 3, coord.fixed = TRUE)
 dev.off() 
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7", "ges-1"), ncol = 2)
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("elt-2", "elt-7", "ges-1"), ncol = 2)
 
 # germline
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.germ.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("glh-1", "nos-1", "pgl-1"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.germ.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("glh-1", "nos-1", "pgl-1"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("glh-1", "nos-1", "pgl-1"), ncol = 2)
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("glh-1", "nos-1", "pgl-1"), ncol = 2)
 
 # muscle
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.muscle.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("myo-3", "pat-10", "lev-11"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.muscle.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("myo-3", "pat-10", "lev-11"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("myo-3", "pat-10", "lev-11"), ncol = 2)
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("myo-3", "pat-10", "lev-11"), ncol = 2)
 
 # neuron
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.neuron.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("rab-3", "odr-2", "mec-7"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.neuron.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("rab-3", "odr-2", "mec-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("rab-3", "odr-2", "mec-7"), ncol = 2)
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("rab-3", "odr-2", "mec-7"), ncol = 2)
 
 # pharynx
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.pharynx.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("myo-2", "tnc-2", "phat-2"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.pharynx.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("myo-2", "tnc-2", "phat-2"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("myo-2", "tnc-2", "phat-2"), ncol = 2)
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("myo-2", "tnc-2", "phat-2"), ncol = 2)
 
 # hypodermis
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.hypodermis.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.hypodermis.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("elt-1", "elt-3", "dpy-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-1", "elt-3", "dpy-7"), ncol = 2)
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("elt-1", "elt-3", "dpy-7"), ncol = 2)
 
 # early intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.earlyint.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("end-1", "acp-2", "ugt-14", "C10C5.4"), ncol = 2 , coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.earlyint.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("end-1", "acp-2", "ugt-14", "C10C5.4"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 
 # mid intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.midint.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("T19D7.6", "T21E8.4", "C10A4.3", "klo-1"), ncol = 2 , coord.fixed = TRUE) #(not the best) "T20D4.19", "F47B8.4"
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.midint.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("T19D7.6", "T21E8.4", "C10A4.3", "klo-1"), ncol = 2 , coord.fixed = TRUE) #(not the best) "T20D4.19", "F47B8.4"
 dev.off()
 
 # late intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.lateint.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("C14C6.5", "clec-56", "cpr-1", "lec-9"), ncol = 2 , coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.lateint.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("C14C6.5", "clec-56", "cpr-1", "lec-9"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 
 # anterior intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.anterior-int.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("C14C6.5", "cpr-1"), ncol = 2 , coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.anterior-int.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("C14C6.5", "cpr-1"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 
 # central intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.central-int.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("clec-56", "endu-2"), ncol = 2 , coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.central-int.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("clec-56", "endu-2"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 
 # posterior intestine
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.featureplot.posterior-int.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("pbo-4"), ncol = 2 , coord.fixed = TRUE)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.posterior-int.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("pbo-4"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 ```
 
@@ -1180,14 +1178,14 @@ dev.off()
 ```{r}
 # how many cells are expressing these markers of other tissues in our intestine specific cell population?
 
-total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["hlh-2", ] > 0) 
-print(total_cells_expressing_gene) #639
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClustersFINAL@assays$RNA$data["hlh-2", ] > 0) 
+print(total_cells_expressing_gene) #24
 
-total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["myo-3", ] > 0) 
-print(total_cells_expressing_gene) #20
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClustersFINAL@assays$RNA$data["myo-3", ] > 0) 
+print(total_cells_expressing_gene) #13
 
-total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClusters@assays$RNA$data["rab-3", ] > 0) 
-print(total_cells_expressing_gene) #149
+total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClustersFINAL@assays$RNA$data["rab-3", ] > 0) 
+print(total_cells_expressing_gene) #144
 ```
 
 
@@ -1235,44 +1233,40 @@ library(ggtree)
 
 
 ```{r}
-Cluster0.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==0 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster1.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==1 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster2.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==2 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster3.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==3 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster4.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==4 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster5.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==5 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster6.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==6 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster7.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==7 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster8.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==8 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster9.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==9 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster10.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==10 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster11.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==11 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster12.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==12 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster13.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==13 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster14.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==14 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster15.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==15 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
-Cluster16.markers <- emb.GFPpooled_v2.filteredClusters.markers[emb.GFPpooled_v2.filteredClusters.markers$cluster==16 & emb.GFPpooled_v2.filteredClusters.markers$p_val_adj < 0.05, ]
+Cluster0.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==0 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster1.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==1 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster2.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==2 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster3.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==3 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster4.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==4 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster5.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==5 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster6.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==6 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster7.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==7 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster8.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==8 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster9.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==9 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster10.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==10 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster11.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==11 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster12.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==12 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster13.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==13 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
+Cluster14.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==14 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
 ```
 
 
 ```{r}
-Cluster0.gene_ids <- bitr(Cluster0.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #3.76% of input gene IDs are fail to map...
-Cluster1.gene_ids <- bitr(Cluster1.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #3.31% of input gene IDs are fail to map...
-Cluster2.gene_ids <- bitr(Cluster2.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #6.09% of input gene IDs are fail to map...
-Cluster3.gene_ids <- bitr(Cluster3.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.58% of input gene IDs are fail to map...
-Cluster4.gene_ids <- bitr(Cluster4.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #0.96% of input gene IDs are fail to map...
-Cluster5.gene_ids <- bitr(Cluster5.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.39% of input gene IDs are fail to map...
-Cluster6.gene_ids <- bitr(Cluster6.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.82% of input gene IDs are fail to map...
-Cluster7.gene_ids <- bitr(Cluster7.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.04% of input gene IDs are fail to map...
-Cluster8.gene_ids <- bitr(Cluster8.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.56% of input gene IDs are fail to map...
-Cluster9.gene_ids <- bitr(Cluster9.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.85% of input gene IDs are fail to map...
-Cluster10.gene_ids <- bitr(Cluster10.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.58% of input gene IDs are fail to map...
-Cluster11.gene_ids <- bitr(Cluster11.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.74% of input gene IDs are fail to map...
-Cluster12.gene_ids <- bitr(Cluster12.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.52% of input gene IDs are fail to map...
-Cluster13.gene_ids <- bitr(Cluster13.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #5.62% of input gene IDs are fail to map...
-Cluster14.gene_ids <- bitr(Cluster14.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.7% of input gene IDs are fail to map...
-Cluster15.gene_ids <- bitr(Cluster15.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #4.33% of input gene IDs are fail to map...
-Cluster16.gene_ids <- bitr(Cluster16.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #0.96% of input gene IDs are fail to map...
+Cluster0.gene_ids <- bitr(Cluster0.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.09% of input gene IDs are fail to map...
+Cluster1.gene_ids <- bitr(Cluster1.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.8% of input gene IDs are fail to map...
+Cluster2.gene_ids <- bitr(Cluster2.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #0.33% of input gene IDs are fail to map...
+Cluster3.gene_ids <- bitr(Cluster3.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.01% of input gene IDs are fail to map...
+Cluster4.gene_ids <- bitr(Cluster4.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.49% of input gene IDs are fail to map...
+Cluster5.gene_ids <- bitr(Cluster5.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.21% of input gene IDs are fail to map...
+Cluster6.gene_ids <- bitr(Cluster6.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.6% of input gene IDs are fail to map...
+Cluster7.gene_ids <- bitr(Cluster7.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.85% of input gene IDs are fail to map...
+Cluster8.gene_ids <- bitr(Cluster8.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.74% of input gene IDs are fail to map...
+Cluster9.gene_ids <- bitr(Cluster9.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.79% of input gene IDs are fail to map...
+Cluster10.gene_ids <- bitr(Cluster10.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.62% of input gene IDs are fail to map...
+Cluster11.gene_ids <- bitr(Cluster11.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #4.07% of input gene IDs are fail to map...
+Cluster12.gene_ids <- bitr(Cluster12.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.81% of input gene IDs are fail to map...
+Cluster13.gene_ids <- bitr(Cluster13.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #0.89% of input gene IDs are fail to map...
+Cluster14.gene_ids <- bitr(Cluster14.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.65% of input gene IDs are fail to map...
 ```
 
 
@@ -1309,7 +1303,7 @@ upsetplot(Cluster0.ego)
 ```{r}
 # how to do for all clusters 
 
-cluster_gene_list <- split(emb.GFPpooled_v2.filteredClusters.markers$gene, emb.GFPpooled_v2.filteredClusters.markers$cluster)
+cluster_gene_list <- split(emb.GFPpooled_v2.filteredClustersFINAL.markers$gene, emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster)
 
 cluster_gene_list <- lapply(cluster_gene_list, function(genes) {
   gene_ids <- bitr(genes, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db)
@@ -1329,7 +1323,7 @@ go_compare_bp <- compareCluster(geneCluster = cluster_gene_list,
 
 bp <- clusterProfiler::simplify(go_compare_bp, cutoff = 0.7, by="p.adjust", select_fun = min)
 
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.dotPlot-GO-BP.pdf", height = 10, width = 20)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
 cluster.p1 + theme(
