@@ -1345,7 +1345,7 @@ dev.off()
 
 
 ```{r}
-# how to do for specific clusters - across developmental time
+# how to do for specific clusters - across developmental time - with and without background gene set
 
 #early intestine
 VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c('end-1', 'acp-2', 'ugt-14', 'C10C5.4'), raster=F, ncol = 2)
@@ -1360,6 +1360,7 @@ VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c('C14C6.5', 'clec-56
 early_clusters <- as.character(c(14))
 mid_clusters <- as.character(c(1, 2, 3, 6, 7, 14))
 late_clusters <- as.character(c(4, 5, 7, 8, 12, 2, 9, 11, 13))
+
 
 background_gene_list <- unique(unlist(cluster_gene_list))
 
@@ -1439,6 +1440,8 @@ dev.off()
 
 
 ```{r}
+# how to do for specific clusters - across intestinal region - with and without background gene set
+
 #anterior intestine
 VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c('C14C6.5', 'cpr-1'), raster=F, ncol = 2)
 
@@ -1454,17 +1457,29 @@ anterior_clusters <- as.character(c(4,7,8,12))
 central_clusters <- as.character(c(2,4,5,7,8,9))
 posterior_clusters <- as.character(c(2,5,9,11,14))
 
-background_gene_list <- unique(unlist(cluster_gene_list))
-
 anterior_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters]
 central_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% central_clusters]
 posterior_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% posterior_clusters]
+
+
+ant_cen_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters & names(cluster_gene_list) %in% central_clusters]
+ant_post_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters & names(cluster_gene_list) %in% posterior_clusters]
+cen_post_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% central_clusters & names(cluster_gene_list) %in% posterior_clusters]
+
+
+background_gene_list <- unique(unlist(cluster_gene_list))
+
+ant_cen_gene_list <- unique(unlist(ant_cen_clusters.list))
+ant_post_gene_list <- unique(unlist(ant_post_clusters.list))
+cen_post_gene_list <- unique(unlist(cen_post_clusters.list))
+
 
 go_compare_bp_ant <- compareCluster(geneCluster = anterior_clusters.list, 
                              fun = "enrichGO", 
                              OrgDb = org.Ce.eg.db, 
                              ont = "BP",
-                             universe = background_gene_list,
+                             #universe = background_gene_list,
+                             universe = cen_post_gene_list,
                              pAdjustMethod = "BH",
                              pvalueCutoff = 0.05,
                              qvalueCutoff = 0.05)
