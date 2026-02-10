@@ -1361,7 +1361,7 @@ early_clusters <- as.character(c(14))
 mid_clusters <- as.character(c(1, 2, 3, 6, 7, 14))
 late_clusters <- as.character(c(4, 5, 7, 8, 12, 2, 9, 11, 13))
 
-background_gene_list <- cluster_gene_list
+background_gene_list <- unique(unlist(cluster_gene_list))
 
 early_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% early_clusters]
 mid_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% mid_clusters]
@@ -1400,7 +1400,7 @@ bp_mid_dev <- clusterProfiler::simplify(go_compare_bp_mid, cutoff=0.7, by="p.adj
 bp_late_dev <- clusterProfiler::simplify(go_compare_bp_late, cutoff=0.7, by="p.adjust", select_fun=min)
 
 
-
+#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_early_dev.pdf", height = 10, width = 20)
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_early_dev-background.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_early_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
@@ -1412,6 +1412,7 @@ cluster.p1 + theme(
 dev.off()
 
 
+#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_mid_dev.pdf", height = 10, width = 20)
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_mid_dev-background.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_mid_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
@@ -1424,6 +1425,7 @@ dev.off()
 
 
 
+#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_late_dev.pdf", height = 10, width = 20)
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_late_dev-background.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_late_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
@@ -1452,7 +1454,7 @@ anterior_clusters <- as.character(c(4,7,8,12))
 central_clusters <- as.character(c(2,4,5,7,8,9))
 posterior_clusters <- as.character(c(2,5,9,11,14))
 
-background_gene_list <- cluster_gene_list
+background_gene_list <- unique(unlist(cluster_gene_list))
 
 anterior_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters]
 central_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% central_clusters]
@@ -1491,7 +1493,7 @@ bp_cen_dev <- clusterProfiler::simplify(go_compare_bp_cen, cutoff=0.7, by="p.adj
 bp_post_dev <- clusterProfiler::simplify(go_compare_bp_post, cutoff=0.7, by="p.adjust", select_fun=min)
 
 
-
+#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_anterior.pdf", height = 10, width = 20)
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_anterior-background.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_ant_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
@@ -1503,6 +1505,7 @@ cluster.p1 + theme(
 dev.off()
 
 
+#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_central.pdf", height = 10, width = 20)
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_central-background.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_cen_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
@@ -1515,6 +1518,7 @@ dev.off()
 
 
 
+#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_posterior.pdf", height = 10, width = 20)
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_posterior-background.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_post_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
@@ -1531,7 +1535,7 @@ dev.off()
 # Calculate gene level variance in expression across clusters: for a given gene, how different is its typical expression between clusters?
 
 # Average expression per cluster. Rows = genes, Columns = clusters. Removes cluster size as a confound, so when compute variance across clusters you’re measuring biological differences in expression, not how many cells happened to be in each cluster.
-avg_expr <- AverageExpression(emb.GFPpooled_v2.filteredClusters, return.seurat = FALSE)$RNA
+avg_expr <- AverageExpression(emb.GFPpooled_v2.filteredClustersFINAL, return.seurat = FALSE)$RNA
 
 # variance of each gene across clusters: apply(X, MARGIN, FUNction)
 gene_variances <- apply(avg_expr, 1, var)
@@ -1554,7 +1558,7 @@ print(num_genes)
 scaled_data <- t(scale(t(as.matrix(heatmap_data))))
 
 # plot heatmap
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.varianceHM.pdf", height = 10, width = 20)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.varianceHM.pdf", height = 10, width = 20)
 pheatmap(scaled_data,
          cluster_rows = TRUE,
          cluster_cols = TRUE,
@@ -1569,7 +1573,7 @@ dev.off()
 ```{r}
 # genes and cells in each counts matrix
 dim(emb.GFPpooled_v2) #15116  2571
-dim(emb.GFPpooled_v2.filteredClusters) #15116   2414
+dim(emb.GFPpooled_v2.filteredClustersFINAL) #15116   1073
 
 dim(emb.ALLpooled_v2) #18590 18738
 ```
@@ -1836,21 +1840,31 @@ dev.off()
 ```{r}
 sessionInfo() 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ----
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # Perform gene ontology
 ```{r}
