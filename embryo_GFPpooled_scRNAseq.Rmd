@@ -1339,7 +1339,7 @@ dev.off()
 trim_bp <- pairwise_termsim(bp, method = "JC")
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.treeMap-GO-BP.pdf", height = 20, width = 30)
-treeplot(trim_bp, showCategory = 3, cladelab_offset=5, tiplab_offset=.3, fontsize_cladelab =6, fontsize_tiplab =5, hexpand(.2), legend_n = 3,  nCluster = 5)  
+treeplot(trim_bp, showCategory = 3, cladelab_offset=5, tiplab_offset=.3, fontsize_cladelab =4, fontsize_tiplab =5, hexpand(.2), legend_n = 3,  nCluster = 5)  
 dev.off()
 ```
 
