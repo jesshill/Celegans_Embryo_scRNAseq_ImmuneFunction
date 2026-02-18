@@ -1148,15 +1148,21 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featurepl
 FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("end-1", "acp-2", "ugt-14", "C10C5.4"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("end-1", "acp-2", "ugt-14", "C10C5.4"), ncol = 2)
+
 # mid intestine
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.midint.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("T19D7.6", "T21E8.4", "C10A4.3", "klo-1"), ncol = 2 , coord.fixed = TRUE) #(not the best) "T20D4.19", "F47B8.4"
 dev.off()
 
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("T19D7.6", "T21E8.4", "C10A4.3", "klo-1"), ncol = 2)
+
 # late intestine
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.lateint.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("C14C6.5", "clec-56", "cpr-1", "lec-9"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
+
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("C14C6.5", "clec-56", "cpr-1", "lec-9"), ncol = 2)
 
 # anterior intestine
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.anterior-int.pdf", height = 6, width = 15)
