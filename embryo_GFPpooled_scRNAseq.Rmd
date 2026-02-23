@@ -1169,15 +1169,21 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featurepl
 FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("C14C6.5", "cpr-1"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("C14C6.5", "cpr-1"), ncol = 2)
+
 # central intestine
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.central-int.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("clec-56", "endu-2"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
 
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("clec-56", "endu-2"), ncol = 2)
+
 # posterior intestine
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.posterior-int.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("pbo-4"), ncol = 2 , coord.fixed = TRUE)
 dev.off()
+
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("pbo-4"), ncol = 2)
 ```
 
 
@@ -1862,6 +1868,19 @@ ggplot(metadata_cca_long_all, aes(x = Embedding_Value, color = rep_group, fill =
 dev.off()
 ```
 
+
+```{r}
+# violin plots to look at cluster expression of microscopy targets
+
+#figure 4 - supplemental 1
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("C14C6.5", "clec-56", "pbo-4", "C10C5.3", "cpr-1", "ttr-52"), ncol = 2)
+
+#figure 4 - supplemental 2
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("pbo-4"), ncol = 2)
+
+#figure 4 - supplemental 3
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("pbo-4"), ncol = 2)
+```
 
 ```{r}
 sessionInfo() 
