@@ -745,8 +745,6 @@ dev.off()
 ```{r}
 # Perform integration:  Aims to return a single dimensional reduction that captures the shared sources of variance across multiple layers, so that cells in a similar biological state will cluster. The method returns a dimensional reduction (i.e. integrated.cca, harmony) which can be used for visualization and unsupervised clustering analysis.
 
-set.seed(42) # this will match the default seed.use = 42 for RunPCR
-
 emb.ALLpooled_v2 <- IntegrateLayers(object = emb.ALLpooled_v2, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca", verbose = FALSE)
 
 emb.ALLpooled_v2 <- FindNeighbors(emb.ALLpooled_v2, reduction = "integrated.cca", dims = 1:20)
@@ -771,8 +769,6 @@ emb.ALLpooled_v2[["RNA"]] <- JoinLayers(emb.ALLpooled_v2[["RNA"]])
 
 ```{r}
 # Perform integration:  Aims to return a single dimensional reduction that captures the shared sources of variance across multiple layers, so that cells in a similar biological state will cluster. The method returns a dimensional reduction (i.e. integrated.cca, harmony) which can be used for visualization and unsupervised clustering analysis.
-
-set.seed(42) # this will match the default seed.use = 42 for RunPCR
 
 emb.GFPpooled_v2 <- IntegrateLayers(object = emb.GFPpooled_v2, method = CCAIntegration, orig.reduction = "pca", new.reduction = "integrated.cca", verbose = FALSE)
 
