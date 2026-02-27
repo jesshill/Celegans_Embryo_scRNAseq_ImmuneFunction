@@ -50,6 +50,10 @@ library(pheatmap)
 library(tibble)
 ```
 
+```{r}
+# Set global seed for random number generator
+set.seed(42)
+```
 
 ```{r}
 # Load the data
@@ -481,8 +485,6 @@ emb.GFPpooled_v2 <- ScaleData(emb.GFPpooled_v2, features = all.genes_1)
 ```{r}
 # Linear dimensional reduction: Perform PCA on the scaled data. By default, only the previously determined variable features are used as input. 
 
-# default: seed.use = 42
-
 emb.ALLpooled_v2 <- RunPCA(emb.ALLpooled_v2, features = VariableFeatures(object = emb.ALLpooled_v2))
 ```
 
@@ -672,11 +674,13 @@ DimPlot(emb.GFPpooled_v2.clust, group.by = "RNA_snn_res.0.8", label = TRUE)
 
 ```{r}
 # now choose the appropriate resolution for the given dimensions using the Clustree data
+
 emb.ALLpooled_v2 <- FindClusters(emb.ALLpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
 ```
 
 ```{r}
 # now choose the appropriate resolution for the given dimensions using the Clustree data
+
 emb.GFPpooled_v2 <- FindClusters(emb.GFPpooled_v2, resolution = 1.2, cluster.name = "unintegrated_clusters")
 ```
 
@@ -924,7 +928,6 @@ FeaturePlot(emb.GFPpooled_v2, reduction = "umap.cca", features = c("elt-2", "elt
 dev.off()
 
 
-
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.VlnPlot.AllTissueMarkerGenes.pdf", height = 20, width = 24)
 VlnPlot(object = emb.GFPpooled_v2, features = c("elt-2", "elt-7", "ges-1", "glh-1", "nos-1", "pgl-1", "myo-3", "pat-10", "mls-1", "rab-3", "odr-2",  "mec-7", "myo-2", "tnc-2", "phat-2", "elt-1", "elt-3", "dpy-7"), ncol = 3)
 dev.off()
@@ -933,32 +936,46 @@ dev.off()
 
 ```{r}
 # Remove contamination cluster(s)
-# (Loose filtering) contamination clusters we want to remove = 0, 2, 3, 6, 7, 8, 15, 16  
-emb.GFPpooled_v2.filteredClusters <- subset(emb.GFPpooled_v2, idents = c('0', '2', '3', '6', '7', '8', '15', '16'), invert = TRUE)
+# (Loose filtering) contamination clusters we want to remove = 0, 2, 7, 8, 9, 10, 12, 15, 16, 17 
+## (Loose filtering) contamination clusters we want to remove = 0, 2, 3, 6, 7, 8, 15, 16  
+emb.GFPpooled_v2.filteredClusters_unint <- subset(emb.GFPpooled_v2, idents = c('0', '2', '3', '6', '7', '8', '15', '16', '17'), invert = TRUE)
+#emb.GFPpooled_v2.filteredClusters_unint <- subset(emb.GFPpooled_v2, idents = c('0', '2', '3', '6', '7', '8', '15', '16', '17'), invert = TRUE)
+
+emb.GFPpooled_v2.filteredClusters_unint <- subset(emb.GFPpooled_v2, subset = !(unintegrated_clusters %in% c('0','2','3','6','7','8','15','16')))
+
+emb.GFPpooled_v2.filteredClusters_cca <- subset(emb.GFPpooled_v2, subset = !(cca_clusters %in% c('0','2','3','6','7','8','15','16')))
+
 
 # Re-run PCA and clustering 
+emb.GFPpooled_v2.filteredClusters_unint <- RunPCA(emb.GFPpooled_v2.filteredClusters_unint)
+emb.GFPpooled_v2.filteredClusters_cca <- RunPCA(emb.GFPpooled_v2.filteredClusters_cca)
 emb.GFPpooled_v2.filteredClusters <- RunPCA(emb.GFPpooled_v2.filteredClusters)
 
 ElbowPlot(emb.GFPpooled_v2.filteredClusters)
+ElbowPlot(emb.GFPpooled_v2.filteredClusters_unint)
+ElbowPlot(emb.GFPpooled_v2.filteredClusters_cca)
 
 emb.GFPpooled_v2.filteredClusters <- FindNeighbors(emb.GFPpooled_v2.filteredClusters, dims = 1:5, reduction = "pca")
+emb.GFPpooled_v2.filteredClusters_unint <- FindNeighbors(emb.GFPpooled_v2.filteredClusters_unint, dims = 1:5, reduction = "pca")
+emb.GFPpooled_v2.filteredClusters_cca <- FindNeighbors(emb.GFPpooled_v2.filteredClusters_cca, dims = 1:5, reduction = "pca")
 
 
-emb.GFPpooled_v2.filteredClusters.clust <- FindClusters(
-  object = emb.GFPpooled_v2.filteredClusters,
+emb.GFPpooled_v2.filteredClusters_cca.clust <- FindClusters(
+  object = emb.GFPpooled_v2.filteredClusters_cca,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
   dims.use = 1:5,
   save.SNN = TRUE)
-clustree(emb.GFPpooled_v2.filteredClusters.clust, prefix = "RNA_snn_res.")
+clustree(emb.GFPpooled_v2.filteredClusters_cca.clust, prefix = "RNA_snn_res.")
 
 
-emb.GFPpooled_v2.filteredClusters <- FindClusters(emb.GFPpooled_v2.filteredClusters, resolution = 1.2, cluster.name = "filtered_clusters")
+emb.GFPpooled_v2.filteredClusters_cca <- FindClusters(emb.GFPpooled_v2.filteredClusters_cca, resolution = 1.2, cluster.name = "filtered_clusters")
 
-emb.GFPpooled_v2.filteredClusters <- RunUMAP(emb.GFPpooled_v2.filteredClusters, dims = 1:5, reduction = "pca", reduction.name = "umap.filtered")
+emb.GFPpooled_v2.filteredClusters_cca <- RunUMAP(emb.GFPpooled_v2.filteredClusters_cca, dims = 1:5, reduction = "pca", reduction.name = "umap.filtered")
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.UMAP.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", label = TRUE, label.size = 7, pt.size = 1)
+DimPlot(emb.GFPpooled_v2.filteredClusters_cca, reduction = "umap.filtered", label = TRUE, label.size = 7, pt.size = 1)
+DimPlot(emb.GFPpooled_v2.filteredClusters_unint, reduction = "umap.filtered", label = TRUE, label.size = 7, pt.size = 1)
 dev.off()
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.UMAP-rep.pdf", height = 6, width = 9)
