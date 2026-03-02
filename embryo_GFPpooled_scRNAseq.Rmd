@@ -176,7 +176,6 @@ cellcodes$condition <- dplyr::case_when(
 )
 
 # Examine the dataframe
-view(cellcodes)
 head(cellcodes)
 ```
 
@@ -204,7 +203,6 @@ cellcodes_1$condition <- dplyr::case_when(
 )
 
 # Examine the dataframe
-view(cellcodes_1)
 head(cellcodes_1) 
 ```
 
@@ -219,15 +217,11 @@ all(colnames(emb.GFPpooled_v2.data.filt) == rownames(cellcodes_1))
 ```{r}
 # Set up the Seurat object. Initialize the Seurat object with the raw (non-normalized data)
 emb.ALLpooled_v2 <- CreateSeuratObject(counts = emb.ALLpooled_v2.data.filt, project = "emb.ALLpooled_v2", min.cells = 3, min.features = 200, meta.data = cellcodes)
-
-view(emb.ALLpooled_v2@meta.data)
 ```
 
 ```{r}
 # Set up the Seurat object. Initialize the Seurat object with the raw (non-normalized data)
 emb.GFPpooled_v2 <- CreateSeuratObject(counts = emb.GFPpooled_v2.data.filt, project = "emb.GFPpooled_v2", min.cells = 3, min.features = 200, meta.data = cellcodes_1)
-
-view(emb.GFPpooled_v2@meta.data)
 ```
 
 
@@ -255,7 +249,6 @@ emb.GFPpooled_v2
 # Low `nFeature_RNA` indicates that the cell may be dead or dying or an empty droplet
 # High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
 
-view(emb.ALLpooled_v2@meta.data)
 head(emb.ALLpooled_v2@meta.data, 5)
 ```
 
@@ -266,7 +259,6 @@ head(emb.ALLpooled_v2@meta.data, 5)
 # Low `nFeature_RNA` indicates that the cell may be dead or dying or an empty droplet
 # High `nCount_RNA` and/or `nFeature_RNA` indicates that the "cell" may in fact be a doublet (or multiplet)
 
-view(emb.GFPpooled_v2@meta.data)
 head(emb.GFPpooled_v2@meta.data, 5)
 ```
 
@@ -364,14 +356,13 @@ dev.off()
 
 ```{r}
 # Check out the metadata, inspect QC metrics, labels, etc. 
-view(emb.ALLpooled_v2@meta.data) 
 hist(emb.ALLpooled_v2$nFeature_RNA) 
 hist(emb.ALLpooled_v2$nCount_RNA) 
 
-view(emb.ALLpooled_v2@assays$RNA$counts.Rep_1)
-view(emb.ALLpooled_v2@assays$RNA$counts.Rep_2)
-view(emb.ALLpooled_v2@assays$RNA$counts.Rep_3)
-view(emb.ALLpooled_v2@assays$RNA$counts.Rep_4)
+# view(emb.ALLpooled_v2@assays$RNA$counts.Rep_1)
+# view(emb.ALLpooled_v2@assays$RNA$counts.Rep_2)
+# view(emb.ALLpooled_v2@assays$RNA$counts.Rep_3)
+# view(emb.ALLpooled_v2@assays$RNA$counts.Rep_4)
 
 # Extract the raw count matrix (genes x cells) from the RNA assay
 exp_matrix <- as.matrix(emb.ALLpooled_v2@assays$RNA$counts.Rep_1)
@@ -395,14 +386,13 @@ genes_express_only_once4 <- sum(total_cts_per_gene4==1)
 
 ```{r}
 # Check out the metadata, inspect QC metrics, labels, etc. 
-view(emb.GFPpooled_v2@meta.data)
 hist(emb.GFPpooled_v2$nFeature_RNA)
 hist(emb.GFPpooled_v2$nCount_RNA)
 
-view(emb.GFPpooled_v2@assays$RNA$counts.Rep_1)
-view(emb.GFPpooled_v2@assays$RNA$counts.Rep_2)
-view(emb.GFPpooled_v2@assays$RNA$counts.Rep_3)
-view(emb.GFPpooled_v2@assays$RNA$counts.Rep_4)
+# view(emb.GFPpooled_v2@assays$RNA$counts.Rep_1)
+# view(emb.GFPpooled_v2@assays$RNA$counts.Rep_2)
+# view(emb.GFPpooled_v2@assays$RNA$counts.Rep_3)
+# view(emb.GFPpooled_v2@assays$RNA$counts.Rep_4)
 
 # Extract the raw count matrix (genes x cells) from the RNA assay
 exp_matrix <- as.matrix(emb.GFPpooled_v2@assays$RNA$counts.Rep_1)
@@ -662,7 +652,6 @@ emb.GFPpooled_v2.clust <- FindClusters(
   save.SNN = TRUE)
 
 ## Now use Clustree to build a clustering tree based on the chosen resolutions specified above
-
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.Clustree.pdf", height = 6, width = 9)
 clustree(emb.GFPpooled_v2.clust, prefix = "RNA_snn_res.")
 dev.off()
@@ -932,46 +921,69 @@ dev.off()
 
 ```{r}
 # Remove contamination cluster(s)
-# (Loose filtering) contamination clusters we want to remove = 0, 2, 7, 8, 9, 10, 12, 15, 16, 17 
-## (Loose filtering) contamination clusters we want to remove = 0, 2, 3, 6, 7, 8, 15, 16  
-emb.GFPpooled_v2.filteredClusters_unint <- subset(emb.GFPpooled_v2, idents = c('0', '2', '3', '6', '7', '8', '15', '16', '17'), invert = TRUE)
-#emb.GFPpooled_v2.filteredClusters_unint <- subset(emb.GFPpooled_v2, idents = c('0', '2', '3', '6', '7', '8', '15', '16', '17'), invert = TRUE)
+# (Loose filtering) contamination clusters we want to remove = 8, 9, 10, 11, 12, 17 
 
-emb.GFPpooled_v2.filteredClusters_unint <- subset(emb.GFPpooled_v2, subset = !(unintegrated_clusters %in% c('0','2','3','6','7','8','15','16')))
-
-emb.GFPpooled_v2.filteredClusters_cca <- subset(emb.GFPpooled_v2, subset = !(cca_clusters %in% c('0','2','3','6','7','8','15','16')))
+# this will be pulled based on the cca-integrated cluster identities (tested this by the below extractions)
+ 
+emb.GFPpooled_v2.filteredClusters <- subset(emb.GFPpooled_v2, idents = c('8', '9', '10', '11', '12', '17'), invert = TRUE)
+#emb.GFPpooled_v2.filteredClusters_unint <- subset(emb.GFPpooled_v2, subset = !(unintegrated_clusters %in% c('8', '9', '10', '11', '12', '17')))
+#emb.GFPpooled_v2.filteredClusters_cca <- subset(emb.GFPpooled_v2, subset = !(cca_clusters %in% c('8', '9', '10', '11', '12', '17')))
 
 
 # Re-run PCA and clustering 
-emb.GFPpooled_v2.filteredClusters_unint <- RunPCA(emb.GFPpooled_v2.filteredClusters_unint)
-emb.GFPpooled_v2.filteredClusters_cca <- RunPCA(emb.GFPpooled_v2.filteredClusters_cca)
 emb.GFPpooled_v2.filteredClusters <- RunPCA(emb.GFPpooled_v2.filteredClusters)
+#emb.GFPpooled_v2.filteredClusters_unint <- RunPCA(emb.GFPpooled_v2.filteredClusters_unint)
+#emb.GFPpooled_v2.filteredClusters_cca <- RunPCA(emb.GFPpooled_v2.filteredClusters_cca)
+
 
 ElbowPlot(emb.GFPpooled_v2.filteredClusters)
-ElbowPlot(emb.GFPpooled_v2.filteredClusters_unint)
-ElbowPlot(emb.GFPpooled_v2.filteredClusters_cca)
+#ElbowPlot(emb.GFPpooled_v2.filteredClusters_unint)
+#ElbowPlot(emb.GFPpooled_v2.filteredClusters_cca)
 
 emb.GFPpooled_v2.filteredClusters <- FindNeighbors(emb.GFPpooled_v2.filteredClusters, dims = 1:5, reduction = "pca")
-emb.GFPpooled_v2.filteredClusters_unint <- FindNeighbors(emb.GFPpooled_v2.filteredClusters_unint, dims = 1:5, reduction = "pca")
-emb.GFPpooled_v2.filteredClusters_cca <- FindNeighbors(emb.GFPpooled_v2.filteredClusters_cca, dims = 1:5, reduction = "pca")
+#emb.GFPpooled_v2.filteredClusters_unint <- FindNeighbors(emb.GFPpooled_v2.filteredClusters_unint, dims = 1:5, reduction = "pca")
+#emb.GFPpooled_v2.filteredClusters_cca <- FindNeighbors(emb.GFPpooled_v2.filteredClusters_cca, dims = 1:5, reduction = "pca")
 
 
-emb.GFPpooled_v2.filteredClusters_cca.clust <- FindClusters(
-  object = emb.GFPpooled_v2.filteredClusters_cca,
+
+emb.GFPpooled_v2.filteredClusters.clust <- FindClusters(
+  object = emb.GFPpooled_v2.filteredClusters,
   reduction.type = "pca",
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
   dims.use = 1:5,
   save.SNN = TRUE)
-clustree(emb.GFPpooled_v2.filteredClusters_cca.clust, prefix = "RNA_snn_res.")
+
+clustree(emb.GFPpooled_v2.filteredClusters.clust, prefix = "RNA_snn_res.")
+
+# emb.GFPpooled_v2.filteredClusters_unint.clust <- FindClusters(
+#   object = emb.GFPpooled_v2.filteredClusters_unint,
+#   reduction.type = "pca",
+#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+#   dims.use = 1:5,
+#   save.SNN = TRUE)
+# clustree(emb.GFPpooled_v2.filteredClusters_unint.clust, prefix = "RNA_snn_res.")
+# 
+# emb.GFPpooled_v2.filteredClusters_cca.clust <- FindClusters(
+#   object = emb.GFPpooled_v2.filteredClusters_cca,
+#   reduction.type = "pca",
+#   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
+#   dims.use = 1:5,
+#   save.SNN = TRUE)
+# clustree(emb.GFPpooled_v2.filteredClusters_cca.clust, prefix = "RNA_snn_res.")
 
 
-emb.GFPpooled_v2.filteredClusters_cca <- FindClusters(emb.GFPpooled_v2.filteredClusters_cca, resolution = 1.2, cluster.name = "filtered_clusters")
+emb.GFPpooled_v2.filteredClusters <- FindClusters(emb.GFPpooled_v2.filteredClusters, resolution = 1.2, cluster.name = "filtered_clusters")
+#emb.GFPpooled_v2.filteredClusters_unint <- FindClusters(emb.GFPpooled_v2.filteredClusters_unint, resolution = 1.2, cluster.name = "filtered_clusters")
+#emb.GFPpooled_v2.filteredClusters_cca <- FindClusters(emb.GFPpooled_v2.filteredClusters_cca, resolution = 1.2, cluster.name = "filtered_clusters")
 
-emb.GFPpooled_v2.filteredClusters_cca <- RunUMAP(emb.GFPpooled_v2.filteredClusters_cca, dims = 1:5, reduction = "pca", reduction.name = "umap.filtered")
+emb.GFPpooled_v2.filteredClusters <- RunUMAP(emb.GFPpooled_v2.filteredClusters, dims = 1:5, reduction = "pca", reduction.name = "umap.filtered")
+#emb.GFPpooled_v2.filteredClusters_unint <- RunUMAP(emb.GFPpooled_v2.filteredClusters_unint, dims = 1:5, reduction = "pca", reduction.name = "umap.filtered")
+#emb.GFPpooled_v2.filteredClusters_cca <- RunUMAP(emb.GFPpooled_v2.filteredClusters_cca, dims = 1:5, reduction = "pca", reduction.name = "umap.filtered")
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.UMAP.pdf", height = 6, width = 9)
-DimPlot(emb.GFPpooled_v2.filteredClusters_cca, reduction = "umap.filtered", label = TRUE, label.size = 7, pt.size = 1)
-DimPlot(emb.GFPpooled_v2.filteredClusters_unint, reduction = "umap.filtered", label = TRUE, label.size = 7, pt.size = 1)
+DimPlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", label = TRUE, label.size = 7, pt.size = 1)
+#DimPlot(emb.GFPpooled_v2.filteredClusters_cca, reduction = "umap.filtered", label = TRUE, label.size = 7, pt.size = 1)
+#DimPlot(emb.GFPpooled_v2.filteredClusters_unint, reduction = "umap.filtered", label = TRUE, label.size = 7, pt.size = 1)
 dev.off()
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClusters.UMAP-rep.pdf", height = 6, width = 9)
@@ -984,7 +996,7 @@ dev.off()
 #check clusters for expression of intestine marker genes
 FeaturePlot(emb.GFPpooled_v2.filteredClusters, reduction = "umap.filtered", features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3, coord.fixed = TRUE)
 
-VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
+VlnPlot(object = emb.GFPpooled_v2.filteredClusters, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"), ncol = 3)
 
 #check clusters for expression of all tissue marker genes
 
@@ -996,8 +1008,8 @@ dev.off()
 
 ```{r}
 # Remove more contamination cluster(s) AS NEEDED 
-# (Loose filtering) contamination clusters we want to remove = 6, 8, 12, 16  
-emb.GFPpooled_v2.filteredClustersFINAL <- subset(emb.GFPpooled_v2.filteredClusters, idents = c('6', '8', '12', '16'), invert = TRUE)
+# (Loose filtering) contamination clusters we want to remove = 0,1,3,4,6,10
+emb.GFPpooled_v2.filteredClustersFINAL <- subset(emb.GFPpooled_v2.filteredClusters, idents = c('0', '1', '3', '4', '6', '10'), invert = TRUE)
 
 # Re-run PCA and clustering 
 emb.GFPpooled_v2.filteredClustersFINAL <- RunPCA(emb.GFPpooled_v2.filteredClustersFINAL)
@@ -1204,13 +1216,13 @@ VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("pbo-4"), 
 # how many cells are expressing these markers of other tissues in our intestine specific cell population?
 
 total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClustersFINAL@assays$RNA$data["hlh-2", ] > 0) 
-print(total_cells_expressing_gene) #24
+print(total_cells_expressing_gene) #27
 
 total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClustersFINAL@assays$RNA$data["myo-3", ] > 0) 
-print(total_cells_expressing_gene) #13
+print(total_cells_expressing_gene) #11
 
 total_cells_expressing_gene <- sum(emb.GFPpooled_v2.filteredClustersFINAL@assays$RNA$data["rab-3", ] > 0) 
-print(total_cells_expressing_gene) #144
+print(total_cells_expressing_gene) #143
 ```
 
 
