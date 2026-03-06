@@ -879,7 +879,7 @@ dev.off()
 
 
 #VlnPlot(object = emb.ALLpooled_v2, features = c("ugt-14", "c10c5.4", "acp-2", "end-1"))
-#VlnPlot(object = emb.ALLpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
+VlnPlot(object = emb.ALLpooled_v2, features = c("elt-2", "elt-7", "ges-1", "end-1", "end-3", "ifb-2", "act-5"))
 ```
 ```{r}
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.FeaturePlot.INTmarkergenes.umap-cca.pdf", height = 6, width = 9)
@@ -1098,6 +1098,20 @@ DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c(top10$gene), rast
 dev.off()
 
 
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-all.pdf", height = 20, width = 15)
+DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, raster=F) + 
+  theme(axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+dev.off()
+
+
+emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=60, wt=avg_log2FC) -> top60
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-top60.pdf", height = 30, width = 15)
+DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c(top60$gene, "cpr-1"), raster=F) + 
+  theme(axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14))
+dev.off()
 
 # With smiFISH targets in the heatmap as well (will be on the bottom)
 
@@ -1140,19 +1154,19 @@ dev.off()
 
 VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("glh-1", "nos-1", "pgl-1"), ncol = 2)
 
-# muscle
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.muscle.pdf", height = 6, width = 15)
-FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("myo-3", "pat-10", "lev-11"), ncol = 3, coord.fixed = TRUE)
-dev.off()
-
-VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("myo-3", "pat-10", "lev-11"), ncol = 2)
-
 # neuron
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.neuron.pdf", height = 6, width = 15)
 FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("rab-3", "odr-2", "mec-7"), ncol = 3, coord.fixed = TRUE)
 dev.off()
 
 VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("rab-3", "odr-2", "mec-7"), ncol = 2)
+
+# muscle
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.muscle.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("myo-3", "pat-10", "lev-11"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("myo-3", "pat-10", "lev-11"), ncol = 2)
 
 # pharynx
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.pharynx.pdf", height = 6, width = 15)
@@ -1252,6 +1266,7 @@ BiocManager::install("biovizBase")
 BiocManager::install("clusterProfiler")
 BiocManager::install("enrichplot")
 BiocManager::install("ggtree")
+install.packages("ggupset")
 
 # load libraries
 library(Signac)
@@ -1260,6 +1275,7 @@ library(clusterProfiler)
 library(org.Ce.eg.db)
 library(enrichplot)
 library(ggtree)
+library(ggupset)
 
 #If you use [clusterProfiler](https://www.bioconductor.org/packages/clusterProfiler) in published research, please cite:
 
@@ -1283,27 +1299,23 @@ Cluster9.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled
 Cluster10.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==10 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
 Cluster11.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==11 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
 Cluster12.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==12 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
-Cluster13.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==13 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
-Cluster14.markers <- emb.GFPpooled_v2.filteredClustersFINAL.markers[emb.GFPpooled_v2.filteredClustersFINAL.markers$cluster==14 & emb.GFPpooled_v2.filteredClustersFINAL.markers$p_val_adj < 0.05, ]
 ```
 
 
 ```{r}
-Cluster0.gene_ids <- bitr(Cluster0.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.09% of input gene IDs are fail to map...
-Cluster1.gene_ids <- bitr(Cluster1.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.8% of input gene IDs are fail to map...
-Cluster2.gene_ids <- bitr(Cluster2.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #0.33% of input gene IDs are fail to map...
-Cluster3.gene_ids <- bitr(Cluster3.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.01% of input gene IDs are fail to map...
-Cluster4.gene_ids <- bitr(Cluster4.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.49% of input gene IDs are fail to map...
-Cluster5.gene_ids <- bitr(Cluster5.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.21% of input gene IDs are fail to map...
-Cluster6.gene_ids <- bitr(Cluster6.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.6% of input gene IDs are fail to map...
-Cluster7.gene_ids <- bitr(Cluster7.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.85% of input gene IDs are fail to map...
-Cluster8.gene_ids <- bitr(Cluster8.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.74% of input gene IDs are fail to map...
-Cluster9.gene_ids <- bitr(Cluster9.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.79% of input gene IDs are fail to map...
-Cluster10.gene_ids <- bitr(Cluster10.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #2.62% of input gene IDs are fail to map...
-Cluster11.gene_ids <- bitr(Cluster11.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #4.07% of input gene IDs are fail to map...
-Cluster12.gene_ids <- bitr(Cluster12.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.81% of input gene IDs are fail to map...
-Cluster13.gene_ids <- bitr(Cluster13.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #0.89% of input gene IDs are fail to map...
-Cluster14.gene_ids <- bitr(Cluster14.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) #1.65% of input gene IDs are fail to map...
+Cluster0.gene_ids <- bitr(Cluster0.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster1.gene_ids <- bitr(Cluster1.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster2.gene_ids <- bitr(Cluster2.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster3.gene_ids <- bitr(Cluster3.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster4.gene_ids <- bitr(Cluster4.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster5.gene_ids <- bitr(Cluster5.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster6.gene_ids <- bitr(Cluster6.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster7.gene_ids <- bitr(Cluster7.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster8.gene_ids <- bitr(Cluster8.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster9.gene_ids <- bitr(Cluster9.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster10.gene_ids <- bitr(Cluster10.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster11.gene_ids <- bitr(Cluster11.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
+Cluster12.gene_ids <- bitr(Cluster12.markers$gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Ce.eg.db) 
 ```
 
 
@@ -1330,9 +1342,6 @@ Cluster0.ego <- pairwise_termsim(Cluster0.ego)
 emapplot(Cluster0.ego, showCategory=20)
 ```
 ```{r}
-#install.packages("ggupset")
-#library(ggupset)
-
 upsetplot(Cluster0.ego)
 ```
 
@@ -1394,9 +1403,9 @@ VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c('T19D7.6', 'T21E8.4
 VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c('C14C6.5', 'clec-56', 'cpr-1', 'lec-9'), raster=F, ncol = 2)
 
 
-early_clusters <- as.character(c(14))
-mid_clusters <- as.character(c(1, 2, 3, 6, 7, 14))
-late_clusters <- as.character(c(4, 5, 7, 8, 12, 2, 9, 11, 13))
+early_clusters <- as.character(c(12))
+mid_clusters <- as.character(c(1, 4, 7, 12))
+late_clusters <- as.character(c(0, 3, 4, 5, 6, 9, 10, 11))
 
 
 background_gene_list <- unique(unlist(cluster_gene_list))
@@ -1404,6 +1413,7 @@ background_gene_list <- unique(unlist(cluster_gene_list))
 early_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% early_clusters]
 mid_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% mid_clusters]
 late_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% late_clusters]
+
 
 go_compare_bp_early <- compareCluster(geneCluster = early_clusters.list, 
                              fun = "enrichGO", 
@@ -1490,22 +1500,21 @@ VlnPlot(emb.GFPpooled_v2.filteredClustersFINAL, features = c('pbo-4'), raster=F,
 
 
 
-anterior_clusters <- as.character(c(4,7,8,12))
-central_clusters <- as.character(c(2,4,5,7,8,9))
-posterior_clusters <- as.character(c(2,5,9,11,14))
+anterior_clusters <- as.character(c(3,4,5,9))
+central_clusters <- as.character(c(0,3,4,5,6))
+posterior_clusters <- as.character(c(0,6,10,12))
 
 anterior_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters]
 central_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% central_clusters]
 posterior_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% posterior_clusters]
 
 
-ant_cen_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters & names(cluster_gene_list) %in% central_clusters]
-ant_post_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters & names(cluster_gene_list) %in% posterior_clusters]
-cen_post_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% central_clusters & names(cluster_gene_list) %in% posterior_clusters]
+ant_cen_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters | names(cluster_gene_list) %in% central_clusters]
+ant_post_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% anterior_clusters | names(cluster_gene_list) %in% posterior_clusters]
+cen_post_clusters.list <- cluster_gene_list[names(cluster_gene_list) %in% central_clusters | names(cluster_gene_list) %in% posterior_clusters]
 
 
 background_gene_list <- unique(unlist(cluster_gene_list))
-
 ant_cen_gene_list <- unique(unlist(ant_cen_clusters.list))
 ant_post_gene_list <- unique(unlist(ant_post_clusters.list))
 cen_post_gene_list <- unique(unlist(cen_post_clusters.list))
@@ -1516,7 +1525,7 @@ go_compare_bp_ant <- compareCluster(geneCluster = anterior_clusters.list,
                              OrgDb = org.Ce.eg.db, 
                              ont = "BP",
                              #universe = background_gene_list,
-                             universe = cen_post_gene_list,
+                             #universe = cen_post_gene_list,
                              pAdjustMethod = "BH",
                              pvalueCutoff = 0.05,
                              qvalueCutoff = 0.05)
@@ -1526,7 +1535,7 @@ go_compare_bp_cen <- compareCluster(geneCluster = central_clusters.list,
                              OrgDb = org.Ce.eg.db, 
                              ont = "BP",
                              #universe = background_gene_list,
-                             universe = ant_post_gene_list,
+                             #universe = ant_post_gene_list,
                              pAdjustMethod = "BH",
                              pvalueCutoff = 0.05,
                              qvalueCutoff = 0.05)
@@ -1536,7 +1545,7 @@ go_compare_bp_post <- compareCluster(geneCluster = posterior_clusters.list,
                              OrgDb = org.Ce.eg.db, 
                              ont = "BP",
                              #universe = background_gene_list,
-                             universe = ant_cen_gene_list,
+                             #universe = ant_cen_gene_list,
                              pAdjustMethod = "BH",
                              pvalueCutoff = 0.05,
                              qvalueCutoff = 0.05)
@@ -1547,9 +1556,9 @@ bp_cen_dev <- clusterProfiler::simplify(go_compare_bp_cen, cutoff=0.7, by="p.adj
 bp_post_dev <- clusterProfiler::simplify(go_compare_bp_post, cutoff=0.7, by="p.adjust", select_fun=min)
 
 
-#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_anterior.pdf", height = 10, width = 20)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_anterior.pdf", height = 10, width = 20)
 #pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_anterior-background.pdf", height = 10, width = 20)
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_anterior-cen_post.pdf", height = 10, width = 20)
+#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_anterior-cen_post.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_ant_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
 cluster.p1 + theme(
@@ -1560,9 +1569,9 @@ cluster.p1 + theme(
 dev.off()
 
 
-#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_central.pdf", height = 10, width = 20)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_central.pdf", height = 10, width = 20)
 #pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_central-background.pdf", height = 10, width = 20)
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_central-ant_post.pdf", height = 10, width = 20)
+#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_central-ant_post.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_cen_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
 cluster.p1 + theme(
@@ -1574,9 +1583,9 @@ dev.off()
 
 
 
-#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_posterior.pdf", height = 10, width = 20)
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_posterior.pdf", height = 10, width = 20)
 #pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_posterior-background.pdf", height = 10, width = 20)
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_posterior-ant_cen.pdf", height = 10, width = 20)
+#pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.dotPlot-GO-BP_posterior-ant_cen.pdf", height = 10, width = 20)
 cluster.p1 <- dotplot(bp_post_dev, showCategory = 1,
               title = "GO Enrichment (Biological Process)")
 cluster.p1 + theme(
@@ -1630,7 +1639,7 @@ dev.off()
 ```{r}
 # genes and cells in each counts matrix
 dim(emb.GFPpooled_v2) #15116  2571
-dim(emb.GFPpooled_v2.filteredClustersFINAL) #15116   1073
+dim(emb.GFPpooled_v2.filteredClustersFINAL) #15116   974
 
 dim(emb.ALLpooled_v2) #18590 18738
 ```
@@ -1641,7 +1650,6 @@ dim(emb.ALLpooled_v2) #18590 18738
 
 # Visualize cell embeddings (the principle components, the dimensionality)
 head(emb.GFPpooled_v2@reductions$pca@cell.embeddings)
-view(emb.GFPpooled_v2@reductions$pca@cell.embeddings)
 
 metadata_pca <- as.data.frame(emb.GFPpooled_v2@reductions$pca@cell.embeddings)
 metadata_pca <- rownames_to_column(metadata_pca)
@@ -1651,10 +1659,8 @@ metadata_pca$rep_group <- dplyr::case_when(
   grepl("-2$", metadata_pca$rowname) ~ "Rep_2",
   grepl("-3$", metadata_pca$rowname) ~ "Rep_3",
   grepl("-4$", metadata_pca$rowname) ~ "Rep_4",
-  TRUE ~ "Unknown"
-)
+  TRUE ~ "Unknown")
 
-view(metadata_pca)
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.pca_embeddings.pdf", height = 10, width = 20)
 p <- ggplot(metadata_pca[sample(nrow(metadata_pca)),]) 
@@ -1671,35 +1677,32 @@ dev.off()
 
 
 
-head(emb.GFPpooled_v2@reductions$integrated.harmony@cell.embeddings)
-view(emb.GFPpooled_v2@reductions$integrated.harmony@cell.embeddings)
-
-metadata_har <- as.data.frame(emb.GFPpooled_v2@reductions$integrated.harmony@cell.embeddings)
-metadata_har <- rownames_to_column(metadata_har)
-metadata_har$rep_group <- ""
-metadata_har$rep_group <- dplyr::case_when(
-  grepl("-1$", metadata_har$rowname) ~ "Rep_1",
-  grepl("-2$", metadata_har$rowname) ~ "Rep_2",
-  grepl("-3$", metadata_har$rowname) ~ "Rep_3",
-  grepl("-4$", metadata_har$rowname) ~ "Rep_4",
-  TRUE ~ "Unknown"
-)
-
-view(metadata_har)
-
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.harmony_embeddings.pdf", height = 10, width = 20)
-p <- ggplot(metadata_har[sample(nrow(metadata_har)),]) 
-p1 <- p + geom_point(aes(harmony_1, harmony_2, color = rep_group))
-p2 <- p + geom_point(aes(harmony_3, harmony_4, color = rep_group))
-p3 <- p + geom_point(aes(harmony_5, harmony_6, color = rep_group))
-p4 <- p + geom_point(aes(harmony_7, harmony_8, color = rep_group))
-p1 + p2 + p3 + p4 + plot_layout(ncol = 4)
-dev.off()
+# head(emb.GFPpooled_v2@reductions$integrated.harmony@cell.embeddings)
+# 
+# metadata_har <- as.data.frame(emb.GFPpooled_v2@reductions$integrated.harmony@cell.embeddings)
+# metadata_har <- rownames_to_column(metadata_har)
+# metadata_har$rep_group <- ""
+# metadata_har$rep_group <- dplyr::case_when(
+#   grepl("-1$", metadata_har$rowname) ~ "Rep_1",
+#   grepl("-2$", metadata_har$rowname) ~ "Rep_2",
+#   grepl("-3$", metadata_har$rowname) ~ "Rep_3",
+#   grepl("-4$", metadata_har$rowname) ~ "Rep_4",
+#   TRUE ~ "Unknown")
+# 
+# view(metadata_har)
+# 
+# pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.harmony_embeddings.pdf", height = 10, width = 20)
+# p <- ggplot(metadata_har[sample(nrow(metadata_har)),]) 
+# p1 <- p + geom_point(aes(harmony_1, harmony_2, color = rep_group))
+# p2 <- p + geom_point(aes(harmony_3, harmony_4, color = rep_group))
+# p3 <- p + geom_point(aes(harmony_5, harmony_6, color = rep_group))
+# p4 <- p + geom_point(aes(harmony_7, harmony_8, color = rep_group))
+# p1 + p2 + p3 + p4 + plot_layout(ncol = 4)
+# dev.off()
 
 
 
 head(emb.GFPpooled_v2@reductions$integrated.cca@cell.embeddings)
-view(emb.GFPpooled_v2@reductions$integrated.cca@cell.embeddings)
 
 metadata_cca <- as.data.frame(emb.GFPpooled_v2@reductions$integrated.cca@cell.embeddings)
 metadata_cca <- rownames_to_column(metadata_cca)
@@ -1709,10 +1712,7 @@ metadata_cca$rep_group <- dplyr::case_when(
   grepl("-2$", metadata_cca$rowname) ~ "Rep_2",
   grepl("-3$", metadata_cca$rowname) ~ "Rep_3",
   grepl("-4$", metadata_cca$rowname) ~ "Rep_4",
-  TRUE ~ "Unknown"
-)
-
-view(metadata_cca)
+  TRUE ~ "Unknown")
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.cca_embeddings.pdf", height = 10, width = 20)
 p <- ggplot(metadata_cca[sample(nrow(metadata_cca)),]) 
@@ -1726,37 +1726,32 @@ dev.off()
 
 
 ```{r}
-metadata_har_long <- metadata_har %>%
-  pivot_longer(
-    cols = starts_with("harmony_"),  # or use harmony_1:harmony_3 to be specific
-    names_to = "Harmony_PC",
-    values_to = "Embedding_Value"
-  )
- 
-# Plot density distributions of Harmony components grouped by rep
-pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.harmony_embeddings_hist.pdf", height = 10, width = 20)
-ggplot(metadata_har_long, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
-  geom_density(alpha = 0.3) +
-  facet_wrap(~ Harmony_PC, scales = "free") +
-  theme_minimal() +
-  labs(
-    title = "Density of Harmony components by replicate group",
-    x = "Embedding Value",
-    y = "Density"
-  )
-dev.off()
-
-
+# metadata_har_long <- metadata_har %>%
+#   pivot_longer(
+#     cols = starts_with("harmony_"),  # or use harmony_1:harmony_3 to be specific
+#     names_to = "Harmony_PC",
+#     values_to = "Embedding_Value")
+#  
+# # Plot density distributions of Harmony components grouped by rep
+# pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.harmony_embeddings_hist.pdf", height = 10, width = 20)
+# ggplot(metadata_har_long, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
+#   geom_density(alpha = 0.3) +
+#   facet_wrap(~ Harmony_PC, scales = "free") +
+#   theme_minimal() +
+#   labs(
+#     title = "Density of Harmony components by replicate group",
+#     x = "Embedding Value",
+#     y = "Density")
+# dev.off()
 
 
 metadata_pca_long <- metadata_pca %>%
   pivot_longer(
     cols = starts_with("PC_"),
     names_to = "PCA_PC",
-    values_to = "Embedding_Value"
-  )
+    values_to = "Embedding_Value")
  
-# Plot density distributions of Harmony components grouped by rep
+# Plot density distributions of PC grouped by rep
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.pca_embeddings_hist.pdf", height = 10, width = 20)
 ggplot(metadata_pca_long, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
   geom_density(alpha = 0.3) +
@@ -1765,20 +1760,17 @@ ggplot(metadata_pca_long, aes(x = Embedding_Value, color = rep_group, fill = rep
   labs(
     title = "Density of unintegrated PC components by replicate group",
     x = "Embedding Value",
-    y = "Density"
-  )
+    y = "Density")
 dev.off()
-
 
 
 metadata_cca_long <- metadata_cca %>%
   pivot_longer(
     cols = starts_with("integratedcca_"),
     names_to = "CCA_PC",
-    values_to = "Embedding_Value"
-  )
+    values_to = "Embedding_Value")
  
-# Plot density distributions of Harmony components grouped by rep
+# Plot density distributions of CCA components grouped by rep
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.cca_embeddings_hist.pdf", height = 10, width = 20)
 ggplot(metadata_cca_long, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
   geom_density(alpha = 0.3) +
@@ -1787,8 +1779,7 @@ ggplot(metadata_cca_long, aes(x = Embedding_Value, color = rep_group, fill = rep
   labs(
     title = "Density of CCA components by replicate group",
     x = "Embedding Value",
-    y = "Density"
-  )
+    y = "Density")
 dev.off()
 ```
 
@@ -1802,10 +1793,8 @@ metadata_pca_all$rep_group <- dplyr::case_when(
   grepl("-(2|6)$", metadata_pca_all$rowname) ~ "Rep_2",
   grepl("-(3|7)$", metadata_pca_all$rowname) ~ "Rep_3",
   grepl("-(4|8)$", metadata_pca_all$rowname) ~ "Rep_4",
-  TRUE ~ "Unknown"
-)
+  TRUE ~ "Unknown")
 
-view(metadata_pca_all)
 
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.pca_embeddings.pdf", height = 10, width = 20)
 p <- ggplot(metadata_pca_all[sample(nrow(metadata_pca_all)),]) 
@@ -1822,9 +1811,6 @@ dev.off()
 
 
 
-
-
-
 metadata_cca_all <- as.data.frame(emb.ALLpooled_v2@reductions$integrated.cca@cell.embeddings)
 metadata_cca_all <- rownames_to_column(metadata_cca_all)
 metadata_cca_all$rep_group <- ""
@@ -1833,10 +1819,8 @@ metadata_cca_all$rep_group <- dplyr::case_when(
   grepl("-(2|6)$", metadata_cca_all$rowname) ~ "Rep_2",
   grepl("-(3|7)$", metadata_cca_all$rowname) ~ "Rep_3",
   grepl("-(4|8)$", metadata_cca_all$rowname) ~ "Rep_4",
-  TRUE ~ "Unknown"
-)
+  TRUE ~ "Unknown")
 
-view(metadata_cca_all)
 
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.cca_embeddings.pdf", height = 10, width = 20)
 p <- ggplot(metadata_cca_all[sample(nrow(metadata_cca_all)),]) 
@@ -1854,10 +1838,9 @@ metadata_pca_long_all <- metadata_pca_all %>%
   pivot_longer(
     cols = starts_with("PC_"),
     names_to = "PCA_PC",
-    values_to = "Embedding_Value"
-  )
+    values_to = "Embedding_Value")
  
-# Plot density distributions of Harmony components grouped by rep
+# Plot density distributions of PCs grouped by rep
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.pca_embeddings_hist.pdf", height = 10, width = 20)
 ggplot(metadata_pca_long_all, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
   geom_density(alpha = 0.3) +
@@ -1866,8 +1849,7 @@ ggplot(metadata_pca_long_all, aes(x = Embedding_Value, color = rep_group, fill =
   labs(
     title = "Density of unintegrated PC components by replicate group",
     x = "Embedding Value",
-    y = "Density"
-  )
+    y = "Density")
 dev.off()
 
 
@@ -1876,10 +1858,9 @@ metadata_cca_long_all <- metadata_cca_all %>%
   pivot_longer(
     cols = starts_with("integratedcca_"),
     names_to = "CCA_PC",
-    values_to = "Embedding_Value"
-  )
+    values_to = "Embedding_Value")
  
-# Plot density distributions of Harmony components grouped by rep
+# Plot density distributions of CCA components grouped by rep
 pdf("./Seurat_output/all_pooled_v2/emb.ALLpooled_v2.cca_embeddings_hist.pdf", height = 10, width = 20)
 ggplot(metadata_cca_long_all, aes(x = Embedding_Value, color = rep_group, fill = rep_group)) + 
   geom_density(alpha = 0.3) +
@@ -1888,8 +1869,7 @@ ggplot(metadata_cca_long_all, aes(x = Embedding_Value, color = rep_group, fill =
   labs(
     title = "Density of CCA components by replicate group",
     x = "Embedding Value",
-    y = "Density"
-  )
+    y = "Density")
 dev.off()
 ```
 
