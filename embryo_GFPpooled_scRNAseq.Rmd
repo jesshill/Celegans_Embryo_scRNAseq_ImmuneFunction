@@ -1025,6 +1025,7 @@ emb.GFPpooled_v2.filteredClustersFINAL.clust <- FindClusters(
   resolution = c(0.2, 0.4, 0.8, 1, 1.2),
   dims.use = 1:5,
   save.SNN = TRUE)
+
 clustree(emb.GFPpooled_v2.filteredClustersFINAL.clust, prefix = "RNA_snn_res.")
 
 
@@ -1090,6 +1091,8 @@ dev.off()
 
 
 emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10
+
+write.csv(top10,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL_top10markers.csv", row.names = TRUE)
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-top10.pdf", height = 20, width = 15)
 DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c(top10$gene), raster=F) + 
