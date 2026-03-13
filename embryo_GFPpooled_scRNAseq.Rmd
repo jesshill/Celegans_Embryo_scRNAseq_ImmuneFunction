@@ -1082,6 +1082,7 @@ print(paste("Number of all cells in UMAP:", num_all_cells))
 # make some pretty heatmaps 
 
 emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3
+write.csv(top3,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL_top3markers.csv", row.names = TRUE)
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-top3.pdf", height = 10, width = 15)
 DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c(top3$gene), raster=F) + 
@@ -1091,7 +1092,6 @@ dev.off()
 
 
 emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10
-
 write.csv(top10,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL_top10markers.csv", row.names = TRUE)
 
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-top10.pdf", height = 20, width = 15)
