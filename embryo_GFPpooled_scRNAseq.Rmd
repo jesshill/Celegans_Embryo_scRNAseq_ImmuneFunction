@@ -1091,6 +1091,9 @@ DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c(top3$gene), raste
 dev.off()
 
 
+emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=5, wt=avg_log2FC) -> top5
+write.csv(top5,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL_top5markers.csv", row.names = TRUE)
+
 emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=10, wt=avg_log2FC) -> top10
 write.csv(top10,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL_top10markers.csv", row.names = TRUE)
 
@@ -1226,6 +1229,7 @@ FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.f
 dev.off()
 
 VlnPlot(object = emb.GFPpooled_v2.filteredClustersFINAL, features = c("pbo-4"), ncol = 2)
+
 ```
 
 
