@@ -1123,6 +1123,15 @@ DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = c(top60$gene, "cpr-
         legend.text = element_text(size = 14))
 dev.off()
 
+### output this heatmap data
+heatmap_genes <- unique(c(top60$gene, "cpr-1", "ifd-2", "ttr-52", "itr-1"))
+
+heatmap_markers_export <- emb.GFPpooled_v2.filteredClustersFINAL.markers %>% filter(gene %in% heatmap_genes) %>% arrange(cluster, desc(avg_log2FC))
+
+write.csv(heatmap_markers_export, file = "./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap-top64.markerStats.csv", row.names = FALSE, quote = FALSE)
+###
+
+
 # With smiFISH targets in the heatmap as well (will be on the bottom)
 
 emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=2, wt=avg_log2FC) -> top2
@@ -1983,8 +1992,8 @@ pheatmap(scaled_data,
          main = "Top Variable Genes Across Clusters")
 dev.off()
 
-# need to output this variance dataset as a .csv 
-
+# Output of the scaled data (z-scored expression values) used in the variance heatmap. Exported as a .csv.
+write.csv(scaled_data, file = "./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.varianceHM.scaled.csv", quote = FALSE)
 ```
 
 
