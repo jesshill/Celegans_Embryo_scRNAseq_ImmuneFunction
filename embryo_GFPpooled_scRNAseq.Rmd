@@ -1982,6 +1982,9 @@ pheatmap(scaled_data,
          fontsize_row = 8,
          main = "Top Variable Genes Across Clusters")
 dev.off()
+
+# need to output this variance dataset as a .csv 
+
 ```
 
 
