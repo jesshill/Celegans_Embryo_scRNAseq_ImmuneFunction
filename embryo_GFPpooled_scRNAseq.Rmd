@@ -2253,6 +2253,40 @@ sessionInfo()
 ```
 
 
+```{r}
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.immune-interests.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("drh-1","sta-1", "zip-2", "ogt-1", "oga-1"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.unc-82.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("unc-82"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+emb.GFPpooled_v2.filteredClustersFINAL.markers %>% group_by(cluster) %>% filter(grepl("clec*",gene), p_val_adj < .01) %>% top_n(n=3, wt=avg_log2FC) -> top3clecs
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.HeatMap.clecs.pdf", height = 6, width = 15)
+DoHeatmap(emb.GFPpooled_v2.filteredClustersFINAL, features = top3clecs$gene,raster=F)
+dev.off()
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.clecs.pdf", height = 15, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("clec-167", "clec-266", "clec-40", "clec-47", "clec-38", "clec-36", "clec-37", "clec-35", "clec-31", "clec-33", "clec-32", "clec-28", "clec-25", "clec-22", "clec-26", "clec-27"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+
+
+pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.featureplot.clecs-examples.pdf", height = 6, width = 15)
+FeaturePlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", features = c("clec-56", "clec-37"), ncol = 3, coord.fixed = TRUE)
+dev.off()
+```
+
+
+# Assign cell type identity to clusters 
+```{r}
+new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono",
+    "NK", "DC", "Platelet")
+names(new.cluster.ids) <- levels(pbmc)
+pbmc <- RenameIdents(pbmc, new.cluster.ids)
+DimPlot(pbmc, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
+```
 
 
 
@@ -2266,16 +2300,7 @@ sessionInfo()
 
 
 
-
-
-
-
-
-
-
-
-
-----
+-------------------------------NOT USING RIGHT NOW-----------------------
 
 # Perform gene ontology
 ```{r}
@@ -2582,14 +2607,6 @@ dev.off()
 
 
 
-
-
-
-
-
-
-
-
 # plot genes of interest
 From John Murray dataset 
     - intestine_anterior: ZC204.12, cpr-1, ceh-37
@@ -2646,165 +2663,7 @@ From John Murray dataset
 # ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.smiFISH-genes.png")
 ```
 
--------------------------------NOT USING RIGHT NOW-----------------------
-# Remove contamination clusters
-contamination clusters = 6, 12, 20
-```{r}
-emb.GFPpooled_v2.specificClusters <- RunUMAP(subset(emb.GFPpooled_v2, idents = c('6','12', '20'), invert = TRUE), dims = 1:20)
-```
-# now rerun PCA and re-lcuster 
-```{r}
-emb.GFPpooled_v2.specificClusters <- RunPCA(emb.GFPpooled_v2.specificClusters, features = VariableFeatures(object = emb.GFPpooled_v2.specificClusters))
 
-DimPlot(emb.GFPpooled_v2.specificClusters, reduction = "pca")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.DimPlot.png")
-
-ElbowPlot(emb.GFPpooled_v2.specificClusters)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.ElbowPlot.png")
-```
-```{r}
-# Choose the number of PCs to use for re-clustering 
-emb.GFPpooled_v2.specificClusters <- FindNeighbors(emb.GFPpooled_v2.specificClusters, dims = 1:7)
-
-# check new clusters with Clustree
-emb.GFPpooled_v2.specificClusters.recluster <- FindClusters(
-  object = emb.GFPpooled_v2.specificClusters,
-  reduction.type = "pca",
-  resolution = c(0.2, 0.4, 0.8, 1, 1.2),
-  dims.use = 1:7,
-  save.SNN = TRUE)
-
-clustree(emb.GFPpooled_v2.specificClusters.recluster, prefix = "RNA_snn_res.")
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.Clustree.png")
-
-emb.GFPpooled_v2.specificClusters.recluster <- FindClusters(emb.GFPpooled_v2.specificClusters, resolution = 1.2)
-
-emb.GFPpooled_v2.specificClusters.recluster <- RunUMAP(emb.GFPpooled_v2.specificClusters.recluster, dims = 1:7)
-
-DimPlot(emb.GFPpooled_v2.specificClusters.recluster, reduction = "umap", group.by = c("rep_group", "seurat_clusters"), pt.size = 1) + theme(legend.text = element_text(size = 15))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.UMAP.png") 
-
-DimPlot(emb.GFPpooled_v2.specificClusters.recluster, reduction = "umap", split.by = c("rep_group"), pt.size = 1) + theme(legend.text = element_text(size = 15))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.UMAP.rep.png") 
-```
-
-# Find new marker genes
-```{r}
-#find markers for every cluster compared to all remaining cells
-emb.GFPpooled_v2.specificClusters.recluster.markers <- FindAllMarkers(emb.GFPpooled_v2.specificClusters.recluster, only.pos = F, min.pct = 0.25, logfc.threshold = 1)
-
-emb.GFPpooled_v2.specificClusters.recluster.markers %>% 
-  group_by(cluster) %>%
-  slice_max(n = 2, order_by = avg_log2FC)
-
-write.csv(emb.GFPpooled_v2.specificClusters.recluster.markers,"./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.markers.csv", row.names = TRUE)
-```
-
-
-# Validate clusters 
-```{r}
-emb.GFPpooled_v2.specificClusters.recluster.markers %>% group_by(cluster) %>% filter(p_val_adj < .01) %>% top_n(n=1, wt=avg_log2FC) -> top1_reclust
-
-DoHeatmap(emb.GFPpooled_v2.specificClusters.recluster, features = top1_reclust$gene,raster=F) + theme(text = element_text(size = 20))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.HeatMap-top1.png") 
-
-DoHeatmap(emb.GFPpooled_v2.specificClusters.recluster, features = c(top1_reclust$gene, "clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F) + theme(text = element_text(size = 20))
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.HeatMap-top1.fish.png") 
-
-
-# intestine marker genes
-FeaturePlot(emb.GFPpooled_v2.specificClusters.recluster, features = c("elt-2","elt-7", 'ges-1'),raster=F, ncol = 2)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.FeaturePlot-PostCtrls.png")
-
-# Contamination marker genes: germline (glh-1, chs-1), muscle (myo-2, myo-3), neuron(hlh-2, rab-3)  
-FeaturePlot(emb.GFPpooled_v2.specificClusters.recluster, features = c("glh-1","chs-1", "myo-2", "myo-3", "hlh-2", "rab-3"), raster=F, ncol = 2)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.FeaturePlot-NegCtrls.png")
-
-
-# FISH
-FeaturePlot(emb.GFPpooled_v2.specificClusters.recluster, features = c("clec-56", "pbo-4", "C14C6.5", "ugt-14", "endu-2", "cpr-1", "Y32F6A.5"), raster=F, ncol = 3)
-ggsave("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.ContaminationRemoved.FeaturePlot-FISH.png")
-```
-
-
-# Perform gene ontology
-```{r}
-library(reticulate)
-py_config()
-# to modify the python to use in R, nano ~/.Renviron. just uncomment the right path and comment out the other. Will need to restart the Rsession before implimenting. 
-use_condaenv("base")
-
-tea <- import("tissue_enrichment_analysis")
-tissue_df <- tea$fetch_dictionary("tissue")
-phenotype_df <- tea$fetch_dictionary("phenotype")
-go_df <- tea$fetch_dictionary("go")
-```
-
-```{r}
-emb.GFPpooled.specificClusters.recluster.markers <- emb.GFPpooled.specificClusters.recluster.markers %>% left_join(genes.df, by = c("gene" = "external_gene_id")) 
-
-emb.GFPpooled.specificClusters.recluster.markers <- emb.GFPpooled.specificClusters.recluster.markers %>% rename(WBGeneID = wbps_gene_id)
-```
-
-```{r}
-clusters <- unique(emb.GFPpooled.specificClusters.recluster.markers$cluster)
-
-my_tea_analysis <- function(input_df, tea_dict){
-  tea_df <- data.frame()
-  for (i in clusters){
-  tea_set <- tea$enrichment_analysis(
-    (input_df %>% 
-       filter(cluster == i))$WBGeneID, 
-    tissue_df = tea_dict 
-    # %>% 
-    #   filter(wbid %in% (input_df %>% 
-    #                       filter(cluster %in% clusters))$WBGeneID)
-  )
-  if(nrow(tea_set) == 0){
-    next
-  } else {
-  tea_df <- bind_rows(tea_df, data.frame(tea_set, cluster = i))
-  }
-}
-tea_df
-}
-
-reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
-    new_x <- paste(x, within, sep = sep)
-    stats::reorder(new_x, by, FUN = fun)
-}
-
-scale_x_reordered <- function(..., sep = "___") {
-    reg <- paste0(sep, ".+$")
-    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
-}
-
-my_ontology_plot <- function(input_df, xlabel){
-  input_df %>%
-  filter(Q.value < 0.001,  Observed > 50) %>% 
-  ggplot(aes(x = reorder_within(Term, -log10(Q.value), cluster), y = -log10(Q.value))) +
-  geom_point(aes(size = Observed)) +
-  coord_flip() +
-  scale_x_reordered() +
-  facet_grid(cluster~., scales = "free_y") +
-  theme_bw() +
-  xlab(xlabel) +
-  guides(size = guide_legend(title = "# genes")) +
-  scale_size_continuous(breaks = c(20,100,200))
-}
-```
-
-```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1), tissue_df), "Tissue Ontology")
-
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO_T.png")
-```
-
-```{r fig.height=15, fig.width=5}
-my_ontology_plot(my_tea_analysis(emb.GFPpooled.specificClusters.recluster.markers %>% filter(p_val_adj < 0.05, avg_log2FC > 1.01), go_df), "Gene Ontology") + theme(text = element_text(size = 15))
-
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.GO_G.png")
-```
 
 
 # Pull out new cluster marker genes 
@@ -2841,44 +2700,3 @@ emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% filte
 DoHeatmap(emb.GFPpooled.specificClusters.recluster, features = top10irgs$gene,raster=F)
 ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.HeatMap-top10irg.png")
 ```
-
-
-
-# plot genes of interest
-From John Murray dataset 
-    - intestine_anterior: ZC204.12, cpr-1, ceh-37
-    - intestine_middle_and_posterior: irg-7, pal-1, cpr-1, ceh-37
-    - intestine_far_posterior: irg-7, faah-1, pbo-4, psa-3
-
-```{r}
-# top marker gene for each cluster
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, pt.size = 0.1,
-            features = (emb.GFPpooled.specificClusters.recluster.markers %>% group_by(cluster) %>% slice_max(n = 1, order_by = avg_log2FC))$gene)
-```
-
-```{r}
-# genes from murray data
-# intestine_anterior
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('ZC204.12', 'cpr-1', 'ceh-37'), raster=F, ncol = 2)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Anterior.png") 
-
-# intestine_middle_and_posterior
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('irg-7', 'pal-1', 'cpr-1', 'ceh-37'), raster=F, ncol = 2)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Mid.png")
-
-# intestine_far_posterior
-FeaturePlot(emb.GFPpooled.specificClusters.recluster, features = c('faah-1', 'pbo-4', 'psa-3'), raster=F, ncol = 2)
-ggsave("./Seurat_output/GFP_pooled/emb.GFPpooled.ContaminationRemoved.Murray-Posterior.png")
-```
-
-
-
-# Assign cell type identity to clusters 
-```
-new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono",
-    "NK", "DC", "Platelet")
-names(new.cluster.ids) <- levels(pbmc)
-pbmc <- RenameIdents(pbmc, new.cluster.ids)
-DimPlot(pbmc, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
-```
-
