@@ -1041,6 +1041,8 @@ pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.UMAP.pdf"
 DimPlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", label = TRUE, label.size = 7, pt.size = 1)
 dev.off()
 
+table(Idents(emb.GFPpooled_v2.filteredClustersFINAL))
+
 pdf("./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.UMAP-rep.pdf", height = 6, width = 9)
 DimPlot(emb.GFPpooled_v2.filteredClustersFINAL, reduction = "umap.filtered.final", split.by = "rep_group")
 dev.off()
@@ -2281,6 +2283,57 @@ dev.off()
 
 # Assign cell type identity to clusters 
 ```{r}
+# view data identities/levels 
+emb.GFPpooled_v2.filteredClustersFINAL
+emb.GFPpooled_v2.filteredClustersFINAL$cell_timing
+emb.GFPpooled_v2.filteredClustersFINAL$cell_region
+table(Idents(emb.GFPpooled_v2.filteredClustersFINAL))
+Idents(emb.GFPpooled_v2.filteredClustersFINAL)
+
+# create a new column in our seurat object
+emb.GFPpooled_v2.filteredClustersFINAL$cell_region <- as.character(Idents(emb.GFPpooled_v2.filteredClustersFINAL))
+emb.GFPpooled_v2.filteredClustersFINAL$cell_timing <- as.character(Idents(emb.GFPpooled_v2.filteredClustersFINAL))
+
+emb.GFPpooled_v2.filteredClustersFINAL$cell_timing[
+  emb.GFPpooled_v2.filteredClustersFINAL$filtered_clusters_FINAL %in% c("12")
+] <- "early_dev"
+
+emb.GFPpooled_v2.filteredClustersFINAL$cell_timing[
+  emb.GFPpooled_v2.filteredClustersFINAL$filtered_clusters_FINAL %in% c("1", "4", "7")
+] <- "mid_dev"
+
+emb.GFPpooled_v2.filteredClustersFINAL$cell_timing[
+  emb.GFPpooled_v2.filteredClustersFINAL$filtered_clusters_FINAL %in% c("0", "3", "5", "6", "9", "10", "11")
+] <- "late_dev"
+
+
+emb.GFPpooled_v2.filteredClustersFINAL$cell_region[
+  emb.GFPpooled_v2.filteredClustersFINAL$filtered_clusters_FINAL %in% c("3", "4", "5", "9")
+] <- "anterior"
+
+emb.GFPpooled_v2.filteredClustersFINAL$cell_region[
+  emb.GFPpooled_v2.filteredClustersFINAL$filtered_clusters_FINAL %in% c("0", "6")
+] <- "central"
+
+emb.GFPpooled_v2.filteredClustersFINAL$cell_region[
+  emb.GFPpooled_v2.filteredClustersFINAL$filtered_clusters_FINAL %in% c("10")
+] <- "posterior"
+
+
+  
+cell_annotations <- data.frame(
+  cell_id = colnames(emb.GFPpooled_v2.filteredClustersFINAL),
+  cluster = emb.GFPpooled_v2.filteredClustersFINAL$filtered_clusters_FINAL,
+  cell_region = emb.GFPpooled_v2.filteredClustersFINAL$cell_region,
+  cell_timing = emb.GFPpooled_v2.filteredClustersFINAL$cell_timing
+)
+
+write.csv(cell_annotations, file = "./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.cell_annotations.csv", row.names = FALSE)
+write.csv(cell_annotations, file = "./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.cell_annotations.csv")
+  
+
+
+
 new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono",
     "NK", "DC", "Platelet")
 names(new.cluster.ids) <- levels(pbmc)
