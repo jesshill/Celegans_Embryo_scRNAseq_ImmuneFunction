@@ -2328,17 +2328,7 @@ cell_annotations <- data.frame(
   cell_timing = emb.GFPpooled_v2.filteredClustersFINAL$cell_timing
 )
 
-write.csv(cell_annotations, file = "./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.cell_annotations.csv", row.names = FALSE)
 write.csv(cell_annotations, file = "./Seurat_output/all_GFP_v2/emb.GFPpooled_v2.filteredClustersFINAL.cell_annotations.csv")
-  
-
-
-
-new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono",
-    "NK", "DC", "Platelet")
-names(new.cluster.ids) <- levels(pbmc)
-pbmc <- RenameIdents(pbmc, new.cluster.ids)
-DimPlot(pbmc, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
 ```
 
 
